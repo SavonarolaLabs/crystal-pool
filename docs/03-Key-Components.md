@@ -1,6 +1,4 @@
-# Key Components
-
-1. **Transaction Processing System**: Handling and storing chains of unpublished transactions.
-2. **Information Exchange System**: Facilitating the creation of correct multisignatures.
-3. **Integrated Wallet Functions**: For initial user convenience and interaction with smart contracts.
-4. **User Interface**: Enabling order creation, execution, and tracking balances and active operations.
+1. **Transaction Processing System**: Manages the processing and storage of chains of unsubmitted transactions.
+2. **Communication Protocol**: Creation and exchange of multisignatures.
+3. **Integrated Wallet Functions**: Provides user convenience and interaction with smart contracts.
+4. **User Interface**: Enables order creation, execution, and tracking of balances and active operations.

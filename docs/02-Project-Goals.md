@@ -1,6 +1,6 @@
 # Project Goals
 
-As part of the Ergohack initiative, we aim to develop:
+For ErgohackVII , we aim to develop:
 
-1. **User Interface (UI)**: For trading and order book management.
-2. **Core System**: For handling order books and managing chains of unpublished transactions.
+1. **Simple User Interface (UI)**: For deposit, withdrawal and trading.
+2. **Core System**: For handling order books and managing chains of unsubmitted transactions.

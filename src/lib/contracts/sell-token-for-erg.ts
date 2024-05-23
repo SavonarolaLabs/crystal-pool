@@ -13,32 +13,32 @@ export const sellTokenForErg = `{
 	def tokenAmount(box: Box) = box.tokens(0)._2
   
 	def isSameContract(box: Box) = 
-		  box.propositionBytes == SELF.propositionBytes
+		box.propositionBytes == SELF.propositionBytes
   
 	def isSameToken(box: Box)    = 
 	  	getTokenId(SELF) == getTokenId(box) &&
 	  	box.tokens.size > 0 &&
-		  getTokenId(SELF) == tokenId(box)
+		getTokenId(SELF) == tokenId(box)
 
   	def isGreaterZeroRate(box:Box) =
-      getSellRate(box) > 0
+    	getSellRate(box) > 0
   
 	def isSameSeller(box: Box)   = 
-      getSellerPk(SELF) == getSellerPk(box) &&
-      getPoolPk(SELF) == getPoolPk(box)
+    	getSellerPk(SELF) == getSellerPk(box) &&
+    	getPoolPk(SELF) == getPoolPk(box)
 
   	def isSameUnlockHeight(box: Box)  = 
-      unlockHeight(SELF) == unlockHeight(box)
+    	unlockHeight(SELF) == unlockHeight(box)
 
   	def isSameMultisig(box: Box)    =
-      getSellerMultisigAddress(SELF) == getSellerMultisigAddress(box)
+    	getSellerMultisigAddress(SELF) == getSellerMultisigAddress(box)
 
 	def isLegitInputBox(b: Box) = {
 	    isSameContract(b) && 
-      isSameToken(b) && 
-      isSameMultisig(b) && 
-      isSameSeller(b) && 
-      isGreaterZeroRate(b)
+    	isSameToken(b) && 
+    	isSameMultisig(b) && 
+    	isSameSeller(b) && 
+    	isGreaterZeroRate(b)
 	}
   
 	def isPaymentBox(box:Box) = {
@@ -48,30 +48,28 @@ export const sellTokenForErg = `{
 		getSellerMultisigAddress(SELF) == box.propositionBytes
 	}
   
-	def sumTokensIn(boxes: Coll[Box]): Long = 
-		boxes
-			.filter(isLegitInputBox) 
-			.fold(0L, {(a:Long, b: Box) => a + b.tokens(0)._2})
+	def sumTokensIn(boxes: Coll[Box]): Long = boxes
+		.filter(isLegitInputBox) 
+		.fold(0L, {(a:Long, b: Box) => a + b.tokens(0)._2})
   
 	val tokensIn: Long = sumTokensIn(INPUTS)
   
 	val avgRateInputs: Long = INPUTS
-    .filter(isLegitInputBox)
-    .fold(0L, {(a:Long, b: Box) => {
-      a + getSellRate(b)*tokenAmount(b)
-    }}) / tokensIn 
+    	.filter(isLegitInputBox)
+    	.fold(0L, {(a:Long, b: Box) => {
+    	  a + getSellRate(b)*tokenAmount(b)
+    	}}) / tokensIn 
 	
 	val maxSellRate = INPUTS
-    .filter(isLegitInputBox)
-    .fold(0L, {(r:Long, box:Box) => {
-	    if(r > getSellRate(box)) r else getSellRate(box)
-	  }})
+    	.filter(isLegitInputBox)
+    	.fold(0L, {(r:Long, box:Box) => {
+		    if(r > getSellRate(box)) r else getSellRate(box)
+		}})
   
-	def sumTokensInAtMaxRate(boxes: Coll[Box]): Long = 
-		boxes
-			.filter(isLegitInputBox)
-			.filter({(b: Box)=> getSellRate(b) == maxSellRate})
-			.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)})
+	def sumTokensInAtMaxRate(boxes: Coll[Box]): Long = boxes
+		.filter(isLegitInputBox)
+		.filter({(b: Box)=> getSellRate(b) == maxSellRate})
+		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)})
   
 	def isMaxRateChangeBox(box: Box) = {
 		isSameSeller(box) &&
@@ -82,18 +80,16 @@ export const sellTokenForErg = `{
 		isSameContract(box)
 	}
   
-	def tokensRemaining(boxes: Coll[Box]): Long = 
-		boxes
-			.filter(isMaxRateChangeBox)
-			.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)}) 
+	def tokensRemaining(boxes: Coll[Box]): Long = boxes
+		.filter(isMaxRateChangeBox)
+		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)}) 
 	
 	val tokensBack: Long = tokensRemaining(OUTPUTS)
 	val tokensSold: Long = tokensIn - tokensBack
   
-	val nanoErgsPaid: Long = 
-		OUTPUTS
-		  .filter(isPaymentBox)
-		  .fold(0L, {(a:Long, b: Box) => a + b.value})
+	val nanoErgsPaid: Long = OUTPUTS
+		.filter(isPaymentBox)
+		.fold(0L, {(a:Long, b: Box) => a + b.value})
   
   	val valueOfSoldTokens: Long  = tokensIn * avgRateInputs - tokensBack * maxSellRate
   	val amountOfSoldTokens: Long = tokensIn - tokensBack
@@ -112,7 +108,7 @@ export const sellTokenForErg = `{
 	}
 }`;
 
-function compileContract() {
+function compileContract(){
 	const tree = compile(sellTokenForErg, {
 		version: 0,
 		includeSize: false

@@ -1,6 +1,6 @@
 # Smart Contracts
 
-The project includes smart contracts for Deposit, Swap, Buy, and Sell operations. These contracts ensure secure and transparent transactions, minimizing the risk of potential bugs and malicious activities.
+The project includes smart contracts for Deposit, Swap, Buy, and Sell operations. These contracts rquire more testing and audits.
 
 ### 1. Deposit Contract
 
