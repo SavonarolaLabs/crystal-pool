@@ -1,6 +1,6 @@
 # Summary
 
-**CrystalPoolL1: Realtime Order-Based Exchange on L1**
+**CrystalPool: Realtime Order-Based Exchange on L1**
 
 **Authors:** c8 c8e4@proton.me, savonarola  
 **Date:** May 23, 2024
