@@ -4,10 +4,9 @@ Welcome to the CrystalPool project documentation. This book provides an in-depth
 
 ## Table of Contents
 
-- [Abstract](01-Abstract.md)
+- [Summary](01-Summary.md)
 - [Project Goals](02-Project-Goals.md)
 - [Key Components](03-Key-Components.md)
 - [Built-in Wallet](04-Built-in-Wallet.md)
-- [Know Your Asset (KYA)](05-KYA.md)
+- [Know Your Assumtions (KYA)](05-KYA.md)
 - [Smart Contracts](06-Smart-Contracts.md)
-- [Risk Vectors and Mitigations](07-Risk-Vectors-and-Mitigations.md)
