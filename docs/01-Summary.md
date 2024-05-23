@@ -1,8 +1,8 @@
-# Summary
-
 **CrystalPool: Realtime Order-Based Exchange on L1**
 
 **Authors:** c8 c8e4@proton.me, savonarola  
+**Github:** https://github.com/SavonarolaLabs/crystal-pool
+**Documentation:** https://savonarolalabs.github.io/crystal-pool/#/
 **Date:** May 23, 2024
 
 CrystalPool is a simple concept for a self-custodial exchange that offers real time user experience (UX) that is comparable to centralized exchanges (CEX). At ErgohackVIII this project aims to deliver a proof of concept for: a user interface (UI) for trading, an order book management system, and core functionalities for handling and storing chains of unsubmitted transactions. 100% of the code is open-source.
@@ -34,3 +34,5 @@ The project includes smart contracts for Deposit, Swap, Buy, and Sell operations
 
 **Potential Loss of Unsubmitted Transactions:**
 In an environment characterized by a constantly busy mempool and rising transaction fees, it is conceivable to imagine a scenario where an unsubmitted transaction tree with a low-fee root cannot be submitted before the unlock height.
+
+
