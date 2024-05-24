@@ -1,37 +1,39 @@
-<div class="headline_wrapper">
-	<div class="header_wrapper">
+<div class="header_wrapper">
+	<div>
 		<div class="headline_bigName">BTC/USDT</div>
 		<div class="headline_etfDisplay">Bitcoin</div>
+	</div>
+	<div>
 		<div class="headline_latestPrice">68,163.62</div>
 
 		<div class="headline_priceBox">
-			<div class="headline_etfDisplay">$</div>
-			<div class="headline_etfDisplay">68,158.39</div>
+			<span class="headline_etfDisplay">$</span>
+			<span class="headline_etfDisplay">68,158.39</span>
 		</div>
+	</div>
 
-		<div class="headline_change">-0.11%</div>
-		<div class="headline_changeDown">-0.11%</div>
-		<div class="headline_changeUp">+3.5%</div>
+	<div class="headline_change">-0.11%</div>
+	<div class="headline_changeDown">-0.11%</div>
+	<div class="headline_changeUp">+3.5%</div>
 
-		<div class="headline_leftItem">
-			<div class="headline_withBorder">24h High</div>
-			<div class="headline_title">68,635.99</div>
-		</div>
+	<div class="headline_leftItem">
+		<div class="headline_withBorder">24h High</div>
+		<div class="headline_title">68,635.99</div>
+	</div>
 
-		<div class="headline_leftItem">
-			<div class="headline_withBorder">24h Low</div>
-			<div class="headline_title">66,302.40</div>
-		</div>
+	<div class="headline_leftItem">
+		<div class="headline_withBorder">24h Low</div>
+		<div class="headline_title">66,302.40</div>
+	</div>
 
-		<div class="headline_leftItem">
-			<div class="headline_withBorder">24h Volume (BTC)</div>
-			<div class="headline_title">12.38K</div>
-		</div>
+	<div class="headline_leftItem">
+		<div class="headline_withBorder">24h Volume (BTC)</div>
+		<div class="headline_title">12.38K</div>
+	</div>
 
-		<div class="headline_leftItem">
-			<div class="headline_withBorder">24h Amount (USDT)</div>
-			<div class="headline_title">836.47M</div>
-		</div>
+	<div class="headline_leftItem">
+		<div class="headline_withBorder">24h Amount (USDT)</div>
+		<div class="headline_title">836.47M</div>
 	</div>
 </div>
 
@@ -49,6 +51,8 @@
 	}
 
 	.header_wrapper {
+		display: flex;
+		align-items: center;
 		font-weight: 500;
 		font-family:
 			-apple-system,
