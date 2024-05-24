@@ -52,4 +52,33 @@
         grid-template-columns: minmax(350px,1fr) minmax(auto,2.5fr) minmax(380px,1fr);
         grid-template-rows: 44px 410px 380px 330px;
     }
+    .orderbook{
+        rid-column: 1 / 2;
+        grid-row: 1 / 4;
+    }
+    .headline{
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+    }
+    .chart{
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+    }
+    .actions{
+        grid-column: 2 / 3;
+        grid-row: 3 / 4;
+    }
+    .markets{
+        grid-column: 3 / 4;
+        grid-row: 1 / 3;
+        background-color: var(--bg-level-secondary);
+    }
+    .trades{
+        grid-column: 3 / 4;
+        grid-row: 3 / 4;
+    }
+    .orders{
+        grid-column: 1 / 4;
+        grid-row: 4 / 5;
+    }
 </style>
