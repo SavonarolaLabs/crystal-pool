@@ -3,5 +3,5 @@
 - [Project Goals](02-Project-Goals.md)
 - [Key Components](03-Key-Components.md)
 - [Built-in Wallet](04-Built-in-Wallet.md)
-- [Know Your Asset (KYA) Protocol](05-KYA.md)
+- [Know Your Assumtions (KYA)](05-KYA.md)
 - [Smart Contracts](06-Smart-Contracts.md)
