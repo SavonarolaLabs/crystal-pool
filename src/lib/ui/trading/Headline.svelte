@@ -4,12 +4,34 @@
 		<div class="headline_etfDisplay">Bitcoin</div>
 		<div class="headline_latestPrice">68,163.62</div>
 
+		<div class="headline_priceBox">
+			<div class="headline_etfDisplay">$</div>
+			<div class="headline_etfDisplay">68,158.39</div>
+		</div>
+
 		<div class="headline_change">-0.11%</div>
 		<div class="headline_changeDown">-0.11%</div>
+		<div class="headline_changeUp">+3.5%</div>
 
-		<div class="headline_leftItem">24h High</div>
+		<div class="headline_leftItem">
+			<div class="headline_withBorder">24h High</div>
+			<div class="headline_title">68,635.99</div>
+		</div>
 
-		<div class="headline_etfDisplay">68,158.39</div>
+		<div class="headline_leftItem">
+			<div class="headline_withBorder">24h Low</div>
+			<div class="headline_title">66,302.40</div>
+		</div>
+
+		<div class="headline_leftItem">
+			<div class="headline_withBorder">24h Volume (BTC)</div>
+			<div class="headline_title">12.38K</div>
+		</div>
+
+		<div class="headline_leftItem">
+			<div class="headline_withBorder">24h Amount (USDT)</div>
+			<div class="headline_title">836.47M</div>
+		</div>
 	</div>
 </div>
 
@@ -58,6 +80,11 @@
 		color: var(--text-primary);
 	}
 
+	.headline_priceBox {
+		white-space: normal;
+		line-height: 20px;
+	}
+
 	.headline_etfDisplay {
 		font-size: 12px;
 		font-weight: 400;
@@ -79,6 +106,15 @@
 		white-space: nowrap;
 	}
 
+	.headline_withBorder {
+		border-bottom: 1px dashed transparent;
+		color: var(--text-secondary);
+	}
+
+	.headline_title {
+		color: var(--text-primary);
+	}
+
 	.headline_change {
 		color: var(--title);
 		-webkit-margin-start: 4px;
@@ -86,5 +122,8 @@
 	}
 	.headline_changeDown {
 		color: var(--down);
+	}
+	.headline_changeUp {
+		color: var(--up);
 	}
 </style>
