@@ -1,0 +1,55 @@
+<script>
+	import Actions from "./Actions.svelte";
+	import Chart from "./Chart.svelte";
+	import Headline from "./Headline.svelte";
+	import Markets from "./Markets.svelte";
+	import OrderBook from "./OrderBook.svelte";
+	import Orders from "./Orders.svelte";
+	import Trades from "./Trades.svelte";
+</script>
+<div class="exchange">
+    <!-- left -->
+    <div class="orderbook">
+        <OrderBook></OrderBook>
+    </div>
+    <!-- top center -->
+    <div class="headline">
+        <Headline></Headline>
+    </div>
+    <!-- top center -->
+    <div class="chart">
+        <Chart></Chart>
+    </div>
+    <!-- top right -->
+    <div class="markets">
+        <Markets></Markets>
+    </div>
+    <!-- bottom center -->
+    <div class="actions">
+        <Actions></Actions>
+    </div>
+    <!-- bottom right -->
+    <div class="trades">
+        <Trades></Trades>
+    </div>
+    <!-- bottom -->
+    <div class="orders">
+        <Orders></Orders>
+    </div>
+</div>
+
+<style lang="postcss">
+    .exchange{
+        display: grid;
+        grid-column-gap: 5px;
+        grid-row-gap: 5px;
+        justify-items: stretch;
+        align-items: stretch;
+        padding: 5px 0;
+        max-width: 1520px;
+        min-width: 760px;
+        margin: 0 auto;
+        grid-template-columns: minmax(350px,1fr) minmax(auto,2.5fr) minmax(380px,1fr);
+        grid-template-rows: 44px 410px 380px 330px;
+    }
+</style>
