@@ -17,6 +17,26 @@
 	<div class="headline">
 		<Headline></Headline>
 	</div>
+    <!-- top center -->
+    <div class="chart">
+        <Chart></Chart>
+    </div>
+    <!-- top right -->
+    <div class="markets">
+        <Markets></Markets>
+    </div>
+    <!-- bottom center -->
+    <div class="actions">
+        <Actions></Actions>
+    </div>
+    <!-- bottom right -->
+    <div class="trades">
+        <Trades></Trades>
+    </div>
+    <!-- bottom -->
+    <div class="orders">
+        <Orders></Orders>
+    </div>
 </div>
 
 <style lang="postcss">
