@@ -1,41 +1,22 @@
 <script>
-	import Actions from "./Actions.svelte";
-	import Chart from "./Chart.svelte";
-	import Headline from "./Headline.svelte";
-	import Markets from "./Markets.svelte";
-	import OrderBook from "./OrderBook.svelte";
-	import Orders from "./Orders.svelte";
-	import Trades from "./Trades.svelte";
+	import Actions from './Actions.svelte';
+	import Chart from './Chart.svelte';
+	import Headline from './Headline.svelte';
+	import Markets from './Markets.svelte';
+	import OrderBook from './OrderBook.svelte';
+	import Orders from './Orders.svelte';
+	import Trades from './Trades.svelte';
 </script>
+
 <div class="exchange">
-    <!-- left -->
-    <div class="orderbook">
-        <OrderBook></OrderBook>
-    </div>
-    <!-- top center -->
-    <div class="headline">
-        <Headline></Headline>
-    </div>
-    <!-- top center -->
-    <div class="chart">
-        <Chart></Chart>
-    </div>
-    <!-- top right -->
-    <div class="markets">
-        <Markets></Markets>
-    </div>
-    <!-- bottom center -->
-    <div class="actions">
-        <Actions></Actions>
-    </div>
-    <!-- bottom right -->
-    <div class="trades">
-        <Trades></Trades>
-    </div>
-    <!-- bottom -->
-    <div class="orders">
-        <Orders></Orders>
-    </div>
+	<!-- left -->
+	<div class="orderbook">
+		<OrderBook></OrderBook>
+	</div>
+	<!-- top center -->
+	<div class="headline">
+		<Headline></Headline>
+	</div>
 </div>
 
 <style lang="postcss">
