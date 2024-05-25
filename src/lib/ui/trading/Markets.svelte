@@ -1,5 +1,33 @@
 <div class="markets_wrapper">
-	<div class="ant-input-affix-wrapper">search</div>
+	<div class="markets_searchBar">
+		<div class="ant-input-affix-wrapper ant-input-affix-wrapper-sm">
+			<span class="ant-input-prefix"
+				><svg
+					class="svg-icon iconfont"
+					focusable="false"
+					width="1em"
+					height="1em"
+					fill="currentColor"
+					aria-hidden="true"
+					viewBox="0 0 16 16"
+					data-icon="SearchOutlined"
+					><path
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						d="M9.93186 10.8786C9.02879 11.5806 7.89393 11.9987 6.66146 11.9987C3.71594 11.9987 1.32812 9.6109 1.32812 6.66536C1.32812 3.71984 3.71594 1.33203 6.66146 1.33203C9.60699 1.33203 11.9948 3.71984 11.9948 6.66536C11.9948 7.89783 11.5767 9.0327 10.8747 9.93576L14.4662 13.5273C14.7265 13.7876 14.7265 14.2098 14.4662 14.4701C14.2059 14.7304 13.7837 14.7304 13.5234 14.4701L9.93186 10.8786ZM10.6615 6.66536C10.6615 8.8745 8.87059 10.6654 6.66146 10.6654C4.45232 10.6654 2.66146 8.8745 2.66146 6.66536C2.66146 4.45622 4.45232 2.66536 6.66146 2.66536C8.87059 2.66536 10.6615 4.45622 10.6615 6.66536Z"
+					></path></svg
+				></span
+			>
+
+			<input
+				placeholder="Search"
+				class="ant-input"
+				type="text"
+				value=""
+			/>
+		</div>
+	</div>
+
 	<div class="marketTabs_box">
 		<div class="styles_nav-item nav-item">Favorite</div>
 		<div class="styles_nav-item nav-item">USDC</div>
@@ -99,14 +127,15 @@
 		flex-flow: column;
 	}
 
-	.ant-input {
-		--input-icon-hover-color: var(--text-primary);
-		--input-padding-vertical-lg: 10.5px;
-		--input-padding-vertical-sm: 4px;
-		--input-disabled-color: var(--text-disable);
-		--input-addon-bg: var(--bg-primary);
-		--outline-fade: 20%;
-		--input-hover-border-color: var(--primary-5);
+	.markets_searchBar {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 16px;
+		margin-top: 14px;
+		position: relative;
+		padding: 0 8px;
 	}
 
 	.ant-input-affix-wrapper {
@@ -125,6 +154,77 @@
 		border-radius: var(--control-border-radius);
 		transition: all 0.3s;
 		display: inline-flex;
+		--input-icon-hover-color: var(--text-primary);
+		--input-padding-vertical-lg: 10.5px;
+		--input-padding-vertical-sm: 4px;
+		--input-disabled-color: var(--text-disable);
+		--input-addon-bg: var(--bg-primary);
+		--outline-fade: 20%;
+		--input-hover-border-color: var(--primary-5);
+	}
+
+	.ant-input-affix-wrapper-sm {
+		height: var(--height-sm);
+		padding: 4px 12px;
+		font-size: 14px;
+		line-height: 22px;
+		border-radius: 4px;
+	}
+
+	.ant-input {
+		height: 100%;
+		padding: 0;
+		font-size: 14px;
+		line-height: inherit;
+		background-color: initial;
+		border: none;
+		outline: none;
+		border-radius: 4px;
+
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+		color: var(--text-color);
+		font-variant: var(--font-variant-base);
+		list-style: none;
+		font-feature-settings: var(--font-feature-settings-base);
+		position: relative;
+		display: inline-block;
+		width: 100%;
+		min-width: 0;
+		padding: var(--input-padding-vertical-base)
+			var(--input-padding-horizontal-base);
+		color: var(--input-color);
+		font-size: var(--font-size-base);
+		line-height: var(--line-height-base);
+		background-color: var(--fill-opacity-container);
+		background-image: none;
+		border: var(--border-width-base) var(--border-style-base) transparent;
+		border-radius: var(--control-border-radius);
+		transition: all 0.3s;
+
+		--input-icon-hover-color: var(--text-primary);
+		--input-padding-vertical-lg: 10.5px;
+		--input-padding-vertical-sm: 4px;
+		--input-disabled-color: var(--text-disable);
+		--input-addon-bg: var(--bg-primary);
+		--outline-fade: 20%;
+		--input-hover-border-color: var(--primary-5);
+	}
+
+	.ant-input:placeholder-shown {
+		text-overflow: ellipsis;
+	}
+
+	.ant-input:hover {
+		border-color: var(--primary-blue);
+		border-right-width: var(--border-width-base);
+	}
+
+	.ant-input-prefix {
+		display: flex;
+		flex: none;
+		align-items: center;
 	}
 
 	.marketTabs_box {
