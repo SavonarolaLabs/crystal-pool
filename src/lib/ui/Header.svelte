@@ -31,6 +31,8 @@
 
 <style lang="postcss">
 	.header {
+		position: sticky;
+		top: 0;
 		font-family:
 			-apple-system,
 			BlinkMacSystemFont,
