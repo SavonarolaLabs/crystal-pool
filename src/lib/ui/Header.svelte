@@ -31,6 +31,7 @@
 
 <style lang="postcss">
 	.header {
+		z-index: 10;
 		position: sticky;
 		top: 0;
 		font-family:
@@ -69,6 +70,7 @@
 		z-index: 999;
 		border-bottom: 1px solid var(--divider-primary);
 		height: 60px;
+		
 	}
 	.header_leftWrapper {
 		display: flex;
