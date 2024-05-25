@@ -3,7 +3,7 @@
 		<div class="header_leftWrapper">
 			<a
 				href="http://localhost:5173/"
-				class="header_logoContainer flex items-center"
+				class="header_logoContainer flex items-center header_navItem"
 			>
 					<img
 						width="30px"
@@ -15,17 +15,19 @@
 				</div>
 			</a>
 			<div class="header_leftMenu">
-				<div class="responsive-item-content">
-					<a class="header_navItem" href="https://hodlbox.xyz/">
-						<span>Hodlbox</span>
-					</a>
-					<div class="header_navItem">Markets</div>
-					<div class="header_navItem">Contracts</div>
-				</div>
+				<a class="header_navItem" href="https://hodlbox.xyz/">
+					Hodlbox
+				</a>
+				<div class="header_navItem">Markets</div>
+				<div class="header_navItem">Contracts</div>
 			</div>
 		</div>
-		<!-- <div class="header_rightWrapper">right</div>
-		<div class="header_asidePlaceholderArea">aside</div> -->
+		<div class="header_leftWrapper">
+			<div class="header_leftMenu">
+				<div class="header_navItem">Wallet</div>
+				<div class="header_navItem">Light/Dark</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -61,7 +63,7 @@
 	.header_wrapper {
 		background-color: var(--bg-level-secondary);
 		color: var(--text-primary);
-		font-weight: 500;
+		font-weight: 600;
 		display: flex;
 		justify-content: space-between;
 		-webkit-padding-start: 16px;
