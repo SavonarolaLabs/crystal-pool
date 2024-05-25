@@ -238,7 +238,24 @@
 	}
 	.mx-scroll-is-active {
 		color: var(--text-primary) !important;
+		text-shadow: 0 0 0.3px currentcolor;
 		position: relative;
+	}
+	.mx-scroll-is-active:after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 2px;
+		background-color: var(--primary-blue);
+		box-sizing: border-box;
+	}
+
+	.styles_scrollTabsWrapper__QM7GP
+		.mx-scroll-tabs__nav-item.mx-scroll-is-active {
+		color: var(--text-primary);
+		text-shadow: 0 0 0.3px currentcolor;
 	}
 
 	.styles_scrollTabsWrapper {
