@@ -116,9 +116,6 @@
 </div>
 
 <style lang="postcss">
-	.markets {
-		background-color: lightblue;
-	}
 	.markets_wrapper {
 		width: 100%;
 		height: 100%;

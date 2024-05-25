@@ -172,6 +172,7 @@
 
 <style lang="postcss">
 	.orderbook {
+		background-color: var(--bg-level-secondary);
 	}
 	.orderbook_controller {
 		display: flex;

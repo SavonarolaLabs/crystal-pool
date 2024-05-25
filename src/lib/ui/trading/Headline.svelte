@@ -83,7 +83,6 @@
 		padding-inline-start: 10px;
 		height: 100%;
 		color: var(--text-secondary);
-		background-color: var(--bg-level-secondary);
 		font-weight: 500;
 		font-family:
 			-apple-system,

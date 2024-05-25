@@ -20,6 +20,7 @@
 
 <style lang="postcss">
 	.trades {
+		background-color: var(--bg-level-secondary);
 	}
 	.trades_controller {
 		display: flex;
