@@ -8,7 +8,8 @@
 	import Trades from './Trades.svelte';
 </script>
 
-<div class="exchange">
+<div class="exchange_pageWrapper">
+    <div class="exchange">
 	<!-- left -->
 	<div class="orderbook">
 		<OrderBook></OrderBook>
@@ -38,8 +39,12 @@
         <Orders></Orders>
     </div>
 </div>
+</div>
 
 <style lang="postcss">
+    .exchange_pageWrapper{
+        background-color: var(--bg-level-primary);
+    }
     .exchange{
         display: grid;
         grid-column-gap: 5px;
