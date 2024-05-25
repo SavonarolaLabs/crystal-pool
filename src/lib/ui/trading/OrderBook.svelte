@@ -131,11 +131,10 @@
 				</div>
 			{/each}
 		</div>
-		<div class="orderbook_leftItem">
-            <div class="orderbook_leftItem">
+		<div class="flex items-center">
 			<span class="orderbook_bigPrice orderbook_sell"
 				><span>68,832.57</span><svg
-					class="sc-eqUAAy cMqsAc mx-icon iconfont iconic_arrow1 orderbook_updownArrow__amCAX"
+					class="orderbook_updownArrow"
 					focusable="false"
 					width="1em"
 					height="1em"
@@ -147,7 +146,7 @@
 						d="M128 469.333333h604.586667l-152.746667-153.173333L640 256l256 256-256 256-60.16-60.16L732.586667 554.666667H128z"
 					></path></svg
 				></span
-			><span class="orderbook_fiatPrice"
+			><span class="orderbook_fiatPrice ml-2"
 				><span style="margin-inline-end: 4px;">≈</span><span dir="ltr"
 					><span style="margin-inline-end: 2px;">$</span><span
 						dir="ltr">68,798.26</span
@@ -155,8 +154,7 @@
 				></span
 			>
 		</div>
-    </div>
-    <div class="orderbook_bids">
+		<div class="orderbook_bids">
 			{#each new Array(10) as i}
 				<div class="orderbook_row">
 					<div
@@ -274,11 +272,24 @@
 		justify-content: space-between;
 		align-items: center;
 	}
-	.orderbook_bigPrice{
+	.orderbook_bigPrice {
 		font-size: 16px;
 		font-weight: 700;
 		display: flex;
 		align-items: center;
-		color: var(--text-primary);
+	}
+	.orderbook_sell .orderbook_updownArrow {
+		transform: rotate(90deg);
+		opacity: 1;
+	}
+	.orderbook_buy .orderbook_updownArrow {
+		transform: rotate(270deg);
+		opacity: 1;
+	}
+	.orderbook_fiatPrice {
+		font-size: 12px;
+		color: var(--primary-text);
+		-webkit-margin-start: 5px;
+		margin-inline-start: 5px;
 	}
 </style>
