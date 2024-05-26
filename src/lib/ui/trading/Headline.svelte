@@ -81,7 +81,7 @@
 		justify-content: space-between;
 		-webkit-padding-start: 10px;
 		padding-inline-start: 10px;
-		height: 100%;
+		height: 44px;
 		color: var(--text-secondary);
 		font-weight: 500;
 		font-size: 14px;
@@ -116,6 +116,7 @@
 		color: var(--text-primary);
 	}
 	.headline_etfDisplay {
+		line-height: 14px;
 		font-size: 12px;
 		font-weight: 400;
 		color: var(--text-secondary);
