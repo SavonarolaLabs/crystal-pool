@@ -1,8 +1,11 @@
 <div class="chart">
-    chart
+    price chart
 </div>
 <style lang="postcss">
     .chart{
-        background-color: pink;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 </style>
