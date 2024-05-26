@@ -33,14 +33,10 @@
 			fill="currentColor"
 		></rect></svg
 	>
-	<div class="ml-1 network-status-text">Connected</div>
+	<div class="ml-1">Connected</div>
 </div>
 
 <style lang="postcss">
-.network-status-text{
-    font-size: 12px;
-    line-height: 14px;
-}
 .network_stable_color{
     color: var(--primary-color);
 }
