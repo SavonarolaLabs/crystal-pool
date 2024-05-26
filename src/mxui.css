@@ -8332,7 +8332,7 @@ a.ant-btn-sm {
     text-decoration: none;
     word-wrap: break-word;
     background-color: var(--bg-tooltip);
-    border-radius: var(--mexc-tooltip-border-radius);
+    border-radius: var(--cp-tooltip-border-radius);
     box-shadow: 0 2px 4px rgba(0,0,0,.1)
 }
 
@@ -8577,7 +8577,7 @@ a.ant-btn-sm {
 }
 
 .ant-tooltip {
-    --mexc-tooltip-border-radius: 4px;
+    --cp-tooltip-border-radius: 4px;
     --tooltip-arrow-width: 12px;
     --tooltip-max-width: 250px;
     --tooltip-distance: 14.3px;
@@ -33454,7 +33454,7 @@ tr.ant-table-expanded-row .ant-descriptions-view table {
     text-decoration: none;
     word-wrap: break-word;
     background-color: var(--bg-tooltip);
-    border-radius: var(--mexc-tooltip-border-radius);
+    border-radius: var(--cp-tooltip-border-radius);
     box-shadow: 0 2px 4px rgba(0,0,0,.1)
 }
 
@@ -33711,7 +33711,7 @@ tr.ant-table-expanded-row .ant-descriptions-view table {
 }
 
 .ant-tooltip-v5 {
-    --mexc-tooltip-border-radius: 4px;
+    --cp-tooltip-border-radius: 4px;
     --tooltip-arrow-width: 12px;
     --tooltip-max-width: 250px;
     --tooltip-distance: 6px;

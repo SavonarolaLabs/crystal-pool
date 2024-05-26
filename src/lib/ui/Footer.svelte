@@ -13,6 +13,7 @@
 
 <style lang="postcss">
 	.footer {
+		z-index: 10;
 		border-top: 1px solid var(--divider-primary);
 		background-color: var(--bg-level-secondary);
 		display: flex;
