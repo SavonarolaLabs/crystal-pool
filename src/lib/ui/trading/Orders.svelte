@@ -99,11 +99,38 @@
 				</div>
 			</section>
 		</section>
-		<div>table content</div>
+		<div class="table-content">
+			{#each new Array(7) as i}
+			<div class="table-row">
+					<div class="orders_cell_data orders_symbol">rsBTC/sigUSD</div>
+					<div class="orders_cell_data orders_date">
+						20:32:12
+					</div>
+					<div class="orders_cell_data orders_type">
+						Limit
+					</div>
+					<div class="orders_cell_data orders_side">Buy</div>
+					<div class="orders_cell_data orders_price">65,000.00</div>
+					<div class="orders_cell_data orders_quantity">0.3</div>
+					<div class="orders_cell_data orders_amount">$37,500.00</div>
+					<div class="orders_cell_data orders_filled">0%</div>
+					<div class="orders_cell_data orders_cancel">cancel</div>
+			</div>
+			{/each}
+		</div>
 	</section>
 </div>
 
 <style lang="postcss">
+	.table-content{
+		padding-inline-start: 16px;
+		padding-inline-end: 16px;
+	}
+	.table-row{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
 	.exchange_ordersWrapper {
 		grid-column: 1/4;
 		grid-row: 4/5;
@@ -272,6 +299,13 @@
 		text-overflow: ellipsis;
 	}
 
+	.orders_cell_data {
+		padding-inline-end: 4px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
 	.orders_symbol {
 		width: 12%;
 		display: flex;
@@ -320,6 +354,7 @@
 	}
 	.orders_price {
 		flex: 1 1;
+		text-align: right;
 	}
 	.orders_quantity {
 		flex: 1 1;
