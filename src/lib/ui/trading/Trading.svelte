@@ -82,6 +82,7 @@
     .trades{
         grid-column: 3 / 4;
         grid-row: 3 / 4;
+        background-color: var(--bg-level-secondary);
     }
     .orders{
         grid-column: 1 / 4;

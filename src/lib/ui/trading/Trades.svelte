@@ -1,5 +1,5 @@
 <div class="trades">
-	<div>Market Trades</div>
+	<div class="tab">Market Trades</div>
 	<div class="trades_tableHeader">
 		<h2 class="trades_column trades_price">Price(sigUSD)</h2>
 		<h2 class="trades_column trades_vol">Amount(rsBTC)</h2>
@@ -7,7 +7,7 @@
 	</div>
 	<div class="trades_body">
 		<div class="trades_asks">
-			{#each new Array(10) as i}
+			{#each new Array(13) as i}
 				<div class="trades_row">
 					<div class="trades_price trades_sell">69,001.34</div>
 					<div class="trades_vol"><span>1.302628</span></div>
@@ -19,8 +19,16 @@
 </div>
 
 <style lang="postcss">
+	.tab{
+		display: flex;
+    	margin: 4px 0;
+		margin-inline-start: 10px;
+		heigh:32px;
+		line-height: 32px;
+		padding-inline-start: 6px;
+	}
 	.trades {
-		background-color: var(--bg-level-secondary);
+		height: 100%;
 	}
 	.trades_controller {
 		display: flex;
@@ -60,6 +68,7 @@
 		font-weight: 400;
 	}
 	.trades_price {
+		padding-inline-start: 16px;
 		width: 37%;
 	}
 	.trades_vol {
@@ -69,6 +78,7 @@
 		padding-inline-start: 4px;
 	}
 	.trades_time {
+		padding-inline-end: 10px;
 		width: 30%;
 		text-align: end;
 		position: relative;
