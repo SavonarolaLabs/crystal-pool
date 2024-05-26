@@ -334,7 +334,7 @@
 		line-height: 40px;
 	}
 	.actions_headerTabActive {
-		font-weight: 600;
+		font-weight: 500;
 	}
 	.fee {
 		color: var(--tint-blue-base);

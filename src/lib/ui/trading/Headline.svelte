@@ -84,15 +84,6 @@
 		height: 100%;
 		color: var(--text-secondary);
 		font-weight: 500;
-		font-family:
-			-apple-system,
-			BlinkMacSystemFont,
-			Segoe UI,
-			Roboto,
-			Helvetica Neue,
-			Helvetica,
-			Arial,
-			sans-serif;
 		font-size: 14px;
 		font-feature-settings: 'tnum';
 		font-variant: tabular-nums;

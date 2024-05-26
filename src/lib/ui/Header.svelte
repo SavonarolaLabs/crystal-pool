@@ -36,15 +36,6 @@
 		z-index: 10;
 		position: sticky;
 		top: 0;
-		font-family:
-			-apple-system,
-			BlinkMacSystemFont,
-			Segoe UI,
-			Roboto,
-			Helvetica Neue,
-			Helvetica,
-			Arial,
-			sans-serif;
 		background-color: var(--bg-secondary);
 		color: var(--title);
 		font-size: 14px;
@@ -54,7 +45,6 @@
 		margin: 0;
 		color: var(--text-color);
 		font-size: var(--font-size-base);
-		font-family: var(--font-family);
 		font-variant: var(--font-variant-base);
 		line-height: var(--line-height-base);
 		background-color: var(--body-background);
@@ -63,7 +53,7 @@
 	.header_wrapper {
 		background-color: var(--bg-level-secondary);
 		color: var(--text-primary);
-		font-weight: 600;
+		font-weight: 500;
 		display: flex;
 		justify-content: space-between;
 		-webkit-padding-start: 16px;

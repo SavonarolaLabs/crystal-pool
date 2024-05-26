@@ -59,7 +59,7 @@
     --error-color-active: var(--error-active);
     --error-color-hover: var(--error-hover);
     --error-color-outline: var(--error-shadow);
-    --font-family: inherit;
+    --font-family:  -apple-system, "system-ui", BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, "sans-serif";
     --font-feature-settings-base: "tnum";
     --font-size-base: 14px;
     --font-size-lg: 16px;
