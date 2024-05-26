@@ -3,9 +3,11 @@
 </script>
 <div class="footer">
 	<Network></Network>
-	<div class="flex gap-2">
-		<div>Github</div>
-		<div>KYA</div>
+	<div class="flex items-center gap-4">
+		<a href="https://github.com/SavonarolaLabs/crystal-pool" target="_blank">Github</a>
+		<a href="https://github.com/SavonarolaLabs/crystal-pool/tree/main/src/lib/contracts" target="_blank">Contracts</a>
+		<a href="https://savonarolalabs.github.io/crystal-pool/#/" target="_blank">Docs</a>
+		<a href="https://savonarolalabs.github.io/crystal-pool/#/05-KYA" target="_blank">KYA</a>
 	</div>
 </div>
 
@@ -23,5 +25,10 @@
     	margin: 0 auto;
 		bottom: 0;
 		width: 100%;
+		font-size: 12px;
+		line-height: 14px;
+	}
+	a{
+		color: var(--text-primary)
 	}
 </style>
