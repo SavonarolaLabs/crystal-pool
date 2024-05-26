@@ -308,34 +308,34 @@
 		color: var(--primary-base);
 	}
 	.orders_type {
-		width: 7%;
+		width: 10%;
 	}
 	.orders_statusDropdown {
 		display: flex;
 		align-items: center;
 	}
 	.orders_side {
-		width: 7%;
+		width: 10%;
 		text-align: center;
 	}
-	.orders_price{
+	.orders_price {
 		flex: 1 1;
 	}
-	.orders_quantity{
-		flex: 1 1;
-		text-align: right;
-	}
-	
-	.orders_amount{
+	.orders_quantity {
 		flex: 1 1;
 		text-align: right;
 	}
-	.orders_filled{
-		width: 6%;
+
+	.orders_amount {
+		flex: 1 1;
 		text-align: right;
 	}
-	.orders_cancel{
-		width: 10%;
+	.orders_filled {
+		width: 8%;
+		text-align: right;
+	}
+	.orders_cancel {
+		width: 13%;
 		text-align: right;
 	}
 </style>
