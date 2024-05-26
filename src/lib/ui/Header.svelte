@@ -41,11 +41,12 @@
 				>
 			</a>
 			<div class="header_leftMenu">
-				<a class="header_navItem" href="https://hodlbox.xyz/">
-					Hodlbox
+				<a class="header_navItem" target="_blank" href="https://explorer.ergoplatform.com/en/mempool">
+					Mempool
 				</a>
-				<div class="header_navItem">Markets</div>
-				<div class="header_navItem">Contracts</div>
+				<a class="header_navItem" target="_blank" href="https://explorer.ergoplatform.com/en/addresses/t5UVmPtqprz5zN2M2X5fRTajpYD2CYuamxePkcwNFc2t9Yc3DhNMyB81fLAqoL7t91hzyYacMA8uVzkpTYTRdg4A6gZHFZxVsvLo">
+					Deposits
+				</a>
 			</div>
 		</div>
 		<div class="header_leftWrapper">
@@ -179,6 +180,11 @@
 		display: flex;
 		align-items: center;
 		position: relative;
+		color: inherit;
+    	text-decoration: none;
+	}
+	.header_navItem:hover{
+		color: var(--text-primary)
 	}
 
 	.header_rightWrapper {
