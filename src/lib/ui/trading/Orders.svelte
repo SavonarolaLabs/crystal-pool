@@ -10,8 +10,6 @@
 									Open orders
 								</div>
 								<div class="orders_tab">Order history</div>
-								<div class="orders_tab">Order test1</div>
-								<div class="orders_tab">Order test2</div>
 							</div>
 						</div>
 					</div>
@@ -92,12 +90,12 @@
 							></span
 						>
 					</div>
-					<div class="orders_cell orders_direction">Side</div>
-					<div class="orders_cell">Price</div>
-					<div class="orders_cell">Quantity</div>
-					<div class="orders_cell">Order Amount</div>
-					<div class="orders_cell">Filled</div>
-					<div class="orders_cell">Cancell All</div>
+					<div class="orders_cell orders_side">Side</div>
+					<div class="orders_cell orders_price">Price</div>
+					<div class="orders_cell orders_quantity">Quantity</div>
+					<div class="orders_cell orders_amount">Order Amount</div>
+					<div class="orders_cell orders_filled">Filled</div>
+					<div class="orders_cell orders_cancel">Cancell All</div>
 				</div>
 			</section>
 		</section>
@@ -261,6 +259,7 @@
 		display: flex;
 		font-size: 12px;
 		padding-inline-start: 16px;
+		padding-inline-end: 16px;
 		border-bottom: 1px solid var(--divider);
 		flex-shrink: 0;
 	}
@@ -298,6 +297,7 @@
 		color: var(--icon-secondary);
 	}
 	.svg-icon {
+		display: none;
 		width: 1em;
 		vertical-align: -0.15em;
 		fill: currentColor;
@@ -314,7 +314,28 @@
 		display: flex;
 		align-items: center;
 	}
-	.orders_direction {
+	.orders_side {
 		width: 7%;
+		text-align: center;
+	}
+	.orders_price{
+		flex: 1 1;
+	}
+	.orders_quantity{
+		flex: 1 1;
+		text-align: right;
+	}
+	
+	.orders_amount{
+		flex: 1 1;
+		text-align: right;
+	}
+	.orders_filled{
+		width: 6%;
+		text-align: right;
+	}
+	.orders_cancel{
+		width: 10%;
+		text-align: right;
 	}
 </style>
