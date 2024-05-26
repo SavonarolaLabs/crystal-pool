@@ -61,18 +61,22 @@
     .orderbook{
         rid-column: 1 / 2;
         grid-row: 1 / 4;
+        background-color: var(--bg-level-secondary);
     }
     .headline{
         grid-column: 2 / 3;
         grid-row: 1 / 2;
+        background-color: var(--bg-level-secondary);
     }
     .chart{
         grid-column: 2 / 3;
         grid-row: 2 / 3;
+        background-color: var(--bg-level-secondary);
     }
     .actions{
         grid-column: 2 / 3;
         grid-row: 3 / 4;
+        background-color: var(--bg-level-secondary);
     }
     .markets{
         grid-column: 3 / 4;
@@ -87,5 +91,6 @@
     .orders{
         grid-column: 1 / 4;
         grid-row: 4 / 5;
+        background-color: var(--bg-level-secondary);
     }
 </style>
