@@ -16,7 +16,7 @@
 			Limit
 		</div>
 
-        <!-- START -->
+		<!-- START -->
 
 		<div class="actions_buySellWrapper">
 			<div class="actions_buyWrapper actions_doWrapper">
@@ -28,9 +28,7 @@
 							>Available
 						</span><span><span>--</span><span> sigUSD</span></span>
 					</div>
-					<a
-						href="/assets/deposit/sigUSD"
-						class="actions_deposit"
+					<a href="/assets/deposit/sigUSD" class="actions_deposit"
 						><svg
 							class="sc-eqUAAy cMqsAc mx-icon"
 							focusable="false"
@@ -63,6 +61,8 @@
 								value="69029.19"
 							/><span class="ant-input-suffix"
 								><span>sigUSD</span>
+							</span></span
+						>
 					</div>
 				</div>
 				<div class="actions_inputWrapper__OKcnB actions_line">
@@ -81,6 +81,8 @@
 								value=""
 							/><span class="ant-input-suffix"
 								><span>rsBTC</span>
+							</span></span
+						>
 					</div>
 				</div>
 				<div class="actions_slide__pKkpF actions_line">
@@ -160,13 +162,12 @@
 								value=""
 							/><span class="ant-input-suffix"
 								><span>sigUSD</span>
+							</span></span
+						>
 					</div>
 				</div>
 
-                <button
-                    class="buySellButton buyButton"
-                    >Buy</button
-                >
+				<button class="buySellButton buyButton">Buy</button>
 			</div>
 			<div class="actions_doWrapper">
 				<div class="actions_balance">
@@ -210,6 +211,8 @@
 								value="69029.19"
 							/><span class="ant-input-suffix"
 								><span>sigUSD</span>
+							</span></span
+						>
 					</div>
 				</div>
 				<div class="actions_inputWrapper__OKcnB actions_line">
@@ -228,6 +231,8 @@
 								value=""
 							/><span class="ant-input-suffix"
 								><span>rsBTC</span>
+							</span></span
+						>
 					</div>
 				</div>
 				<div class="actions_slide__pKkpF actions_line">
@@ -307,16 +312,15 @@
 								value=""
 							/><span class="ant-input-suffix"
 								><span>sigUSD</span>
+							</span></span
+						>
 					</div>
 				</div>
-                <button
-                class="buySellButton sellButton"
-                >Sell</button
-            >
+				<button class="buySellButton sellButton">Sell</button>
 			</div>
 		</div>
 
-        <!-- END -->
+		<!-- END -->
 	</div>
 </div>
 
@@ -351,49 +355,49 @@
 		margin-bottom: 10px;
 		margin-top: 5px;
 	}
-    .actions_buySellWrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: stretch;
-        position: relative;
-    }
-    .actions_balance{
-        margin-bottom: 5px;
-        min-height: 28px;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-    }
-    .actions_primaryText {
-        color: var(--primary-text);
-    }
-    .actions_deposit {
-        -webkit-padding-start: 4px;
-        padding-inline-start: 4px;
-        color: var(--primary-base);
-    }
+	.actions_buySellWrapper {
+		display: flex;
+		justify-content: space-between;
+		align-items: stretch;
+		position: relative;
+	}
+	.actions_balance {
+		margin-bottom: 5px;
+		min-height: 28px;
+		font-size: 12px;
+		display: flex;
+		align-items: center;
+	}
+	.actions_primaryText {
+		color: var(--primary-text);
+	}
+	.actions_deposit {
+		-webkit-padding-start: 4px;
+		padding-inline-start: 4px;
+		color: var(--primary-base);
+	}
 
-    .actions_buyWrapper {
-        -webkit-padding-end: 12px;
-        padding-inline-end: 12px;
-    }
-    .actions_doWrapper {
-        flex-grow: 1;
-        width: 50%;
-    }
-    .buySellButton{
-        height: 36px;
-        width: 100%;
-        border: none;
-        color: #fff;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all .16s ease-in;
-    }
-    .buyButton{
-        background-color: var(--up);
-    }
-    .sellButton{
-        background-color: var(--down);
-    }
+	.actions_buyWrapper {
+		-webkit-padding-end: 12px;
+		padding-inline-end: 12px;
+	}
+	.actions_doWrapper {
+		flex-grow: 1;
+		width: 50%;
+	}
+	.buySellButton {
+		height: 36px;
+		width: 100%;
+		border: none;
+		color: #fff;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: all 0.16s ease-in;
+	}
+	.buyButton {
+		background-color: var(--up);
+	}
+	.sellButton {
+		background-color: var(--down);
+	}
 </style>

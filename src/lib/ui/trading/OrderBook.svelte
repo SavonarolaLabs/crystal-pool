@@ -4,7 +4,7 @@
 		<div class="orderbook_dirWrapper">
 			<span class="orderbook_orderMode"
 				><svg
-					class="sc-eqUAAy cMqsAc mx-icon svg-icon orderbook_iconBuySell"
+					class="svg-icon orderbook_iconBuySell"
 					focusable="false"
 					width="1em"
 					height="1em"
@@ -36,7 +36,7 @@
 				></span
 			><span class="orderbook_orderMode"
 				><svg
-					class="sc-eqUAAy cMqsAc mx-icon iconfont svg-icon orderbook_iconBuySell"
+					class="svg-icon orderbook_iconBuySell"
 					focusable="false"
 					width="1em"
 					height="1em"
@@ -64,7 +64,7 @@
 				></span
 			><span class="orderbook_orderMode"
 				><svg
-					class="sc-eqUAAy cMqsAc mx-icon iconfont svg-icon orderbook_iconBuySell"
+					class="svg-icon orderbook_iconBuySell"
 					focusable="false"
 					width="1em"
 					height="1em"
@@ -171,16 +171,25 @@
 </div>
 
 <style lang="postcss">
+	
 	.orderbook {
-		background-color: var(--bg-level-secondary);
+    	margin: 4px 0;
+		margin-inline-start: 10px;
+		heigh:32px;
+		line-height: 32px;
+		padding-inline-start: 6px;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
 	}
 	.orderbook_controller {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		height: 24px;
-		padding: 0 16px;
 		margin-top: 2px;
+		padding-inline-end: 10px;
+
 	}
 	.orderbook_dirWrapper {
 		display: flex;
@@ -203,6 +212,8 @@
 		position: relative;
 		overflow: hidden;
 		padding: 6px 0 2px;
+		padding-inline-end: 10px;
+
 	}
 	.orderbook_column {
 		color: var(--text-secondary);
@@ -228,7 +239,9 @@
 	}
 
 	.orderbook_body {
+		flex-grow: 1;
 	}
+	
 	.orderbook_asks,
 	.orderbook_bids {
 		overflow-x: hidden;
@@ -243,6 +256,8 @@
 		line-height: 20px;
 		overflow: hidden;
 		position: relative;
+		padding-inline-end: 10px;
+
 	}
 
 	.orderbook_sell {
@@ -292,5 +307,8 @@
 		color: var(--primary-text);
 		-webkit-margin-start: 5px;
 		margin-inline-start: 5px;
+	}
+	.svg-icon{
+		font-size: 18px;
 	}
 </style>
