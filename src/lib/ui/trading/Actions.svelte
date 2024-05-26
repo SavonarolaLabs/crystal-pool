@@ -19,17 +19,17 @@
         <!-- START -->
 
 		<div class="actions_buySellWrapper">
-			<div class="actions_buyWrapper__y_ZSB actions_doWrapper__POGvp">
+			<div class="actions_buyWrapper actions_doWrapper">
 				<div class="actions_balance">
 					<div>
 						<span
 							class="actions_primaryText"
 							style="margin-inline-end: 8px;"
 							>Available
-						</span><span><span>--</span><span> USDT</span></span>
+						</span><span><span>--</span><span> sigUSD</span></span>
 					</div>
 					<a
-						href="/assets/deposit/USDT"
+						href="/assets/deposit/sigUSD"
 						class="actions_deposit"
 						><svg
 							class="sc-eqUAAy cMqsAc mx-icon"
@@ -47,7 +47,7 @@
 						></a
 					>
 				</div>
-				<div class="actions_inputWrapper__OKcnB actions_line__b_I6K">
+				<div class="actions_inputWrapper__OKcnB actions_line">
 					<div class="plus-minus_wrapper__ht_aW">
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
@@ -62,45 +62,10 @@
 								type="text"
 								value="69029.19"
 							/><span class="ant-input-suffix"
-								><span>USDT</span>
-								<div class="plus-minus_plusMinus__pd3FU">
-									<button
-										class="plus-minus_action__ve0Mh plus-minus_plus__BW3Pv"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle50"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 2048 1024"
-											data-icon="CaretUpOutlined"
-											><path
-												d="M1144.832 120.832a170.666667 170.666667 0 0 0-241.664 0L291.498667 732.501333A170.666667 170.666667 0 0 0 411.989333 1024h1224.021334a170.666667 170.666667 0 0 0 120.490666-291.498667L1144.832 120.832z"
-											></path></svg
-										></button
-									><button
-										class="plus-minus_action__ve0Mh plus-minus_minus__ac6q8"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle51"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 1024 1024"
-											data-icon="CaretDownOutlined"
-											><path
-												d="M929.1776 203.1616a61.44 61.44 0 0 1 46.8992 100.9664L559.104 799.0272a61.44 61.44 0 0 1-94.0032 0L47.9232 304.128a61.44 61.44 0 0 1 46.8992-100.9664h834.3552z"
-											></path></svg
-										></button
-									>
-								</div></span
-							></span
-						>
+								><span>sigUSD</span>
 					</div>
 				</div>
-				<div class="actions_inputWrapper__OKcnB actions_line__b_I6K">
+				<div class="actions_inputWrapper__OKcnB actions_line">
 					<div class="plus-minus_wrapper__ht_aW">
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
@@ -115,45 +80,10 @@
 								type="text"
 								value=""
 							/><span class="ant-input-suffix"
-								><span>BTC</span>
-								<div class="plus-minus_plusMinus__pd3FU">
-									<button
-										class="plus-minus_action__ve0Mh plus-minus_plus__BW3Pv"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle50"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 2048 1024"
-											data-icon="CaretUpOutlined"
-											><path
-												d="M1144.832 120.832a170.666667 170.666667 0 0 0-241.664 0L291.498667 732.501333A170.666667 170.666667 0 0 0 411.989333 1024h1224.021334a170.666667 170.666667 0 0 0 120.490666-291.498667L1144.832 120.832z"
-											></path></svg
-										></button
-									><button
-										class="plus-minus_action__ve0Mh plus-minus_minus__ac6q8"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle51"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 1024 1024"
-											data-icon="CaretDownOutlined"
-											><path
-												d="M929.1776 203.1616a61.44 61.44 0 0 1 46.8992 100.9664L559.104 799.0272a61.44 61.44 0 0 1-94.0032 0L47.9232 304.128a61.44 61.44 0 0 1 46.8992-100.9664h834.3552z"
-											></path></svg
-										></button
-									>
-								</div></span
-							></span
-						>
+								><span>rsBTC</span>
 					</div>
 				</div>
-				<div class="actions_slide__pKkpF actions_line__b_I6K">
+				<div class="actions_slide__pKkpF actions_line">
 					<div
 						class="ant-slider slider-buy ant-slider-disabled ant-slider-horizontal ant-slider-with-marks"
 					>
@@ -214,7 +144,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="actions_inputWrapper__OKcnB actions_line__b_I6K">
+				<div class="actions_inputWrapper__OKcnB actions_line">
 					<div class="plus-minus_wrapper__ht_aW">
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
@@ -229,98 +159,25 @@
 								type="text"
 								value=""
 							/><span class="ant-input-suffix"
-								><span>USDT</span>
-								<div class="plus-minus_plusMinus__pd3FU">
-									<button
-										class="plus-minus_action__ve0Mh plus-minus_plus__BW3Pv"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle50"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 2048 1024"
-											data-icon="CaretUpOutlined"
-											><path
-												d="M1144.832 120.832a170.666667 170.666667 0 0 0-241.664 0L291.498667 732.501333A170.666667 170.666667 0 0 0 411.989333 1024h1224.021334a170.666667 170.666667 0 0 0 120.490666-291.498667L1144.832 120.832z"
-											></path></svg
-										></button
-									><button
-										class="plus-minus_action__ve0Mh plus-minus_minus__ac6q8"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle51"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 1024 1024"
-											data-icon="CaretDownOutlined"
-											><path
-												d="M929.1776 203.1616a61.44 61.44 0 0 1 46.8992 100.9664L559.104 799.0272a61.44 61.44 0 0 1-94.0032 0L47.9232 304.128a61.44 61.44 0 0 1 46.8992-100.9664h834.3552z"
-											></path></svg
-										></button
-									>
-								</div></span
-							></span
-						>
+								><span>sigUSD</span>
 					</div>
 				</div>
-				<div class="actions_profitLoseWrappper__u5k9Y">
-					<div class="actions_checkWrapper__rZYhl">
-						<label class="ant-checkbox-wrapper"
-							><span class="ant-checkbox"
-								><input
-									type="checkbox"
-									class="ant-checkbox-input"
-									value=""
-								/><span class="ant-checkbox-inner"></span></span
-							><span
-								><span class="actions_customLabel__7NFjL"
-									>TP</span
-								></span
-							></label
-						><label class="ant-checkbox-wrapper"
-							><span class="ant-checkbox"
-								><input
-									type="checkbox"
-									class="ant-checkbox-input"
-									value=""
-								/><span class="ant-checkbox-inner"></span></span
-							><span
-								><span class="actions_customLabel__7NFjL"
-									>SL</span
-								></span
-							></label
-						>
-					</div>
-				</div>
-				<div class="do-submit_buyBtnWrapper__Cu6Xe">
-					<button
-						class="do-submit_doBtn__yvi9h"
-						data-testid="spot-trade-orderBuyBtn"
-						><div
-							class="do-submit_anonymityDoBtn__h8t1a auth-links_wrapper__3Qekh"
-						>
-							<span
-								class="auth-links_authBtn__QqEo4 auth-links_anim__2_zk1"
-								>Log In/Sign Up</span
-							>
-						</div></button
-					>
-				</div>
+
+                <button
+                    class="buySellButton buyButton"
+                    >Buy</button
+                >
 			</div>
-			<div class="actions_sellWrapper__J5fJU actions_doWrapper__POGvp">
+			<div class="actions_doWrapper">
 				<div class="actions_balance">
 					<div>
 						<span
 							class="actions_primaryText"
 							style="margin-inline-end: 8px;"
 							>Available
-						</span><span><span>--</span><span> BTC</span></span>
+						</span><span><span>--</span><span> rsBTC</span></span>
 					</div>
-					<a href="/assets/deposit/BTC" class="actions_deposit"
+					<a href="/assets/deposit/rsBTC" class="actions_deposit"
 						><svg
 							class="sc-eqUAAy cMqsAc mx-icon"
 							focusable="false"
@@ -337,7 +194,7 @@
 						></a
 					>
 				</div>
-				<div class="actions_inputWrapper__OKcnB actions_line__b_I6K">
+				<div class="actions_inputWrapper__OKcnB actions_line">
 					<div class="plus-minus_wrapper__ht_aW">
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
@@ -352,45 +209,10 @@
 								type="text"
 								value="69029.19"
 							/><span class="ant-input-suffix"
-								><span>USDT</span>
-								<div class="plus-minus_plusMinus__pd3FU">
-									<button
-										class="plus-minus_action__ve0Mh plus-minus_plus__BW3Pv"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle50"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 2048 1024"
-											data-icon="CaretUpOutlined"
-											><path
-												d="M1144.832 120.832a170.666667 170.666667 0 0 0-241.664 0L291.498667 732.501333A170.666667 170.666667 0 0 0 411.989333 1024h1224.021334a170.666667 170.666667 0 0 0 120.490666-291.498667L1144.832 120.832z"
-											></path></svg
-										></button
-									><button
-										class="plus-minus_action__ve0Mh plus-minus_minus__ac6q8"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle51"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 1024 1024"
-											data-icon="CaretDownOutlined"
-											><path
-												d="M929.1776 203.1616a61.44 61.44 0 0 1 46.8992 100.9664L559.104 799.0272a61.44 61.44 0 0 1-94.0032 0L47.9232 304.128a61.44 61.44 0 0 1 46.8992-100.9664h834.3552z"
-											></path></svg
-										></button
-									>
-								</div></span
-							></span
-						>
+								><span>sigUSD</span>
 					</div>
 				</div>
-				<div class="actions_inputWrapper__OKcnB actions_line__b_I6K">
+				<div class="actions_inputWrapper__OKcnB actions_line">
 					<div class="plus-minus_wrapper__ht_aW">
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
@@ -405,45 +227,10 @@
 								type="text"
 								value=""
 							/><span class="ant-input-suffix"
-								><span>BTC</span>
-								<div class="plus-minus_plusMinus__pd3FU">
-									<button
-										class="plus-minus_action__ve0Mh plus-minus_plus__BW3Pv"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle50"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 2048 1024"
-											data-icon="CaretUpOutlined"
-											><path
-												d="M1144.832 120.832a170.666667 170.666667 0 0 0-241.664 0L291.498667 732.501333A170.666667 170.666667 0 0 0 411.989333 1024h1224.021334a170.666667 170.666667 0 0 0 120.490666-291.498667L1144.832 120.832z"
-											></path></svg
-										></button
-									><button
-										class="plus-minus_action__ve0Mh plus-minus_minus__ac6q8"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle51"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 1024 1024"
-											data-icon="CaretDownOutlined"
-											><path
-												d="M929.1776 203.1616a61.44 61.44 0 0 1 46.8992 100.9664L559.104 799.0272a61.44 61.44 0 0 1-94.0032 0L47.9232 304.128a61.44 61.44 0 0 1 46.8992-100.9664h834.3552z"
-											></path></svg
-										></button
-									>
-								</div></span
-							></span
-						>
+								><span>rsBTC</span>
 					</div>
 				</div>
-				<div class="actions_slide__pKkpF actions_line__b_I6K">
+				<div class="actions_slide__pKkpF actions_line">
 					<div
 						class="ant-slider slider-sell ant-slider-disabled ant-slider-horizontal ant-slider-with-marks"
 					>
@@ -504,7 +291,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="actions_inputWrapper__OKcnB actions_line__b_I6K">
+				<div class="actions_inputWrapper__OKcnB actions_line">
 					<div class="plus-minus_wrapper__ht_aW">
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
@@ -519,87 +306,13 @@
 								type="text"
 								value=""
 							/><span class="ant-input-suffix"
-								><span>USDT</span>
-								<div class="plus-minus_plusMinus__pd3FU">
-									<button
-										class="plus-minus_action__ve0Mh plus-minus_plus__BW3Pv"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle50"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 2048 1024"
-											data-icon="CaretUpOutlined"
-											><path
-												d="M1144.832 120.832a170.666667 170.666667 0 0 0-241.664 0L291.498667 732.501333A170.666667 170.666667 0 0 0 411.989333 1024h1224.021334a170.666667 170.666667 0 0 0 120.490666-291.498667L1144.832 120.832z"
-											></path></svg
-										></button
-									><button
-										class="plus-minus_action__ve0Mh plus-minus_minus__ac6q8"
-										><svg
-											class="sc-eqUAAy cMqsAc mx-icon iconfont iconRectangle51"
-											focusable="false"
-											width="1em"
-											height="1em"
-											fill="currentColor"
-											aria-hidden="true"
-											viewBox="0 0 1024 1024"
-											data-icon="CaretDownOutlined"
-											><path
-												d="M929.1776 203.1616a61.44 61.44 0 0 1 46.8992 100.9664L559.104 799.0272a61.44 61.44 0 0 1-94.0032 0L47.9232 304.128a61.44 61.44 0 0 1 46.8992-100.9664h834.3552z"
-											></path></svg
-										></button
-									>
-								</div></span
-							></span
-						>
+								><span>sigUSD</span>
 					</div>
 				</div>
-				<div class="actions_profitLoseWrappper__u5k9Y">
-					<div class="actions_checkWrapper__rZYhl">
-						<label class="ant-checkbox-wrapper"
-							><span class="ant-checkbox"
-								><input
-									type="checkbox"
-									class="ant-checkbox-input"
-									value=""
-								/><span class="ant-checkbox-inner"></span></span
-							><span
-								><span class="actions_customLabel__7NFjL"
-									>TP</span
-								></span
-							></label
-						><label class="ant-checkbox-wrapper"
-							><span class="ant-checkbox"
-								><input
-									type="checkbox"
-									class="ant-checkbox-input"
-									value=""
-								/><span class="ant-checkbox-inner"></span></span
-							><span
-								><span class="actions_customLabel__7NFjL"
-									>SL</span
-								></span
-							></label
-						>
-					</div>
-				</div>
-				<div class="do-submit_sellBtnWrapper__1oHbv">
-					<button
-						class="do-submit_doBtn__yvi9h"
-						data-testid="spot-trade-orderSellBtn"
-						><div
-							class="do-submit_anonymityDoBtn__h8t1a auth-links_wrapper__3Qekh"
-						>
-							<span
-								class="auth-links_authBtn__QqEo4 auth-links_anim__2_zk1"
-								>Log In/Sign Up</span
-							>
-						</div></button
-					>
-				</div>
+                <button
+                class="buySellButton sellButton"
+                >Sell</button
+            >
 			</div>
 		</div>
 
@@ -654,9 +367,33 @@
     .actions_primaryText {
         color: var(--primary-text);
     }
-    .actions_deposit{
+    .actions_deposit {
         -webkit-padding-start: 4px;
         padding-inline-start: 4px;
         color: var(--primary-base);
+    }
+
+    .actions_buyWrapper {
+        -webkit-padding-end: 12px;
+        padding-inline-end: 12px;
+    }
+    .actions_doWrapper {
+        flex-grow: 1;
+        width: 50%;
+    }
+    .buySellButton{
+        height: 36px;
+        width: 100%;
+        border: none;
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all .16s ease-in;
+    }
+    .buyButton{
+        background-color: var(--up);
+    }
+    .sellButton{
+        background-color: var(--down);
     }
 </style>

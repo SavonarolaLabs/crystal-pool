@@ -113,9 +113,9 @@
 		</div>
 	</div>
 	<div class="orderbook_tableHeader">
-		<h2 class="orderbook_column orderbook_price">Price(USDT)</h2>
-		<h2 class="orderbook_column orderbook_vol">Amount(BTC)</h2>
-		<h2 class="orderbook_column orderbook_amount">Total (USDT)</h2>
+		<h2 class="orderbook_column orderbook_price">Price(sigUSD)</h2>
+		<h2 class="orderbook_column orderbook_vol">Amount(rsBTC)</h2>
+		<h2 class="orderbook_column orderbook_amount">Total (sigUSD)</h2>
 	</div>
 	<div class="orderbook_body">
 		<div class="orderbook_asks">

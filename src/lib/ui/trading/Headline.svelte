@@ -16,7 +16,7 @@
 					></path></svg
 				>
 				<div>
-					<div class="headline_bigName">BTC/USDT</div>
+					<div class="headline_bigName">rsBTC/sigUSD</div>
 					<div class="headline_etfDisplay">Bitcoin</div>
 				</div>
 				<div class="headline_divider"></div>
@@ -52,13 +52,13 @@
 
 							<div class="subtabs_leftItem">
 								<div class="headline_withBorder">
-									24h Volume (BTC)
+									24h Volume (rsBTC)
 								</div>
 								<div class="headline_title">12.38K</div>
 							</div>
 							<div class="subtabs_leftItem">
 								<div class="headline_withBorder">
-									24h Amount (USDT)
+									24h Amount (sigUSD)
 								</div>
 								<div class="headline_title">836.47M</div>
 							</div>

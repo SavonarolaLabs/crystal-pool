@@ -30,11 +30,10 @@
 
 	<div class="marketTabs_box">
 		<div class="styles_nav-item nav-item">Favorite</div>
-		<div class="styles_nav-item nav-item">USDC</div>
-		<div class="styles_nav-item nav-item mx-scroll-is-active">USDT</div>
-		<div class="styles_nav-item nav-item">ETH</div>
-		<div class="styles_nav-item nav-item">BTC</div>
-		<div class="styles_nav-item nav-item">TUSD</div>
+		<div class="styles_nav-item nav-item">ERG</div>
+		<div class="styles_nav-item nav-item mx-scroll-is-active">sigUSD</div>
+		<div class="styles_nav-item nav-item">rsBTC</div>
+		<div class="styles_nav-item nav-item">rsETH</div>
 	</div>
 	<div class="markets_rowHead markets_row">
 		<div class="markets_col1">Pair</div>
@@ -46,10 +45,10 @@
 			<div class="markets_rowItem markets_row">
 				<div class="markets_col1">
 					<div class="markets_symbol">
-						<span class="markets_strong">MX</span>
-						<span>/USDT</span>
+						<span class="markets_strong">rsBTC</span>
+						<span>/sigUSD</span>
 					</div>
-					<div class="markets_secondLine">MX Token</div>
+					<div class="markets_secondLine">Rosen BTC</div>
 				</div>
 
 				<div class="markets_col2">
@@ -81,10 +80,45 @@
 			<div class="markets_rowItem markets_row">
 				<div class="markets_col1">
 					<div class="markets_symbol">
-						<span class="markets_strong">MX</span>
-						<span>/USDT</span>
+						<span class="markets_strong">ERG</span>
+						<span>/sigUSD</span>
 					</div>
-					<div class="markets_secondLine">MX Token</div>
+					<div class="markets_secondLine">ERGO</div>
+				</div>
+
+				<div class="markets_col2">
+					<div class="markets_strong">4.5452</div>
+					<div class="markets_secondLine">$4.54</div>
+				</div>
+				<div class="markets_col3">
+					<div class="markets_changeUp">+0.24%</div>
+					<div class="markets_secondLine">32.68M</div>
+				</div>
+				<div class="markets_favIcon">
+					<svg
+						class="svg-icon iconfont"
+						focusable="false"
+						width="1em"
+						height="1em"
+						fill="currentColor"
+						aria-hidden="true"
+						viewBox="0 0 1024 1024"
+						data-icon="StarFilled"
+						><path
+							d="M908.096 353.088l-253.888-36.864-113.536-230.08a32.128 32.128 0 0 0-57.408 0L369.792 316.16l-253.888 36.864a32 32 0 0 0-17.728 54.656l183.68 179.072-43.392 252.864a32 32 0 0 0 46.4 33.728L512 753.984l227.072 119.424a32 32 0 0 0 46.4-33.728l-43.392-252.864 183.68-179.072a31.936 31.936 0 0 0-17.664-54.656z"
+						></path></svg
+					>
+				</div>
+			</div>
+		</div>
+		<div class="scroll-container">
+			<div class="markets_rowItem markets_row">
+				<div class="markets_col1">
+					<div class="markets_symbol">
+						<span class="markets_strong">Erdoge</span>
+						<span>/sigUSD</span>
+					</div>
+					<div class="markets_secondLine">Erdoge</div>
 				</div>
 
 				<div class="markets_col2">
