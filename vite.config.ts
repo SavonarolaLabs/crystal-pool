@@ -6,11 +6,11 @@ export default defineConfig({
 	plugins: [sveltekit(), wasm()],
 	resolve: {
 		alias: {
-		  'ergo-lib-wasm-browser': 'node_modules/ergo-lib-wasm-browser/ergo_lib_wasm.js'
+		  'ergo-lib-wasm-browser': 'node_modules/ergo-lib-wasm-browser/ergo_lib_wasm.js',
 		}
 	  },
 	  optimizeDeps: {
-		include: ['ergo-lib-wasm-browser']
+		include: ['ergo-lib-wasm-browser', 'buffer']
 	},
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
