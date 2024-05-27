@@ -28,7 +28,6 @@ export async function signTxMulti(
 		await signMultisig(unsignedTx, userMnemonic, userAddress)
 	).to_js_eip12();
 }
-const bip32 = BIP32Factory(ecc);
 
 type JSONTransactionHintsBag = any;
 
@@ -346,6 +345,7 @@ export async function signTxInput(
 const getWalletAddressSecret = (mnemonic: string, idx: number = 0) => {
 	let seed = mnemonicToSeedSync(mnemonic);
 	const path = calcPathFromIndex(idx);
+	const bip32 = BIP32Factory(ecc);
 	const extended = bip32.fromSeed(seed).derivePath(path);
 	return wasm.SecretKey.dlog_from_bytes(
 		Uint8Array.from(extended.privateKey ?? Buffer.from(''))

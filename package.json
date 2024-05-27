@@ -49,9 +49,12 @@
 		"bip39": "^3.1.0",
 		"bs58": "^5.0.0",
 		"bs58check": "^3.0.1",
+		"buffer": "^6.0.3",
 		"ergo-lib-wasm-browser": "^0.26.0",
 		"ergo-lib-wasm-nodejs": "^0.26.0",
 		"json-bigint": "^1.0.0",
+		"rollup-plugin-node-polyfills": "^0.2.1",
+		"safe-buffer": "^5.2.1",
 		"tiny-secp256k1": "^2.2.3"
 	}
 }
