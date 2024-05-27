@@ -8,7 +8,12 @@
 	let unsignedTx: EIP12UnsignedTransaction;
 
 	async function buyAction() {
-		const params = {};
+		const params = {
+			address:"myaddresss",
+			price:12,
+			tokenId:"9fsdf023fmoviwm9023fmiosldakf",
+			amount:12
+		};
 		let res = await fetch("/api/swap-tx", {method: "POST", body: JSON.stringify(params)})
 		let data = await res.json()
 		console.log("data", data)

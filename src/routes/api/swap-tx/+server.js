@@ -1,7 +1,8 @@
 /** @type {import('./$types').RequestHandler} */
-export async function POST({ params }) {
+export async function POST({request}) {
+	const {address, price, tokenId, amount } = await request.json();
 	console.log("api/swap-tx/")
-	console.log(params)
+	console.log(address, price, tokenId, amount)
 
   /*
 		//ADD TYPE
