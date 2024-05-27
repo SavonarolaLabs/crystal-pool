@@ -1,3 +1,105 @@
+<script lang="ts">
+	import { BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addresses';
+	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
+	import { utxos } from '$lib/data/utxos';
+	import { a, b, c } from '$lib/wallet/multisig';
+	import { createSwapOrderTx } from '$lib/wallet/swap';
+	import type { Amount, EIP12UnsignedTransaction } from '@fleet-sdk/common';
+
+	let unsignedTx: EIP12UnsignedTransaction;
+
+	async function buy() {
+		//TODO: ADD VISUAL DIAGRAMM TO DOCS
+		//BLOCK I. execute current sell orders
+		//BLOCK II. create new buy order
+		//Part 1. Analyze inputs and send inputs to Server
+		const address = BOB_ADDRESS;
+		const TOKEN_SIGUSD =
+			'03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
+		const TOKEN_rsBTS =
+			'5bf691fbf0c4b17f8f8cece83fa947f62f480bfbd242bd58946f85535125db4d';
+
+		const price = 100n;
+		const amount = 200n;
+		const total = price * amount;
+
+		const sellingTokenId = TOKEN_rsBTS; //mintAndUse
+		const buyingTokenId = TOKEN_SIGUSD; //TokenID
+
+		const swapParams = {
+			address: address,
+			price: price,
+			amount: amount,
+			total: total,
+			sellingTokenId: sellingTokenId,
+			buyingTokenId: buyingTokenId
+		};
+		console.log(swapParams);
+		//Part 2. Receive commits from server
+		const { unsignedTx, publicCommitsBob } =
+			await requestNewSwap(swapParams);
+		//Part 3. Check Transactions and Sign
+		const userMnemonic = BOB_MNEMONIC;
+		const userAddress = BOB_ADDRESS;
+		const extractedHints = b(
+			unsignedTx,
+			userMnemonic,
+			userAddress,
+			publicCommitsBob
+		);
+		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
+		await requestNewSwapSign(extractedHints);
+	}
+
+	async function sell() {
+		//execute current buy orders
+		//create new sell order
+		console.log('sell test');
+	}
+	type SwapRequest = {
+		address: string;
+		price: bigint;
+		amount: Amount;
+		sellingTokenId: string;
+		buyingTokenId: string;
+	};
+
+	async function requestNewSwap(swapParams: SwapRequest) {
+		//ADD TYPE
+		//-----------------------------------
+		const height = 1273521;
+		const unlockHeight = height + 200000;
+		//------------------------------------
+
+		//CreateTx unsignedTx
+		unsignedTx = createSwapOrderTx(
+			swapParams.address,
+			DEPOSIT_ADDRESS,
+			utxos[BOB_ADDRESS], //need helper function and boxes for tests
+			{ tokenId: swapParams.sellingTokenId, amount: swapParams.amount },
+			swapParams.price,
+			height, //need helper function
+			unlockHeight, // need helper function
+			swapParams.sellingTokenId,
+			swapParams.buyingTokenId
+		);
+
+		const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
+		return { unsignedTx, publicCommitsBob };
+	}
+	async function requestNewSwapSign(extractedHints) {
+		//check
+		//1.Get transaction or find
+		//2.Get private commits or generate new
+		const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
+		//sign
+		const signedTx = c(unsignedTx, privateCommitsBob, extractedHints);
+		//ADD SignedTX to DB and Order Book
+		//...
+		console.log(signedTx);
+	}
+</script>
+
 <div class="actions">
 	<div class="actions_header">
 		<div class="actions_headerTabActive">Spot</div>
@@ -167,7 +269,9 @@
 					</div>
 				</div>
 
-				<button class="buySellButton buyButton">Buy</button>
+				<button class="buySellButton buyButton" on:click={buy}
+					>Buy</button
+				>
 			</div>
 			<div class="actions_doWrapper">
 				<div class="actions_balance">
@@ -316,7 +420,9 @@
 						>
 					</div>
 				</div>
-				<button class="buySellButton sellButton">Sell</button>
+				<button class="buySellButton sellButton" on:click={sell}
+					>Sell</button
+				>
 			</div>
 		</div>
 
