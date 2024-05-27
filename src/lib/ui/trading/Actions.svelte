@@ -36,12 +36,13 @@
 		//Part 3. Check Transactions and Sign
 		const userMnemonic = BOB_MNEMONIC;
 		const userAddress = BOB_ADDRESS;
-		const extractedHints = b(
-			unsignedTx,
-			userMnemonic,
-			userAddress,
-			publicCommitsBob
-		);
+		// const extractedHints = b(
+		// 	unsignedTx,
+		// 	userMnemonic,
+		// 	userAddress,
+		// 	publicCommitsBob
+		// );
+		const extractedHints = null;
 
 		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
 		await requestSignNewOrder(extractedHints);
