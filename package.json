@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"utxo": "bun src/lib/server/utxo/script_loadUnspetUtxo.ts > src/lib/server/utxo/unspent.ts",
+		"utxo": "bun src/lib/utils/script_loadUnspetUtxo.ts > src/lib/data/utxos.ts",
 		"compile": "npm run compile:buy && npm run compile:sell && npm run compile:swap && npm run compile:deposit",
 		"compile:buy": "bun src/lib/server/turbo-mempool/contracts/buy-token-for-erg.ts > src/lib/server/constants/buyOrder.ts",
 		"compile:sell": "bun src/lib/server/turbo-mempool/contracts/sell-token-for-erg.ts > src/lib/server/constants/sellOrder.ts",
