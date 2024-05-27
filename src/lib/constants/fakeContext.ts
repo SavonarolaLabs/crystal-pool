@@ -1,5 +1,3 @@
-import * as wasm from 'ergo-lib-wasm-nodejs';
-
 const headers = [
   `{
       "extensionId" : "1d6a13a3ad0723eeb2c1de056d17be6ea1908393c5768e46cc83898e5cd025dd",
@@ -243,7 +241,7 @@ const headers = [
     }`,
 ];
 
-export const fakeContext = () => {
+export const fakeContext = (wasm: any) => {
   const blockHeaders = wasm.BlockHeaders.from_json(headers);
   const preHeader = wasm.PreHeader.from_block_header(
     wasm.BlockHeader.from_json(headers[0]),
