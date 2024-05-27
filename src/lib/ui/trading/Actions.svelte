@@ -8,6 +8,12 @@
 	let unsignedTx: EIP12UnsignedTransaction;
 
 	async function buyAction() {
+		const params = {};
+		let res = await fetch("/api/swap-tx", {method: "POST", body: JSON.stringify(params)})
+		let data = await res.json()
+		console.log("data", data)
+		return;
+
 		//TODO: ADD VISUAL DIAGRAMM TO DOCS
 		//BLOCK I. execute current buy orders
 		//BLOCK II. create new buy order
@@ -79,6 +85,8 @@
 	async function requestSignNewOrder(extractedHints) {
 		console.log(signedTx);
 	}
+
+	function sell(){}
 </script>
 
 <div class="actions">
@@ -250,7 +258,7 @@
 					</div>
 				</div>
 
-				<button class="buySellButton buyButton" on:click={buy}
+				<button class="buySellButton buyButton" on:click={buyAction}
 					>Buy</button
 				>
 			</div>

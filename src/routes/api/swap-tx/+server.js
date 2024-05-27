@@ -24,5 +24,9 @@ export async function POST({ params }) {
 
   */
 
-	return new Response(String("signed"));
+	return new Response(JSON.stringify({ message: "signed" }), {
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
 }
