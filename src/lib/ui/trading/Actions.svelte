@@ -8,6 +8,15 @@
 	let unsignedTx: EIP12UnsignedTransaction;
 
 	async function swapAction() {
+		let res = await fetch('http://127.0.0.1:3000/sum', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({num1: 1, num2: 2})
+		});
+		console.log(await res.json())
+		/*
 		//TODO: ADD VISUAL DIAGRAMM TO DOCS
 		//BLOCK I. execute current buy orders
 		//BLOCK II. create new buy order
@@ -63,6 +72,7 @@
 
 		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
 		await requestSignNewOrder(extractedHints);
+		*/
 	}
 
 	type SwapRequest = {

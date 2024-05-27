@@ -3,7 +3,6 @@ import { utxos } from '$lib/data/utxos';
 import { a } from '$lib/wallet/multisig-server';
 import { createSwapOrderTx } from '$lib/wallet/swap';
 /** @type {import('./$types').RequestHandler} */
-
 export async function POST({ request }) {
 	const swapParams = await request.json();
 	//ADD TYPE
