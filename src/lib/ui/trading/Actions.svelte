@@ -7,42 +7,48 @@
 
 	let unsignedTx: EIP12UnsignedTransaction;
 
-	async function buyAction() {
-		const params = {
-			address:"myaddresss",
-			price:12,
-			tokenId:"9fsdf023fmoviwm9023fmiosldakf",
-			amount:12
-		};
-		let res = await fetch("/api/swap-tx", {method: "POST", body: JSON.stringify(params)})
-		let data = await res.json()
-		console.log("data", data)
-		return;
-
+	async function swapAction() {
 		//TODO: ADD VISUAL DIAGRAMM TO DOCS
 		//BLOCK I. execute current buy orders
 		//BLOCK II. create new buy order
 		//Part 1. Analyze inputs and send inputs to Server
 		// --------------------- Part from UI --------------------
 		const address = BOB_ADDRESS;
+		const TOKEN_SIGUSD =
+			'03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
 		const TOKEN_rsBTS =
 			'5bf691fbf0c4b17f8f8cece83fa947f62f480bfbd242bd58946f85535125db4d';
 
 		const price = 100n;
 		const amount = 200n;
 		const total = price * amount;
-
-		const buyingTokenId = TOKEN_rsBTS; //mintAndUse
+		const sellingTokenId = TOKEN_rsBTS; //mintAndUse
+		const buyingTokenId = TOKEN_SIGUSD; //TokenID
 		// -------------------------------------------------------
 
-		const buyParams: BuyRequest = {
+		const swapParams = {
 			address: address,
 			price: price,
 			amount: amount,
+			sellingTokenId: sellingTokenId,
 			buyingTokenId: buyingTokenId
 		};
+
+		function bigIntReplacer(key: string, value: any) {
+			return typeof value === 'bigint' ? value.toString() : value;
+		}
+
 		//Part 2. Receive commits from server
-		const { unsignedTx, publicCommitsBob } = await requestNewBuy(buyParams);
+		let res = await fetch('/api/swap-tx', {
+			method: 'POST',
+			body: JSON.stringify(swapParams, bigIntReplacer)
+		});
+		let data = await res.json();
+		console.log('data', data);
+		return;
+
+		const { unsignedTx, publicCommitsBob } =
+			await requestNewBuy(swapParams);
 
 		//Part 3. Check Transactions and Sign
 		const userMnemonic = BOB_MNEMONIC;
@@ -80,7 +86,10 @@
 	};
 
 	async function requestNewBuy(buyParams: BuyRequest) {
-		const resp = await fetch('/api/swap-tx', {method: "POST", body: JSON.stringify(buyParams)});
+		const resp = await fetch('/api/swap-tx', {
+			method: 'POST',
+			body: JSON.stringify(buyParams)
+		});
 		const jsonResponse = resp.json();
 		const { unsignedTx, publicCommitsBob } = jsonResponse;
 
@@ -91,7 +100,7 @@
 		console.log(signedTx);
 	}
 
-	function sell(){}
+	function sell() {}
 </script>
 
 <div class="actions">
@@ -263,7 +272,7 @@
 					</div>
 				</div>
 
-				<button class="buySellButton buyButton" on:click={buyAction}
+				<button class="buySellButton buyButton" on:click={swapAction}
 					>Buy</button
 				>
 			</div>
