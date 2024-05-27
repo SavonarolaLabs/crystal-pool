@@ -28,7 +28,7 @@
     </div>
     <!-- bottom center -->
     <div class="actions">
-        <Actions></Actions>
+        <!-- <Actions></Actions> -->
     </div>
     <!-- bottom right -->
     <div class="trades">

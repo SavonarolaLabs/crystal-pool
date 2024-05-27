@@ -20,6 +20,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/adapter-node": "^5.0.1",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/json-bigint": "^1.0.4",
@@ -34,6 +35,7 @@
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^5.0.3",
+		"vite-plugin-wasm": "^3.3.0",
 		"vitest": "^1.2.0"
 	},
 	"type": "module",
@@ -47,6 +49,7 @@
 		"bip39": "^3.1.0",
 		"bs58": "^5.0.0",
 		"bs58check": "^3.0.1",
+		"ergo-lib-wasm-browser": "^0.26.0",
 		"ergo-lib-wasm-nodejs": "^0.26.0",
 		"json-bigint": "^1.0.0",
 		"tiny-secp256k1": "^2.2.3"
