@@ -1,102 +1,12 @@
 <script lang="ts">
 	import { BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addresses';
 	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
-	import { utxos } from '$lib/data/utxos';
 	import { buy } from '$lib/wallet/buy';
-	import { a, b, c } from '$lib/wallet/multisig';
-	import { createSellOrderTx } from '$lib/wallet/sell';
-	import { createSwapOrderTx } from '$lib/wallet/swap';
+	import { b } from '$lib/wallet/multisig-client';
 	import type { Amount, EIP12UnsignedTransaction } from '@fleet-sdk/common';
 
 	let unsignedTx: EIP12UnsignedTransaction;
 
-	async function deconstructActionVolume(direction,price,amount) {
-		const executionVolume;
-		const orderVolume;
-		return {executionVolume,orderVolume}
-	}
-
-	async function swapAction() {
-		//TODO: ADD VISUAL DIAGRAMM TO DOCS
-		//BLOCK I. execute current swap orders
-		//BLOCK II. create new buy order
-		//Part 1. Analyze inputs and send inputs to Server
-		// --------------------- Part from UI --------------------
-		const address = BOB_ADDRESS;
-		const TOKEN_SIGUSD =
-			'03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
-		const TOKEN_rsBTS =
-			'5bf691fbf0c4b17f8f8cece83fa947f62f480bfbd242bd58946f85535125db4d';
-
-		const price = 100n;
-		const amount = 200n;
-		const total = price * amount;
-
-		const sellingTokenId = TOKEN_rsBTS; //mintAndUse
-		const buyingTokenId = TOKEN_SIGUSD; //TokenID
-		// -------------------------------------------------------
-
-		const swapParams = {
-			address: address,
-			price: price,
-			amount: amount,
-			sellingTokenId: sellingTokenId,
-			buyingTokenId: buyingTokenId
-		};
-		//Part 2. Receive commits from server
-		const { unsignedTx, publicCommitsBob } =
-			await requestNewSwap(swapParams);
-		//Part 3. Check Transactions and Sign
-		const userMnemonic = BOB_MNEMONIC;
-		const userAddress = BOB_ADDRESS;
-		const extractedHints = b(
-			unsignedTx,
-			userMnemonic,
-			userAddress,
-			publicCommitsBob
-		);
-		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
-		await requestSignNewOrder(extractedHints);
-	}
-	async function sellAction() {
-		//TODO: ADD VISUAL DIAGRAMM TO DOCS
-		//BLOCK I. execute current sell orders
-		//BLOCK II. create new buy order
-		//Part 1. Analyze inputs and send inputs to Server
-		// --------------------- Part from UI --------------------
-		const address = BOB_ADDRESS;
-		const TOKEN_rsBTS =
-			'5bf691fbf0c4b17f8f8cece83fa947f62f480bfbd242bd58946f85535125db4d';
-
-		const price = 100n;
-		const amount = 200n;
-		const total = price * amount;
-
-		const sellingTokenId = TOKEN_rsBTS; //mintAndUse
-		// -------------------------------------------------------
-
-		const sellParams: SellRequest = {
-			address: address,
-			price: price,
-			amount: amount,
-			sellingTokenId: sellingTokenId
-		};
-		//Part 2. Receive commits from server
-		const { unsignedTx, publicCommitsBob } =
-			await requestNewSell(sellParams);
-
-		//Part 3. Check Transactions and Sign
-		const userMnemonic = BOB_MNEMONIC;
-		const userAddress = BOB_ADDRESS;
-		const extractedHints = b(
-			unsignedTx,
-			userMnemonic,
-			userAddress,
-			publicCommitsBob
-		);
-		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
-		await requestSignNewOrder(extractedHints);
-	}
 	async function buyAction() {
 		//TODO: ADD VISUAL DIAGRAMM TO DOCS
 		//BLOCK I. execute current buy orders
@@ -157,80 +67,15 @@
 		buyingTokenId: string;
 	};
 
-	async function requestNewSwap(swapParams: SwapRequest) {
-		//ADD TYPE
-		//-----------------------------------
-		const height = 1273521;
-		const unlockHeight = height + 200000;
-		//------------------------------------
-
-		//CreateTx unsignedTx
-		unsignedTx = createSwapOrderTx(
-			swapParams.address,
-			DEPOSIT_ADDRESS,
-			utxos[BOB_ADDRESS], //need helper function and boxes for tests
-			{ tokenId: swapParams.sellingTokenId, amount: swapParams.amount },
-			swapParams.price,
-			height, //need helper function
-			unlockHeight, // need helper function
-			swapParams.sellingTokenId,
-			swapParams.buyingTokenId
-		);
-
-		const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
-		return { unsignedTx, publicCommitsBob };
-	}
-	async function requestNewSell(sellParams: SellRequest) {
-		//ADD TYPE
-		//-----------------------------------
-		const height = 1273521;
-		const unlockHeight = height + 200000;
-		//------------------------------------
-
-		//CreateTx unsignedTx
-		unsignedTx = createSellOrderTx(
-			sellParams.address,
-			DEPOSIT_ADDRESS,
-			utxos[BOB_ADDRESS], //need helper function and boxes for tests
-			{ tokenId: sellParams.sellingTokenId, amount: sellParams.amount },
-			sellParams.price,
-			height, //need helper function
-			unlockHeight // need helper function
-		);
-
-		const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
-		return { unsignedTx, publicCommitsBob };
-	}
 	async function requestNewBuy(buyParams: BuyRequest) {
-		//ADD TYPE
-		//-----------------------------------
-		const height = 1273521;
-		const unlockHeight = height + 200000;
-		//------------------------------------
+		const resp = await fetch('/api/swap-tx', {method: "POST", body: JSON.stringify(buyParams)});
+		const jsonResponse = resp.json();
+		const { unsignedTx, publicCommitsBob } = jsonResponse;
 
-		//CreateTx unsignedTx
-		unsignedTx = buy(
-			height, //need helper function
-			utxos[BOB_ADDRESS], //need helper function and boxes for tests
-			buyParams.address,
-			buyParams.price,
-			unlockHeight, // need helper function
-			{ tokenId: buyParams.buyingTokenId, amount: buyParams.amount }
-		);
-
-		const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
 		return { unsignedTx, publicCommitsBob };
 	}
 
 	async function requestSignNewOrder(extractedHints) {
-		//check
-		//1.Get transaction or find
-		//2.Get private commits or generate new
-		const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
-		//sign
-		const signedTx = c(unsignedTx, privateCommitsBob, extractedHints);
-		//ADD SignedTX to DB and Order Book
-		//...
 		console.log(signedTx);
 	}
 </script>
