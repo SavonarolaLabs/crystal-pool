@@ -2,7 +2,6 @@ import { BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
 import { a, c } from '$lib/wallet/multisig-server';
 import { createSwapOrderTx } from '$lib/wallet/swap';
-import type { Amount } from '@fleet-sdk/common';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 
 const NEW_SWAP_REQUEST = '/swapNew';
