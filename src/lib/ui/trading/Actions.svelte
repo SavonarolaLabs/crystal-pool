@@ -9,15 +9,6 @@
 
 	async function swapAction() {
 		//TEST 1
-		let res = await fetch('http://127.0.0.1:3000/sum', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ num1: 1, num2: 2 })
-		});
-		console.log(await res.json());
-
 		//TODO: ADD VISUAL DIAGRAMM TO DOCS
 		//BLOCK I. execute current buy orders
 		//BLOCK II. create new buy order
@@ -50,32 +41,31 @@
 
 		//Part 2. Receive commits from server
 		//TEST SWAP
-		let res2 = await fetch('http://127.0.0.1:3000/swapNew', {
+		let res = await fetch('http://127.0.0.1:3000/swapNew', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(swapParams)
 		});
-		console.log(await res2.json());
-		return;
-
-		const { unsignedTx, publicCommitsBob } =
-			await requestNewBuy(swapParams);
+		const { unsignedTx, publicCommitsBob } = await res.json();
+		console.log({ unsignedTx, publicCommitsBob });
 
 		//Part 3. Check Transactions and Sign
 		const userMnemonic = BOB_MNEMONIC;
 		const userAddress = BOB_ADDRESS;
-		// const extractedHints = b(
-		// 	unsignedTx,
-		// 	userMnemonic,
-		// 	userAddress,
-		// 	publicCommitsBob
-		// );
-		const extractedHints = null;
+		const extractedHints = await b(
+			unsignedTx,
+			userMnemonic,
+			userAddress,
+			publicCommitsBob
+		);
+		console.log(extractedHints);
 
 		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
-		await requestSignNewOrder(extractedHints);
+		//FETCH()
+		//await requestSignNewOrder(extractedHints);
+		return;
 	}
 
 	type SwapRequest = {

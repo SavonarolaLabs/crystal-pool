@@ -7,8 +7,8 @@ import type { FastifyInstance, FastifyRequest } from 'fastify';
 
 type SwapRequest = {
 	address: string;
-	price: bigint;
-	amount: Amount;
+	price: string;
+	amount: string;
 	sellingTokenId: string;
 	buyingTokenId: string;
 };
@@ -16,17 +16,12 @@ type SwapRequest = {
 export function processNewSwap(fastify: FastifyInstance, opts: any, done: any) {
 	fastify.post(
 		'/swapNew',
-		async (request: FastifyRequest<{ Body: SumRequestBody }>, reply) => {
+		async (request: FastifyRequest<{ Body: SwapRequest }>, reply) => {
 			const swapParams = request.body; //Swap Params
-			console.log('Params:');
-			console.log('🚀 ~ POST ~ swapParams:', swapParams);
-			//F
-
 			//-----------------------------------
 			const height = 1273521;
 			const unlockHeight = height + 200000;
 			//------------------------------------
-
 			//CreateTx unsignedTx
 			const unsignedTx = createSwapOrderTx(
 				swapParams.address,
@@ -36,34 +31,35 @@ export function processNewSwap(fastify: FastifyInstance, opts: any, done: any) {
 					tokenId: swapParams.sellingTokenId,
 					amount: swapParams.amount
 				},
-				swapParams.price,
+				BigInt(swapParams.price),
 				height, //need helper function
 				unlockHeight, // need helper function
 				swapParams.sellingTokenId,
 				swapParams.buyingTokenId
 			);
 
+			console.log('unsignedTx:');
+			console.log('🚀 ~ POST ~ unsignedTx:', unsignedTx);
 			const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
 			//return { unsignedTx, publicCommitsBob };
-			return { publicCommitsBob };
+			return { unsignedTx, publicCommitsBob };
 		}
 	);
 	done();
 }
 
-interface SumRequestBody {
-	num1: number;
-	num2: number;
-}
-
-export const sumRoute = (fastify: FastifyInstance, opts: any, done: any) => {
+export function processNewSwapSign(
+	fastify: FastifyInstance,
+	opts: any,
+	done: any
+) {
 	fastify.post(
-		'/sum',
-		async (request: FastifyRequest<{ Body: SumRequestBody }>, reply) => {
-			const { num1, num2 } = request.body;
-			const sum = num1 + num2;
-			return { sum };
+		'/swapNew/sign',
+		async (request: FastifyRequest<{ Body: SwapRequest }>, reply) => {
+			const extractedHints = request.body; //Swap Params
+			//return { unsignedTx, publicCommitsBob };
+			console.log('signed');
 		}
 	);
 	done();
-};
+}
