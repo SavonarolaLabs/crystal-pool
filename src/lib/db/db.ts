@@ -1,5 +1,9 @@
 import { type Box, type EIP12UnsignedTransaction } from '@fleet-sdk/common';
-import { ContractType, type BoxParameters, type BoxRow } from '$lib/types/boxRow';
+import {
+	ContractType,
+	type BoxParameters,
+	type BoxRow
+} from '$lib/types/boxRow';
 import type { TxRow } from '$lib/types/txRow';
 import { ErgoAddress, ErgoTree } from '@fleet-sdk/core';
 import {
@@ -33,7 +37,7 @@ function nextId(table: HasId[]) {
 
 export function db_addBox(db: BoxDB, box: Box) {
 	const boxParams = parseBox(box);
-	if(boxParams){
+	if (boxParams) {
 		const newRow: BoxRow = {
 			id: nextId(db.boxRows),
 			contract: boxParams.contract,
@@ -42,8 +46,8 @@ export function db_addBox(db: BoxDB, box: Box) {
 			unspent: true
 		};
 		db.boxRows.push(newRow);
-	}else{
-		console.error("db_addBox() invalid box: ", JSON.stringify(box))
+	} else {
+		console.error('db_addBox() invalid box: ', JSON.stringify(box));
 	}
 }
 
@@ -108,7 +112,7 @@ export function parseBox(box: Box): BoxParameters | undefined {
 					unlockHeight: r5,
 					tokenId: r6,
 					buyRate: r7,
-					buyerMultisigAddress: r8,
+					buyerMultisigAddress: r8
 				}
 			};
 		}
@@ -127,7 +131,7 @@ export function parseBox(box: Box): BoxParameters | undefined {
 					unlockHeight: r5,
 					tokenId: r6,
 					sellRate: r7,
-					sellerMultisigAddress: r8,
+					sellerMultisigAddress: r8
 				}
 			};
 		}
@@ -148,10 +152,29 @@ export function parseBox(box: Box): BoxParameters | undefined {
 					sellingTokenId: r6.sellingTokenId,
 					rate: r7,
 					sellerMultisigAddress: r8,
+					pair: pairByTokenIds(r6.sellingTokenId, r6.buyingTokenId)
 				}
 			};
 		}
 	}
+}
+
+export function pairByTokenIds(tokenId: string, additionalTokenId?: string) {
+	const tokenRegistry = [
+		{
+			tokenId:
+				'5bf691fbf0c4b17f8f8cece83fa947f62f480bfbd242bd58946f85535125db4d',
+			name: 'rsBTC'
+		},
+		{
+			tokenId:
+				'03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04',
+			name: 'sigUSD'
+		}
+	];
+	const name1 = tokenRegistry.find((t) => t.tokenId == tokenId);
+	const name2 = tokenRegistry.find((t) => t.tokenId == additionalTokenId);
+	return name1 + '_' + name2;
 }
 
 export function decodeR4(

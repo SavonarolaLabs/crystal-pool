@@ -43,6 +43,7 @@
 		const amount = 200n;
 		const sellingTokenId = TOKEN_rsBTS; //mintAndUse
 		const buyingTokenId = TOKEN_SIGUSD; //TokenID
+		const pair = 'rsBTC_sigUSD';
 
 		const swapParams: SwapRequest = {
 			address: address,
@@ -62,7 +63,7 @@
 		//BLOCK II. create new buy order
 
 		//Part 1. Take inputs from UI
-		const swapParams = getTestSwapParams(); //TODO: Take Real Inputs
+		const swapParams = getTestSwapParams(); //TODO: Take Real Inputs\
 
 		//Part 2. Receive commits from server
 		const { unsignedTx, publicCommitsBob } = await fetchServer(

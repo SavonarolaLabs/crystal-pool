@@ -1,7 +1,16 @@
-import { BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addresses';
+import {
+	BOB_ADDRESS,
+	DEPOSIT_ADDRESS,
+	SWAP_ORDER_ADDRESS
+} from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
+import { db_addBoxes, type BoxDB } from '$lib/db/db';
+import { getBoxById } from '$lib/external/box';
+import { boxesAtAddress } from '$lib/utils/test-helper';
 import { a, c } from '$lib/wallet/multisig-server';
 import { createSwapOrderTx } from '$lib/wallet/swap';
+import type { SignedTransaction } from '@fleet-sdk/common';
+import { sign } from 'crypto';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 
 const NEW_SWAP_REQUEST = '/swapNew';
@@ -68,9 +77,22 @@ export function processNewSwapSign(
 			);
 			const signedTxToStash = signedTx.to_js_eip12();
 			// TODO: Add signedToStash -> to DB -> To orderbook ...
+			storeSignedTx(fastify.db, signedTxToStash, SWAP_ORDER_ADDRESS);
 			//
 			return signedTxToStash;
 		}
 	);
 	done();
+}
+
+export function storeSignedTx(
+	db: BoxDB,
+	signedTx: SignedTransaction,
+	address: string
+) {
+	const boxes = boxesAtAddress(signedTx, address);
+	db_addBoxes(db, boxes);
+	//BoxRow.parameters.pair
+
+	//console.log(signedTx);
 }
