@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import { sumRoute } from './libraryA';
-import { processNewSwap } from './swapOrder';
+import { processNewSwap, processNewSwapSign } from './swapOrder';
 
 const fastify = Fastify({ logger: true });
 
@@ -13,6 +13,7 @@ fastify.register(fastifyCors, {
 
 fastify.register(sumRoute);
 fastify.register(processNewSwap);
+fastify.register(processNewSwapSign);
 
 const start = async () => {
 	try {
