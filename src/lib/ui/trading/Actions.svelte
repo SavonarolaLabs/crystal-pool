@@ -5,7 +5,23 @@
 	import { b } from '$lib/wallet/multisig-client';
 	import type { Amount, EIP12UnsignedTransaction } from '@fleet-sdk/common';
 
+	const INTERNAL_SERVER = 'http://127.0.0.1:3000';
+	const NEW_SWAP_REQUEST = '/swapNew';
+	const NEW_SWAP_SIGN = '/swapNewSign';
+
 	let unsignedTx: EIP12UnsignedTransaction;
+
+	async function fetchServer(address: string, props: any) {
+		let res = await fetch(INTERNAL_SERVER + address, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(props)
+		});
+		const data = await res.json();
+		return data;
+	}
 
 	async function swapAction() {
 		//TEST 1
@@ -41,7 +57,7 @@
 
 		//Part 2. Receive commits from server
 		//TEST SWAP
-		let res = await fetch('http://127.0.0.1:3000/swapNew', {
+		let res = await fetch(INTERNAL_SERVER + NEW_SWAP_REQUEST, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -63,8 +79,15 @@
 		console.log(extractedHints);
 
 		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
-		//FETCH()
-		//await requestSignNewOrder(extractedHints);
+		let resSign = await fetch(INTERNAL_SERVER + NEW_SWAP_SIGN, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ extractedHints, unsignedTx }) //TODO: unsignedTx not from USER
+		});
+		let signedTx = await resSign.json();
+		console.log(signedTx);
 		return;
 	}
 

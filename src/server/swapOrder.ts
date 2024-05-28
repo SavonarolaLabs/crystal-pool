@@ -1,9 +1,12 @@
 import { BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
-import { a } from '$lib/wallet/multisig-server';
+import { a, c } from '$lib/wallet/multisig-server';
 import { createSwapOrderTx } from '$lib/wallet/swap';
 import type { Amount } from '@fleet-sdk/common';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
+
+const NEW_SWAP_REQUEST = '/swapNew';
+const NEW_SWAP_SIGN = '/swapNewSign';
 
 type SwapRequest = {
 	address: string;
@@ -15,7 +18,7 @@ type SwapRequest = {
 
 export function processNewSwap(fastify: FastifyInstance, opts: any, done: any) {
 	fastify.post(
-		'/swapNew',
+		NEW_SWAP_REQUEST,
 		async (request: FastifyRequest<{ Body: SwapRequest }>, reply) => {
 			const swapParams = request.body; //Swap Params
 			//-----------------------------------
@@ -41,7 +44,6 @@ export function processNewSwap(fastify: FastifyInstance, opts: any, done: any) {
 			console.log('unsignedTx:');
 			console.log('🚀 ~ POST ~ unsignedTx:', unsignedTx);
 			const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
-			//return { unsignedTx, publicCommitsBob };
 			return { unsignedTx, publicCommitsBob };
 		}
 	);
@@ -54,11 +56,21 @@ export function processNewSwapSign(
 	done: any
 ) {
 	fastify.post(
-		'/swapNew/sign',
+		NEW_SWAP_SIGN,
 		async (request: FastifyRequest<{ Body: SwapRequest }>, reply) => {
-			const extractedHints = request.body; //Swap Params
-			//return { unsignedTx, publicCommitsBob };
-			console.log('signed');
+			const { extractedHints, unsignedTx } = request.body; //TODO: unsignedTx not from USER
+			console.log('Server hints', unsignedTx);
+			const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
+			const signedTx = await c(
+				unsignedTx,
+				privateCommitsBob,
+				extractedHints
+			);
+			const signedTxToStash = signedTx.to_js_eip12();
+			// TODO: Add signedToStash -> to DB -> To orderbook ...
+			// TODO: Add message for user ("Your order successfully added to orderbook")
+			// TODO: return message;
+			return signedTxToStash;
 		}
 	);
 	done();
