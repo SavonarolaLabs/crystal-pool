@@ -32,7 +32,7 @@ export function initDb(): BoxDB {
 
 function nextId(table: HasId[]) {
 	const maxId = Math.max(...table.map((row) => row.id));
-	return maxId + 1;
+	return maxId? maxId + 1: 0;
 }
 
 export function db_addBox(db: BoxDB, box: Box) {
@@ -172,8 +172,8 @@ export function pairByTokenIds(tokenId: string, additionalTokenId?: string) {
 			name: 'sigUSD'
 		}
 	];
-	const name1 = tokenRegistry.find((t) => t.tokenId == tokenId);
-	const name2 = tokenRegistry.find((t) => t.tokenId == additionalTokenId);
+	const name1 = tokenRegistry.find((t) => t.tokenId == tokenId)?.name;
+	const name2 = tokenRegistry.find((t) => t.tokenId == additionalTokenId)?.name;
 	return name1 + '_' + name2;
 }
 
