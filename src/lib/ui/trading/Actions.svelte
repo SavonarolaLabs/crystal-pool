@@ -23,13 +23,11 @@
 		return data;
 	}
 
-	async function swapAction() {
-		//TEST 1
-		//TODO: ADD VISUAL DIAGRAMM TO DOCS
-		//BLOCK I. execute current buy orders
-		//BLOCK II. create new buy order
-		//Part 1. Analyze inputs and send inputs to Server
-		// --------------------- Part from UI --------------------
+	function bigIntReplacer(value: any) {
+		return typeof value === 'bigint' ? value.toString() : value;
+	}
+
+	function getTestSwapParams() {
 		const address = BOB_ADDRESS;
 		const TOKEN_SIGUSD =
 			'03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
@@ -42,10 +40,6 @@
 		const sellingTokenId = TOKEN_rsBTS; //mintAndUse
 		const buyingTokenId = TOKEN_SIGUSD; //TokenID
 
-		function bigIntReplacer(value: any) {
-			return typeof value === 'bigint' ? value.toString() : value;
-		}
-
 		const swapParams = {
 			address: address,
 			price: bigIntReplacer(price),
@@ -53,22 +47,27 @@
 			sellingTokenId: sellingTokenId,
 			buyingTokenId: buyingTokenId
 		};
-		console.log('🚀 ~ swapAction ~ swapParams:', swapParams);
+
+		return swapParams;
+	}
+
+	async function swapAction() {
+		//TEST 1
+		//TODO: ADD VISUAL DIAGRAMM TO DOCS
+		//BLOCK I. execute current buy orders
+		//BLOCK II. create new buy order
+
+		//Part 1. Take inputs from UI
+		const swapParams = getTestSwapParams(); //TODO: Take Real Inputs
 
 		//Part 2. Receive commits from server
-		//TEST SWAP
-		let res = await fetch(INTERNAL_SERVER + NEW_SWAP_REQUEST, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(swapParams)
-		});
-		const { unsignedTx, publicCommitsBob } = await res.json();
-		console.log({ unsignedTx, publicCommitsBob });
+		const { unsignedTx, publicCommitsBob } = await fetchServer(
+			NEW_SWAP_REQUEST,
+			swapParams
+		);
 
 		//Part 3. Check Transactions and Sign
-		const userMnemonic = BOB_MNEMONIC;
+		const userMnemonic = BOB_MNEMONIC; //TODO: ?
 		const userAddress = BOB_ADDRESS;
 		const extractedHints = await b(
 			unsignedTx,
@@ -76,18 +75,14 @@
 			userAddress,
 			publicCommitsBob
 		);
-		console.log(extractedHints);
 
-		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
-		let resSign = await fetch(INTERNAL_SERVER + NEW_SWAP_SIGN, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ extractedHints, unsignedTx }) //TODO: unsignedTx not from USER
+		//Part 4. Send Hints to server. Server sign and insert tx and boxes into DB and Order Book
+		let message = await fetchServer(NEW_SWAP_SIGN, {
+			extractedHints,
+			unsignedTx //TODO: unsignedTx not from USER
 		});
-		let signedTx = await resSign.json();
-		console.log(signedTx);
+		console.log(message);
+
 		return;
 	}
 

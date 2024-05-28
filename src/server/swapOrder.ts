@@ -68,9 +68,14 @@ export function processNewSwapSign(
 			);
 			const signedTxToStash = signedTx.to_js_eip12();
 			// TODO: Add signedToStash -> to DB -> To orderbook ...
-			// TODO: Add message for user ("Your order successfully added to orderbook")
-			// TODO: return message;
-			return signedTxToStash;
+			//console.log(signedTxToStash);
+
+			// TODO: return message properly;
+			const message = {
+				status: 'succesful',
+				message: 'Your order successfully added to orderbook'
+			};
+			return message;
 		}
 	);
 	done();
