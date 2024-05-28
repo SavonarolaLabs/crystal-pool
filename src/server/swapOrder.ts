@@ -59,6 +59,7 @@ export function processNewSwapSign(
 		async (request: FastifyRequest<{ Body: SwapRequest }>, reply) => {
 			const { extractedHints, unsignedTx } = request.body; //TODO: unsignedTx not from USER
 			console.log('Server hints', unsignedTx);
+
 			const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
 			const signedTx = await c(
 				unsignedTx,
@@ -67,14 +68,8 @@ export function processNewSwapSign(
 			);
 			const signedTxToStash = signedTx.to_js_eip12();
 			// TODO: Add signedToStash -> to DB -> To orderbook ...
-			//console.log(signedTxToStash);
-
-			// TODO: return message properly;
-			const message = {
-				status: 'succesful',
-				message: 'Your order successfully added to orderbook'
-			};
-			return message;
+			//
+			return signedTxToStash;
 		}
 	);
 	done();

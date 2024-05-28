@@ -81,14 +81,15 @@
 		);
 
 		//Part 4. Send Hints to server. Server sign and insert tx and boxes into DB and Order Book
-		let message = await fetchServer(NEW_SWAP_SIGN, {
+		let signedTx = await fetchServer(NEW_SWAP_SIGN, {
 			extractedHints,
 			unsignedTx //TODO: unsignedTx not from USER
 		});
-		console.log(message);
+		console.log(signedTx);
 
 		return;
 	}
+
 	async function swapActionSell() {}
 </script>
 
