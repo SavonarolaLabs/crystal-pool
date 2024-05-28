@@ -21,17 +21,6 @@ let db;
 const start = async () => {
 	try {
     db = initDb();
-
-    const boxRow  = {
-      id: "rsBTC_sigUSD",
-      box: "bigbox"
-  }
-  const boxRow2  = {
-    id: "foobar",
-    box: "bigbox"
-}
-    db.boxRows.push(boxRow)
-    db.boxRows.push(boxRow2)
     fastify.decorate('db', db)
 
     fastify.register(sumRoute);
