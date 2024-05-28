@@ -2,6 +2,8 @@ import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import { sumRoute } from './libraryA';
 import { processNewSwap, processNewSwapSign } from './swapOrder';
+import { boxesRoute } from './boxes';
+import { initDb } from '$lib/db/db';
 
 const fastify = Fastify({ logger: true });
 
@@ -11,12 +13,20 @@ fastify.register(fastifyCors, {
 	methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'] // Allow all methods
 });
 
-fastify.register(sumRoute);
-fastify.register(processNewSwap);
-fastify.register(processNewSwapSign);
+
+
+let db;
 
 const start = async () => {
 	try {
+    db = initDb();
+    fastify.decorate('db', db)
+
+    fastify.register(sumRoute);
+    fastify.register(processNewSwap);
+    fastify.register(processNewSwapSign);
+    fastify.register(boxesRoute);
+
 		await fastify.listen({ port: 3000 }); // Updated to use object for listen method
 		fastify.log.info(`Server running at http://localhost:3000`);
 	} catch (err) {
