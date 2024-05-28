@@ -8,15 +8,16 @@
 	let unsignedTx: EIP12UnsignedTransaction;
 
 	async function swapAction() {
+		//TEST 1
 		let res = await fetch('http://127.0.0.1:3000/sum', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({num1: 1, num2: 2})
+			body: JSON.stringify({ num1: 1, num2: 2 })
 		});
-		console.log(await res.json())
-		/*
+		console.log(await res.json());
+
 		//TODO: ADD VISUAL DIAGRAMM TO DOCS
 		//BLOCK I. execute current buy orders
 		//BLOCK II. create new buy order
@@ -33,27 +34,30 @@
 		const total = price * amount;
 		const sellingTokenId = TOKEN_rsBTS; //mintAndUse
 		const buyingTokenId = TOKEN_SIGUSD; //TokenID
-		// -------------------------------------------------------
 
-		const swapParams = {
-			address: address,
-			price: price,
-			amount: amount,
-			sellingTokenId: sellingTokenId,
-			buyingTokenId: buyingTokenId
-		};
-
-		function bigIntReplacer(key: string, value: any) {
+		function bigIntReplacer(value: any) {
 			return typeof value === 'bigint' ? value.toString() : value;
 		}
 
+		const swapParams = {
+			address: address,
+			price: bigIntReplacer(price),
+			amount: bigIntReplacer(amount),
+			sellingTokenId: sellingTokenId,
+			buyingTokenId: buyingTokenId
+		};
+		console.log('🚀 ~ swapAction ~ swapParams:', swapParams);
+
 		//Part 2. Receive commits from server
-		let res = await fetch('/api/swap-tx', {
+		//TEST SWAP
+		let res2 = await fetch('http://127.0.0.1:3000/swapNew', {
 			method: 'POST',
-			body: JSON.stringify(swapParams, bigIntReplacer)
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(swapParams)
 		});
-		let data = await res.json();
-		console.log('data', data);
+		console.log(await res2.json());
 		return;
 
 		const { unsignedTx, publicCommitsBob } =
@@ -72,7 +76,6 @@
 
 		//Part 4. Send Hints to server //Part 5. Server sign and insert Order in Order Book
 		await requestSignNewOrder(extractedHints);
-		*/
 	}
 
 	type SwapRequest = {
