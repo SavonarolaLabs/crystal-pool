@@ -1,3 +1,11 @@
+<script lang="ts">
+	import {
+		orderbook_buy,
+		orderbook_latest,
+		orderbook_sell
+	} from '$lib/ui/ui_state';
+</script>
+
 <div class="orderbook">
 	<div>Order Book</div>
 	<div class="orderbook_controller">
@@ -119,21 +127,26 @@
 	</div>
 	<div class="orderbook_body">
 		<div class="orderbook_asks">
-			{#each new Array(10) as i}
+			{#each $orderbook_sell as row}
 				<div class="orderbook_row">
 					<div
 						class="orderbook_bar orderbook_askBar"
 						style="transform: scaleX(0.2249933);"
 					></div>
-					<div class="orderbook_price orderbook_sell">69,001.34</div>
-					<div class="orderbook_vol"><span>1.302628</span></div>
-					<div class="orderbook_amount"><span>89,883.07</span></div>
+					<div class="orderbook_price orderbook_sell">
+						{row.price}
+					</div>
+					<div class="orderbook_vol"><span>{row.amount}</span></div>
+					<div class="orderbook_amount"><span>{row.value}</span></div>
 				</div>
 			{/each}
 		</div>
 		<div class="flex items-center">
-			<span class="orderbook_bigPrice orderbook_sell"
-				><span>68,832.57</span><svg
+			<span
+				class="orderbook_bigPrice"
+				class:orderbook_sell={$orderbook_latest.side == 'sell'}
+				class:orderbook_buy={$orderbook_latest.side == 'buy'}
+				><span>{$orderbook_latest.price}</span><svg
 					class="orderbook_updownArrow"
 					focusable="false"
 					width="1em"
@@ -149,21 +162,21 @@
 			><span class="orderbook_fiatPrice ml-2"
 				><span style="margin-inline-end: 4px;">≈</span><span dir="ltr"
 					><span style="margin-inline-end: 2px;">$</span><span
-						dir="ltr">68,798.26</span
+						dir="ltr">{$orderbook_latest.value}</span
 					></span
 				></span
 			>
 		</div>
 		<div class="orderbook_bids">
-			{#each new Array(10) as i}
+			{#each $orderbook_buy as row}
 				<div class="orderbook_row">
 					<div
 						class="orderbook_bar orderbook_bidBar"
 						style="transform: scaleX(0.2249933);"
 					></div>
-					<div class="orderbook_price orderbook_buy">69,001.34</div>
-					<div class="orderbook_vol"><span>1.302628</span></div>
-					<div class="orderbook_amount"><span>89,883.07</span></div>
+					<div class="orderbook_price orderbook_buy">{row.price}</div>
+					<div class="orderbook_vol"><span>{row.amount}</span></div>
+					<div class="orderbook_amount"><span>{row.value}</span></div>
 				</div>
 			{/each}
 		</div>
@@ -171,11 +184,10 @@
 </div>
 
 <style lang="postcss">
-	
 	.orderbook {
-    	margin: 4px 0;
+		margin: 4px 0;
 		margin-inline-start: 10px;
-		heigh:32px;
+		heigh: 32px;
 		line-height: 32px;
 		padding-inline-start: 6px;
 		height: 100%;
@@ -189,7 +201,6 @@
 		height: 24px;
 		margin-top: 2px;
 		padding-inline-end: 10px;
-
 	}
 	.orderbook_dirWrapper {
 		display: flex;
@@ -213,7 +224,6 @@
 		overflow: hidden;
 		padding: 6px 0 2px;
 		padding-inline-end: 10px;
-
 	}
 	.orderbook_column {
 		color: var(--text-secondary);
@@ -241,7 +251,12 @@
 	.orderbook_body {
 		flex-grow: 1;
 	}
-	
+
+	.orderbook_asks {
+		display: flex;
+		flex-direction: column-reverse;
+	}
+
 	.orderbook_asks,
 	.orderbook_bids {
 		overflow-x: hidden;
@@ -257,7 +272,6 @@
 		overflow: hidden;
 		position: relative;
 		padding-inline-end: 10px;
-
 	}
 
 	.orderbook_sell {
@@ -308,7 +322,7 @@
 		-webkit-margin-start: 5px;
 		margin-inline-start: 5px;
 	}
-	.svg-icon{
+	.svg-icon {
 		font-size: 18px;
 	}
 </style>
