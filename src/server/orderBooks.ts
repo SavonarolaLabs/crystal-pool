@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type { BoxDB } from '$lib/db/db';
 import { bigIntSerializer } from './bigIntSerializer';
+import { asBigInt } from '$lib/utils/helper';
 
 interface OrderBooksParams {
 	tradingPair: string;
@@ -25,7 +26,7 @@ export function orderBooksRoute(
 			);
 			const allOrders = filteredBoxRows.map((row) => {
 				return {
-					price: row.parameters.rate, // todo rate to price conversion
+					rate: row.parameters.rate, // todo rate to price conversion
 					amount: row.box.assets[0].amount,
 					side: row.parameters.side
 				};
@@ -35,8 +36,20 @@ export function orderBooksRoute(
 				(order) => order.side == 'sell'
 			);
 			const oderbook = {
-				buy: buyOrders,
-				sell: sellOrders
+				buy: buyOrders.map((r) => {
+					return {
+						price: r.rate,
+						amount: r.amount,
+						total: asBigInt(r.rate) * asBigInt(r.amount)
+					};
+				}),
+				sell: sellOrders.map((r) => {
+					return {
+						price: 1 / r.rate,
+						amount: r.amount,
+						total: 1n / asBigInt(r.rate) * asBigInt(r.amount)
+					};
+				})
 			};
 
 			const serializedData = bigIntSerializer(oderbook);
