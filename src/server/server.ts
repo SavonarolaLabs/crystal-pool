@@ -2,14 +2,18 @@ import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
-import { sumRoute } from './libraryA';
-import { processNewSwap, processNewSwapSign } from './swapOrder';
-import { boxesRoute } from './boxes';
-import { orderBooksRoute } from './orderBooks';
 import { initDb } from '$lib/db/db';
+import { sumRoute } from './libraryA';
+import { processNewSwap } from './swapOrder';
+import { boxesRoute } from './boxes';
 
-// Initialize Fastify
 const fastify = Fastify({ logger: true });
+
+// Register the CORS plugin with maximum permissions
+fastify.register(fastifyCors, {
+  origin: '*',
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD']
+});
 
 // Create an HTTP server and attach Fastify to it
 const server = createServer(fastify.server);
@@ -22,53 +26,39 @@ const io = new SocketIOServer(server, {
   }
 });
 
-// Register the CORS plugin with maximum permissions
-fastify.register(fastifyCors, {
-  origin: '*', // Allow all origins
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'] // Allow all methods
-});
-
-// Attach io to Fastify instance
+// Ensure io is decorated before any routes are registered
 fastify.decorate('io', io);
 
+// Initialize the database
 let db;
 
 const start = async () => {
   try {
+    console.log('Starting server...');
     db = initDb();
     fastify.decorate('db', db);
 
     // Register routes
     fastify.register(sumRoute);
     fastify.register(processNewSwap);
-    fastify.register(processNewSwapSign);
     fastify.register(boxesRoute);
-    fastify.register(orderBooksRoute);
 
-    // Basic test route
-    fastify.get('/test', async (request, reply) => {
-      reply.send({ message: 'Test route is working' });
-    });
-
-    // Start the HTTP server
-    server.listen(3000, () => {
-      fastify.log.info(`Server running at http://localhost:3000`);
-    });
+    await fastify.listen({ port: 3000 });
+    fastify.log.info('Server running at http://localhost:3000');
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
   }
 };
 
+// Basic test route
+fastify.get('/test', async (request, reply) => {
+  return { message: 'Test route is working' };
+});
+
 // Socket.IO communication
 io.on('connection', (socket) => {
   console.log('A client connected:', socket.id);
-
-  // Example event
-  socket.on('join', (room) => {
-    socket.join(room);
-    console.log(`Client ${socket.id} joined room ${room}`);
-  });
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
