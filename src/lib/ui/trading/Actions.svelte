@@ -3,9 +3,11 @@
 	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
 	import { TOKEN } from '$lib/constants/tokens';
 	import { b } from '$lib/wallet/multisig-client';
-	import { createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
-
-
+	import {
+		createSwapTx,
+		signSwapTx
+	} from '$lib/ui/service/crystalPoolService';
+	import BigNumber from 'bignumber.js';
 
 	let buyPriceInput: string;
 	let buyAmountInput: string;
@@ -22,8 +24,6 @@
 		sellingTokenId: string;
 		buyingTokenId: string;
 	};
-
-
 
 	function bigIntReplacer(value: any): string {
 		return typeof value === 'bigint' ? value.toString() : value;
@@ -77,27 +77,37 @@
 		);
 
 		//Part 4. Send Hints to server. Server sign and insert tx and boxes into DB and Order Book
-		let signedTx = await signSwapTx(extractedHints, unsignedTx)
+		let signedTx = await signSwapTx(extractedHints, unsignedTx);
 
 		return;
 	}
 	function getDecimalsByTokenName(name: string) {
-		return '2';
+		const keys = Object.keys(TOKEN);
+		const foundKey = keys.find((n) => n == name);
+		return TOKEN[foundKey].decimals;
 	}
 
 	async function swapActionSell() {
-		console.log('buy');
-		console.log(buyPriceInput);
-		console.log(buyAmountInput);
-		console.log(buyTotalInput);
-		console.log(TOKEN.rsBTC.name);
-		const decimals = getDecimalsByTokenName(TOKEN.rsBTC.name);
-		console.log(decimals);
+		// take user inputs
+		const amountInput = new BigNumber(sellAmountInput);
+		const priceInput = new BigNumber(sellPriceInput);
 
-		console.log('sell');
-		console.log(sellPriceInput);
-		console.log(sellAmountInput);
-		console.log(sellTotalInput);
+		// load and calculate decimals
+		const decimalsToken = getDecimalsByTokenName(TOKEN.rsBTC.name);
+		const decimalsCurrency = getDecimalsByTokenName(TOKEN.sigUSD.name);
+		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
+		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
+
+		const bigDecimalsDelta =
+			bigDecimalsToken.dividedBy(bigDecimalsCurrency);
+
+		// apply decimals
+		const real_price = priceInput.dividedBy(bigDecimalsDelta);
+		const real_amount = amountInput.multipliedBy(bigDecimalsToken);
+
+		// check results after converting toString()
+		console.log('real price: 1 sat in cents =', real_price.toString());
+		console.log('real amount: sats =', real_amount.toString());
 	}
 </script>
 
