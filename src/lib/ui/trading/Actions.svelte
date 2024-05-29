@@ -53,19 +53,9 @@
 		return swapParams;
 	}
 
-	async function swapActionBuy() {
-		//TEST 1
-		//TODO: ADD VISUAL DIAGRAMM TO DOCS
-		//BLOCK I. execute current buy orders
-		//BLOCK II. create new buy order
-
-		//Part 1. Take inputs from UI
-		const swapParams = getTestSwapParams(); //TODO: Take Real Inputs\
-
-		//Part 2. Receive commits from server
-		//TODO: unsignedTx not from USER
+	async function swapCore(swapParams: SwapRequest) {
+		//Part 2. Create Tx and Hints
 		const { unsignedTx, publicCommitsBob } = await createSwapTx(swapParams);
-
 		//Part 3. Check Transactions and Sign
 		const userMnemonic = BOB_MNEMONIC; //TODO: ?
 		const userAddress = BOB_ADDRESS;
@@ -78,7 +68,20 @@
 
 		//Part 4. Send Hints to server. Server sign and insert tx and boxes into DB and Order Book
 		let signedTx = await signSwapTx(extractedHints, unsignedTx);
+		return signedTx;
+	}
 
+	async function swapActionBuy() {
+		//TEST 1
+		//TODO: ADD VISUAL DIAGRAMM TO DOCS
+		//BLOCK I. execute current buy orders
+		//BLOCK II. create new buy order
+
+		//Part 1. Take inputs from UI
+		const swapParams = getTestSwapParams(); //TODO: Take Real Inputs\
+		//----------------------------
+		let signedTx = await swapCore(swapParams);
+		console.log(signedTx);
 		return;
 	}
 
@@ -91,10 +94,6 @@
 		const keys = Object.keys(TOKEN);
 		const foundKey = keys.find((n) => n == name);
 		return TOKEN[foundKey].tokenId;
-	}
-
-	async function deposit_on_contract() {
-		//123
 	}
 
 	async function swapActionSell() {
@@ -143,6 +142,9 @@
 			buyingTokenId: getTokenIdByTokenName(buyingToken)
 		};
 		console.log('swap params for selling:', swapParams);
+		//----------------------------
+		let signedTx = await swapCore(swapParams);
+		console.log(signedTx);
 	}
 </script>
 
