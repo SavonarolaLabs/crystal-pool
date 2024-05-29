@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store';
-import { orderBook } from './service/crystalPoolService';
-import { pairName } from '$lib/constants/tokens';
+
 
 let dummyOrders = []
 for(let i = 0; i < 10; i++){
@@ -20,6 +19,9 @@ export const orderbook_latest = writable({
     side: "sell",
 });
 
-export async function reloadOrderBook(){
-    const book = await orderBook(pairName.rsBTC_sigUSD);
+export async function setOrderBook(book:any){
+    if (book?.buy){
+        orderbook_buy.set(book.buy);
+        orderbook_sell.set(book.sell);
+    }
 }

@@ -40,14 +40,14 @@ export function orderBooksRoute(
 					return {
 						price: r.rate,
 						amount: r.amount,
-						total: asBigInt(r.rate) * asBigInt(r.amount)
+						value: asBigInt(r.rate) * asBigInt(r.amount)
 					};
 				}),
 				sell: sellOrders.map((r) => {
 					return {
 						price: 1 / r.rate,
 						amount: r.amount,
-						total: 1n / asBigInt(r.rate) * asBigInt(r.amount)
+						value: 1n / asBigInt(r.rate) * asBigInt(r.amount)
 					};
 				})
 			};

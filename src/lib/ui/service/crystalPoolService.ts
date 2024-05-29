@@ -1,10 +1,10 @@
-const POOL_URL = 'http://127.0.0.1:3000';
+const CRYSTALPOOL_URL = 'http://127.0.0.1:3000';
 const NEW_SWAP_REQUEST = '/swapNew';
 const NEW_SWAP_SIGN = '/swapNewSign';
 const ORDER_BOOK = '/order-book/';
 
 export async function get(address: string) {
-    let res = await fetch(POOL_URL + address, {
+    let res = await fetch(CRYSTALPOOL_URL + address, {
         headers: {
             'Content-Type': 'application/json'
         },
@@ -14,7 +14,7 @@ export async function get(address: string) {
 }
 
 export async function post(address: string, props: any) {
-    let res = await fetch(POOL_URL + address, {
+    let res = await fetch(CRYSTALPOOL_URL + address, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
