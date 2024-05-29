@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addresses';
 	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
+	import { TOKEN } from '$lib/constants/tokens';
 	import { b } from '$lib/wallet/multisig-client';
 	import type { Amount } from '@fleet-sdk/common';
 
@@ -98,11 +99,17 @@
 
 		return;
 	}
+	function getDecimalsByTokenName(name: string) {
+		return '2';
+	}
+
 	async function swapActionSell() {
 		console.log('buy');
 		console.log(buyPriceInput);
 		console.log(buyAmountInput);
 		console.log(buyTotalInput);
+		console.log(TOKEN.rsBTC.name);
+		getDecimalsByTokenName(TOKEN.rsBTC.name);
 
 		console.log('sell');
 		console.log(sellPriceInput);
