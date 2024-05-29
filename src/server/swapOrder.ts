@@ -42,7 +42,7 @@ export function processNewSwap(fastify: FastifyInstance, opts: any, done: any) {
 					tokenId: swapParams.sellingTokenId,
 					amount: swapParams.amount
 				},
-				BigInt(swapParams.price),
+				swapParams.price,
 				height, //need helper function
 				unlockHeight, // need helper function
 				swapParams.sellingTokenId,
