@@ -1,37 +1,18 @@
-import {
-	SHADOWPOOL_ADDRESS,
-	SWAP_ORDER_ADDRESS
-} from '$lib/constants/addresses';
-import {
-	first,
-	type Amount,
-	type Box,
-	type EIP12UnsignedTransaction,
-	type OneOrMore
-} from '@fleet-sdk/common';
-import {
-	ErgoAddress,
-	OutputBuilder,
-	RECOMMENDED_MIN_FEE_VALUE,
-	SAFE_MIN_BOX_VALUE,
-	SColl,
-	SGroupElement,
-	SInt,
-	SSigmaProp,
-	TransactionBuilder
-} from '@fleet-sdk/core';
-import { SByte, SLong, SPair } from '@fleet-sdk/serializer';
+import { SHADOWPOOL_ADDRESS, SWAP_ORDER_ADDRESS } from "$lib/constants/addresses";
+import { first, type Amount, type Box, type EIP12UnsignedTransaction, type OneOrMore } from "@fleet-sdk/common";
+import { ErgoAddress, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, SColl, SGroupElement, SInt, SSigmaProp, TransactionBuilder } from "@fleet-sdk/core";
+import { SByte, SLong, SPair } from "@fleet-sdk/serializer";
 
 export function createSwapOrderTx(
 	sellerPK: string,
 	sellerMultisigAddress: string,
 	inputBoxes: OneOrMore<Box<Amount>>,
 	token: { tokenId: string; amount: Amount },
-	sellRate: string,
+	sellRate: bigint,
 	currentHeight: number,
 	unlockHeight: number,
-	sellingTokenId: string,
-	buyingTokenId: string
+    sellingTokenId: string,
+    buyingTokenId: string,
 ): EIP12UnsignedTransaction {
 	const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, SWAP_ORDER_ADDRESS)
 		.addTokens(token)
