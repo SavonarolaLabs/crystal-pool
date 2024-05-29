@@ -93,32 +93,12 @@
 		return TOKEN[foundKey].tokenId;
 	}
 
-	async function swapActionSell_RETURN() {
-		// take user inputs
-		const amountInput = new BigNumber(sellAmountInput);
-		const priceInput = new BigNumber(sellPriceInput);
-
-		// load and calculate decimals
-		const decimalsToken = getDecimalsByTokenName(TOKEN.rsBTC.name);
-		const decimalsCurrency = getDecimalsByTokenName(TOKEN.sigUSD.name);
-		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
-		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
-
-		const bigDecimalsDelta =
-			bigDecimalsToken.dividedBy(bigDecimalsCurrency);
-
-		// apply decimals
-		const real_price = priceInput.dividedBy(bigDecimalsDelta);
-		const real_amount = amountInput.multipliedBy(bigDecimalsToken);
-
-		// check results after converting toString()
-		console.log('real price: 1 sat in cents =', real_price.toString());
-		console.log('real amount: sats =', real_amount.toString());
+	async function deposit_on_contract() {
+		//123
 	}
 
 	async function swapActionSell() {
 		//INPUT INFO
-
 		// SELL ORDER CONFIG
 		const userAddress = BOB_ADDRESS; //TODO:
 		const sellingToken = 'rsBTC';
@@ -140,12 +120,21 @@
 		// apply decimals
 		const real_price = priceInput.dividedBy(bigDecimalsDelta);
 		const real_amount = amountInput.multipliedBy(bigDecimalsToken);
+		const total = real_price.multipliedBy(real_amount);
 
 		// check results after converting toString()
 		console.log('real price: 1 sat in cents =', real_price.toString());
 		console.log('real amount: sats =', real_amount.toString());
+		console.log('total amount: cents =', total.toString());
 
-		//ABC
+		//SwapRequest
+		// BOB HAS 0.01 rsBTC
+		// TEST ORDER DISTRIBUTION
+		// 0.001 rsBTC  -  PRICE: 10  -  TOTAL: 1  cent
+		// 0.002 rsBTC  -  PRICE: 20  -  TOTAL: 4  cent
+		// 0.003 rsBTC  -  PRICE  30  -  TOTAL: 9  cent
+		// 0.004 rsBTC  -  PRICE  40  -  TOTAL: 16 cent
+
 		const swapParams: SwapRequest = {
 			address: BOB_ADDRESS,
 			price: real_price.toString(),
