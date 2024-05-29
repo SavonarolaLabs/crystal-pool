@@ -109,7 +109,8 @@
 		console.log(buyAmountInput);
 		console.log(buyTotalInput);
 		console.log(TOKEN.rsBTC.name);
-		getDecimalsByTokenName(TOKEN.rsBTC.name);
+		const decimals = getDecimalsByTokenName(TOKEN.rsBTC.name);
+		console.log(decimals);
 
 		console.log('sell');
 		console.log(sellPriceInput);
