@@ -9,15 +9,15 @@ export const TOKEN = {
 	sigUSD: {
 		tokenId:
 			'03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04',
-		name: 'sigUSD', //?
-		decimals: 9, //?
+		name: 'SigUSD', //?
+		decimals: 2, //?
 		type: 'EIP-004'
 	}
 };
 
 export const tradingPairs = [
 	{
-		name: 'rsBTC_sigUSD',
+		name: 'rsBTC_SigUSD',
 		tokens: [TOKEN.rsBTC.tokenId, TOKEN.sigUSD.tokenId]
 	}
 ];
