@@ -26,6 +26,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/json-bigint": "^1.0.4",
 		"@types/node": "^20.12.8",
+		"@types/socket.io": "^3.0.2",
 		"autoprefixer": "^10.4.19",
 		"nodemon": "^3.1.1",
 		"postcss": "^8.4.38",
@@ -60,6 +61,8 @@
 		"json-bigint": "^1.0.0",
 		"rollup-plugin-node-polyfills": "^0.2.1",
 		"safe-buffer": "^5.2.1",
+		"socket.io": "^4.7.5",
+		"socket.io-client": "^4.7.5",
 		"tiny-secp256k1": "^2.2.3"
 	}
 }
