@@ -3,11 +3,9 @@
 	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
 	import { TOKEN } from '$lib/constants/tokens';
 	import { b } from '$lib/wallet/multisig-client';
-	import type { Amount } from '@fleet-sdk/common';
+	import { createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 
-	const INTERNAL_SERVER = 'http://127.0.0.1:3000';
-	const NEW_SWAP_REQUEST = '/swapNew';
-	const NEW_SWAP_SIGN = '/swapNewSign';
+
 
 	let buyPriceInput: string;
 	let buyAmountInput: string;
@@ -25,17 +23,7 @@
 		buyingTokenId: string;
 	};
 
-	async function fetchServer(address: string, props: any) {
-		let res = await fetch(INTERNAL_SERVER + address, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(props)
-		});
-		const data = await res.json();
-		return data;
-	}
+
 
 	function bigIntReplacer(value: any): string {
 		return typeof value === 'bigint' ? value.toString() : value;
@@ -75,10 +63,8 @@
 		const swapParams = getTestSwapParams(); //TODO: Take Real Inputs\
 
 		//Part 2. Receive commits from server
-		const { unsignedTx, publicCommitsBob } = await fetchServer(
-			NEW_SWAP_REQUEST,
-			swapParams
-		);
+		//TODO: unsignedTx not from USER
+		const { unsignedTx, publicCommitsBob } = await createSwapTx(swapParams);
 
 		//Part 3. Check Transactions and Sign
 		const userMnemonic = BOB_MNEMONIC; //TODO: ?
@@ -91,11 +77,7 @@
 		);
 
 		//Part 4. Send Hints to server. Server sign and insert tx and boxes into DB and Order Book
-		let signedTx = await fetchServer(NEW_SWAP_SIGN, {
-			extractedHints,
-			unsignedTx //TODO: unsignedTx not from USER
-		});
-		console.log(signedTx);
+		let signedTx = await signSwapTx(extractedHints, unsignedTx)
 
 		return;
 	}
