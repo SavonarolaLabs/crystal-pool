@@ -1,60 +1,55 @@
-import Fastify from 'fastify';
-import fastifyCors from '@fastify/cors';
-import fastifyWebsocket from '@fastify/websocket';
-import { sumRoute } from './libraryA';
-import { processNewSwap } from './swapOrder';
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import { json } from 'body-parser';
 import { boxesRoute } from './boxes';
+import { orderBooksRoute } from './orderBooks';
+import { processNewSwap, processNewSwapSign } from './swapOrder';
 import { initDb } from '$lib/db/db';
 
-const fastify = Fastify({ logger: true });
-
-// Register the CORS plugin with maximum permissions
-fastify.register(fastifyCors, {
-  origin: '*',
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD']
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
 });
 
-// Register the @fastify/websocket plugin
-fastify.register(fastifyWebsocket);
+// Middleware
+app.use(json());
 
 // Initialize the database
 const db = initDb();
-fastify.decorate('db', db);
 
 // Register routes
-fastify.register(sumRoute);
-fastify.register(processNewSwap);
-fastify.register(boxesRoute);
+boxesRoute(app, io, db); // Pass the io instance and db
+orderBooksRoute(app, db); // Pass the db
+processNewSwap(app, io, db); // Pass the io instance and db
+processNewSwapSign(app, io, db); // Pass the io instance and db
 
 // Basic test route
-fastify.get('/test', async (request, reply) => {
-  return { message: 'Test route is working' };
+app.get('/test', (req, res) => {
+  res.json({ message: 'Test route is working' });
 });
 
-// WebSocket endpoint
-fastify.get('/ws', { websocket: true }, (connection, req) => {
-  console.log('WebSocket client connected');
+// WebSocket connection
+io.on('connection', (socket) => {
+  console.log('A client connected:', socket.id);
 
-  connection.socket.on('message', message => {
-    console.log('Received message:', message.toString());
-    // Echo the message back to the client
-    connection.socket.send('Hello from server');
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
   });
 
-  connection.socket.on('close', () => {
-    console.log('WebSocket client disconnected');
+  // Example: Emit an update to all clients
+  socket.on('exampleEvent', (data) => {
+    console.log('Received exampleEvent:', data);
+    io.emit('update', { buy: [], sell: [] });
   });
 });
 
-// Start the Fastify server
-const start = async () => {
-  try {
-    await fastify.listen({ port: 3000 });
-    fastify.log.info('Server running at http://localhost:3000');
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
-
-start();
+// Start the server
+const PORT = 3000;
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
