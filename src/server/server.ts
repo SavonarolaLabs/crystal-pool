@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import { json } from 'body-parser';
+import cors from 'cors';
 import { boxesRoute } from './boxes';
 import { orderBooksRoute } from './orderBooks';
 import { processNewSwap, processNewSwapSign } from './swapOrder';
@@ -15,6 +16,17 @@ const io = new Server(server, {
     methods: ['GET', 'POST']
   }
 });
+
+// Apply CORS middleware to Express
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
 
 // Middleware
 app.use(json());
