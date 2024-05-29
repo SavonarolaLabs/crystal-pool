@@ -18,7 +18,6 @@
 			>
 				<svg
 					width="180px"
-					height="auto"
 					viewBox="0 0 369.6551724137931 60.3448275862069"
 					class="looka-1j8o68f"
 					><defs id="SvgjsDefs1201"></defs><g
