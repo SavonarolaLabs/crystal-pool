@@ -19,6 +19,7 @@ export type BuyParams = DepositParams & {
 	buyRate: bigint;
 	buyerMultisigAddress: string;
 	pair: string;
+	side: string;
 };
 
 export type SellParams = DepositParams & {
@@ -26,6 +27,7 @@ export type SellParams = DepositParams & {
 	sellRate: bigint;
 	sellerMultisigAddress: string;
 	pair: string;
+	side: string;
 };
 
 export type SwapParams = DepositParams & {
@@ -34,6 +36,7 @@ export type SwapParams = DepositParams & {
 	rate: bigint;
 	sellerMultisigAddress: string;
 	pair: string;
+	side: string;
 };
 
 export type BoxParameters = {

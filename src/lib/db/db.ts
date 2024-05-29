@@ -13,6 +13,7 @@ import {
 	SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
+import { TOKEN_ID_rsBTC, TOKEN_ID_sigUSD, tradingPairs } from '$lib/constants/tokens';
 
 interface HasId {
 	id: number;
@@ -32,7 +33,7 @@ export function initDb(): BoxDB {
 
 function nextId(table: HasId[]) {
 	const maxId = Math.max(...table.map((row) => row.id));
-	return maxId? maxId + 1: 0;
+	return maxId ? maxId + 1 : 0;
 }
 
 export function db_addBox(db: BoxDB, box: Box) {
@@ -152,29 +153,30 @@ export function parseBox(box: Box): BoxParameters | undefined {
 					sellingTokenId: r6.sellingTokenId,
 					rate: r7,
 					sellerMultisigAddress: r8,
-					pair: pairByTokenIds(r6.sellingTokenId, r6.buyingTokenId)
+					...pairAndSideByTokenIds(r6.sellingTokenId, r6.buyingTokenId)
 				}
 			};
 		}
 	}
 }
 
-export function pairByTokenIds(tokenId: string, additionalTokenId?: string) {
-	const tokenRegistry = [
-		{
-			tokenId:
-				'5bf691fbf0c4b17f8f8cece83fa947f62f480bfbd242bd58946f85535125db4d',
-			name: 'rsBTC'
-		},
-		{
-			tokenId:
-				'03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04',
-			name: 'sigUSD'
+export function pairAndSideByTokenIds(tokenId: string, additionalTokenId: string = ""): {pair: string, side: string} {
+	let pair = tradingPairs.find(
+		(pair) =>
+			pair.tokens.includes(tokenId) &&
+			pair.tokens.includes(additionalTokenId)
+	);
+	if(pair){
+		return {
+			pair: pair.name,
+			side: pair.tokens.indexOf(tokenId) == 0 ? 'buy' : 'sell'
 		}
-	];
-	const name1 = tokenRegistry.find((t) => t.tokenId == tokenId)?.name;
-	const name2 = tokenRegistry.find((t) => t.tokenId == additionalTokenId)?.name;
-	return name1 + '_' + name2;
+	}else{
+		return {
+			pair: '',
+			side: 'sell'
+		}
+	}
 }
 
 export function decodeR4(

@@ -4,6 +4,9 @@
 		orderbook_latest,
 		orderbook_sell
 	} from '$lib/ui/ui_state';
+
+	// buy -> green -> sigUSD,rsBTC
+	// sell -> red -> rsBTC,sigUSD
 </script>
 
 <div class="orderbook">
