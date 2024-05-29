@@ -5,8 +5,8 @@ import { createServer } from 'http';
 import { sumRoute } from './libraryA';
 import { processNewSwap, processNewSwapSign } from './swapOrder';
 import { boxesRoute } from './boxes';
-import { initDb } from '$lib/db/db';
 import { orderBooksRoute } from './orderBooks';
+import { initDb } from '$lib/db/db';
 
 // Initialize Fastify
 const fastify = Fastify({ logger: true });
@@ -44,6 +44,11 @@ const start = async () => {
     fastify.register(processNewSwapSign);
     fastify.register(boxesRoute);
     fastify.register(orderBooksRoute);
+
+    // Basic test route
+    fastify.get('/test', async (request, reply) => {
+      reply.send({ message: 'Test route is working' });
+    });
 
     // Start the HTTP server
     server.listen(3000, () => {
