@@ -1,40 +1,55 @@
-import Fastify from 'fastify';
-import fastifyCors from '@fastify/cors';
-import { sumRoute } from './libraryA';
-import { processNewSwap, processNewSwapSign } from './swapOrder';
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import { json } from 'body-parser';
 import { boxesRoute } from './boxes';
-import { initDb } from '$lib/db/db';
 import { orderBooksRoute } from './orderBooks';
+import { processNewSwap, processNewSwapSign } from './swapOrder';
+import { initDb } from '$lib/db/db';
 
-const fastify = Fastify({ logger: true });
-
-// Register the CORS plugin
-fastify.register(fastifyCors, {
-	origin: '*', // Allow all origins
-	methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'] // Allow all methods
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
 });
 
+// Middleware
+app.use(json());
 
+// Initialize the database
+const db = initDb();
 
-let db;
+// Register routes
+boxesRoute(app, io, db); // Pass the io instance and db
+orderBooksRoute(app, db); // Pass the db
+processNewSwap(app, io, db); // Pass the io instance and db
+processNewSwapSign(app, io, db); // Pass the io instance and db
 
-const start = async () => {
-	try {
-    db = initDb();
-    fastify.decorate('db', db)
+// Basic test route
+app.get('/test', (req, res) => {
+  res.json({ message: 'Test route is working' });
+});
 
-    fastify.register(sumRoute);
-    fastify.register(processNewSwap);
-    fastify.register(processNewSwapSign);
-    fastify.register(boxesRoute);
-    fastify.register(orderBooksRoute);
+// WebSocket connection
+io.on('connection', (socket) => {
+  console.log('A client connected:', socket.id);
 
-		await fastify.listen({ port: 3000 }); // Updated to use object for listen method
-		fastify.log.info(`Server running at http://localhost:3000`);
-	} catch (err) {
-		fastify.log.error(err);
-		process.exit(1);
-	}
-};
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
 
-start();
+  // Example: Emit an update to all clients
+  socket.on('exampleEvent', (data) => {
+    console.log('Received exampleEvent:', data);
+    io.emit('update', { buy: [], sell: [] });
+  });
+});
+
+// Start the server
+const PORT = 3000;
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
