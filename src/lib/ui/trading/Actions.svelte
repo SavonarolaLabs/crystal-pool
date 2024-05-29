@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addresses';
+	import { BOB_ADDRESS } from '$lib/constants/addresses';
 	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
 	import { TOKEN } from '$lib/constants/tokens';
 	import { b } from '$lib/wallet/multisig-client';
@@ -81,13 +81,19 @@
 
 		return;
 	}
+
 	function getDecimalsByTokenName(name: string) {
 		const keys = Object.keys(TOKEN);
 		const foundKey = keys.find((n) => n == name);
 		return TOKEN[foundKey].decimals;
 	}
+	function getTokenIdByTokenName(name: string) {
+		const keys = Object.keys(TOKEN);
+		const foundKey = keys.find((n) => n == name);
+		return TOKEN[foundKey].tokenId;
+	}
 
-	async function swapActionSell() {
+	async function swapActionSell_RETURN() {
 		// take user inputs
 		const amountInput = new BigNumber(sellAmountInput);
 		const priceInput = new BigNumber(sellPriceInput);
@@ -108,6 +114,46 @@
 		// check results after converting toString()
 		console.log('real price: 1 sat in cents =', real_price.toString());
 		console.log('real amount: sats =', real_amount.toString());
+	}
+
+	async function swapActionSell() {
+		//INPUT INFO
+
+		// SELL ORDER CONFIG
+		const userAddress = BOB_ADDRESS; //TODO:
+		const sellingToken = 'rsBTC';
+		const buyingToken = 'sigUSD';
+
+		// take user inputs
+		const amountInput = new BigNumber(sellAmountInput);
+		const priceInput = new BigNumber(sellPriceInput);
+
+		// load and calculate decimals
+		const decimalsToken = getDecimalsByTokenName(TOKEN.rsBTC.name);
+		const decimalsCurrency = getDecimalsByTokenName(TOKEN.sigUSD.name);
+		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
+		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
+
+		const bigDecimalsDelta =
+			bigDecimalsToken.dividedBy(bigDecimalsCurrency);
+
+		// apply decimals
+		const real_price = priceInput.dividedBy(bigDecimalsDelta);
+		const real_amount = amountInput.multipliedBy(bigDecimalsToken);
+
+		// check results after converting toString()
+		console.log('real price: 1 sat in cents =', real_price.toString());
+		console.log('real amount: sats =', real_amount.toString());
+
+		//ABC
+		const swapParams: SwapRequest = {
+			address: BOB_ADDRESS,
+			price: real_price.toString(),
+			amount: real_amount.toString(),
+			sellingTokenId: getTokenIdByTokenName(sellingToken),
+			buyingTokenId: getTokenIdByTokenName(buyingToken)
+		};
+		console.log('swap params for selling:', swapParams);
 	}
 </script>
 
