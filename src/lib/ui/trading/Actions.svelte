@@ -13,8 +13,8 @@
 	let buyAmountInput: string;
 	let buyTotalInput: string;
 
-	let sellPriceInput: string;
-	let sellAmountInput: string;
+	let sellPriceInput: string = '1000000000';
+	let sellAmountInput: string = '1';
 	let sellTotalInput: string;
 
 	type SwapRequest = {
