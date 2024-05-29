@@ -8,6 +8,14 @@
 	const NEW_SWAP_REQUEST = '/swapNew';
 	const NEW_SWAP_SIGN = '/swapNewSign';
 
+	let buyPriceInput: string;
+	let buyAmountInput: string;
+	let buyTotalInput: string;
+
+	let sellPriceInput: string;
+	let sellAmountInput: string;
+	let sellTotalInput: string;
+
 	type SwapRequest = {
 		address: string;
 		price: string;
@@ -90,8 +98,17 @@
 
 		return;
 	}
+	async function swapActionSell() {
+		console.log('buy');
+		console.log(buyPriceInput);
+		console.log(buyAmountInput);
+		console.log(buyTotalInput);
 
-	async function swapActionSell() {}
+		console.log('sell');
+		console.log(sellPriceInput);
+		console.log(sellAmountInput);
+		console.log(sellTotalInput);
+	}
 </script>
 
 <div class="actions">
@@ -154,7 +171,7 @@
 								data-testid="spot-trade-buyPrice"
 								class="ant-input ant-input-sm"
 								type="text"
-								value="69029.19"
+								bind:value={buyPriceInput}
 							/><span class="ant-input-suffix"
 								><span>sigUSD</span>
 							</span></span
@@ -174,7 +191,7 @@
 								data-testid="spot-trade-buyQuantity"
 								class="ant-input ant-input-sm"
 								type="text"
-								value=""
+								bind:value={buyAmountInput}
 							/><span class="ant-input-suffix"
 								><span>rsBTC</span>
 							</span></span
@@ -255,7 +272,7 @@
 								data-testid="spot-trade-buyTotal"
 								class="ant-input ant-input-sm"
 								type="text"
-								value=""
+								bind:value={buyTotalInput}
 							/><span class="ant-input-suffix"
 								><span>sigUSD</span>
 							</span></span
@@ -306,7 +323,7 @@
 								data-testid="spot-trade-sellPrice"
 								class="ant-input ant-input-sm"
 								type="text"
-								value="69029.19"
+								bind:value={sellPriceInput}
 							/><span class="ant-input-suffix"
 								><span>sigUSD</span>
 							</span></span
@@ -326,7 +343,7 @@
 								data-testid="spot-trade-sellQuantity"
 								class="ant-input ant-input-sm"
 								type="text"
-								value=""
+								bind:value={sellAmountInput}
 							/><span class="ant-input-suffix"
 								><span>rsBTC</span>
 							</span></span
@@ -407,7 +424,7 @@
 								data-testid="spot-trade-sellTotal"
 								class="ant-input ant-input-sm"
 								type="text"
-								value=""
+								bind:value={sellTotalInput}
 							/><span class="ant-input-suffix"
 								><span>sigUSD</span>
 							</span></span
