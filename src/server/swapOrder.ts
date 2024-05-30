@@ -5,13 +5,13 @@ import {
 } from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
 import { db_addBoxes, type BoxDB } from '$lib/db/db';
-import { getBoxById } from '$lib/external/box';
 import { boxesAtAddress } from '$lib/utils/test-helper';
 import { a, c } from '$lib/wallet/multisig-server';
 import { createSwapOrderTx } from '$lib/wallet/swap';
 import type { SignedTransaction } from '@fleet-sdk/common';
-import { sign } from 'crypto';
 import type { Request, Response, Express } from 'express';
+import type { Server } from 'socket.io';
+import { createOrderBook } from './orderBookUtils';
 
 const NEW_SWAP_REQUEST = '/swapNew';
 const NEW_SWAP_SIGN = '/swapNewSign';
@@ -56,22 +56,22 @@ export function processNewSwap(app: Express, io: Server, db: BoxDB) {
 
 export function processNewSwapSign(app: Express, io: Server, db: BoxDB) {
 	app.post(NEW_SWAP_SIGN, async (req: Request, res: Response) => {
-		const { extractedHints, unsignedTx } = req.body; // TODO: unsignedTx not from USER
-		console.log('Server hints', unsignedTx);
-
-		const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
-		const signedTx = await c(unsignedTx, privateCommitsBob, extractedHints);
-		const signedTxToStash = signedTx.to_js_eip12();
-
-		// TODO: Add signedToStash -> to DB -> To orderbook ...
-		storeSignedTx(db, signedTxToStash, SWAP_ORDER_ADDRESS);
-
-		// Broadcast a message to all connected clients
-		io.emit('update', { buy: [], sell: [] });
-
-		res.json(signedTxToStash);
+	  const { extractedHints, unsignedTx } = req.body; // TODO: unsignedTx not from USER
+  
+	  const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
+	  const signedTx = await c(unsignedTx, privateCommitsBob, extractedHints);
+	  const signedTxToStash = signedTx.to_js_eip12();
+  
+	  // TODO: Add signedToStash -> to DB -> To orderbook ...
+	  storeSignedTx(db, signedTxToStash, SWAP_ORDER_ADDRESS);
+  
+	  // Create the order book
+	  const orderbook = createOrderBook('rsBTC_sigUSD', db);
+	  io.emit('update', orderbook);
+  
+	  res.json(signedTxToStash);
 	});
-}
+  }
 
 export function storeSignedTx(db: BoxDB, signedTx: SignedTransaction, address: string) {
 	const boxes = boxesAtAddress(signedTx, address);

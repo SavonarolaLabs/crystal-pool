@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { writable } from 'svelte/store';
 import type { DefaultEventsMap } from '@socket.io/component-emitter';
+import { setOrderBook } from '$lib/ui/ui_state';
 
 export const receivedDataList = writable<any[]>([]);
 
@@ -12,8 +13,13 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
   });
 
   socket.on('update', (data) => {
-    console.log('Received update:', data);
-    receivedDataList.update((list) => [...list, data]);
+    try{
+      const book = JSON.parse(data)
+      setOrderBook(book);
+
+    }catch(e){
+      //Gotta catch 'em all!
+    }
   });
 
   return socket;
