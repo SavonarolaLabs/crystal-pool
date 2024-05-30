@@ -14,7 +14,7 @@ import {
 } from '$lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
 import { tradingPairs } from '$lib/constants/tokens';
-import { sqlDb, insertBox, insertMultipleBoxes, loadBoxRows } from '$lib/db/sqlDb';
+import { insertBox, insertMultipleBoxes, loadBoxRows } from '$lib/db/sqlDb';
 
 interface HasId {
     id: number;
@@ -26,8 +26,7 @@ export type BoxDB = {
 };
 
 export async function initDb(): BoxDB {
-    const boxRows: BoxRow[] = await loadBoxRows();
-	console.log("boxRows",boxRows);
+    const boxRows: BoxRow[] = await loadBoxRows() ?? [];
     return {
         boxRows,
         txes: []
@@ -35,8 +34,7 @@ export async function initDb(): BoxDB {
 }
 
 function nextId(table: HasId[]) {
-    const maxId = Math.max(...table.map((row) => row.id));
-    return maxId ? maxId + 1 : 0;
+    const maxId = Math.max(...table.map((row) => row.id), 0);
 }
 
 export function db_addBox(db: BoxDB, box: Box) {

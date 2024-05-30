@@ -1,6 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import type { BoxRow, SerializedBoxRow } from '$lib/types/boxRow';
+import { bigIntSerializer } from '../../server/bigIntSerializer';
 
 export const sqlDb = await open({
   filename: 'chain.db',
@@ -21,33 +22,39 @@ await sqlDb.exec(`
 function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
   return {
     ...boxRow,
-    box: JSON.stringify(boxRow.box),
-    parameters: JSON.stringify(boxRow.parameters)
+    box: bigIntSerializer(boxRow.box),
+    parameters: bigIntSerializer(boxRow.parameters)
   };
 }
 
 export async function insertBox(boxRow: BoxRow): Promise<void> {
   const serializedBoxRow = serializeBoxRow(boxRow);
   const { id, box, contract, parameters, unspent } = serializedBoxRow;
+  console.log('Inserting Box:', { id, box, contract, parameters, unspent: unspent ? 1 : 0 });
   await sqlDb.run(
     `INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
      VALUES (?, ?, ?, ?, ?)`,
-    id, box, contract, parameters, unspent
+    id, box, contract, parameters, unspent ? 1 : 0  // Ensure boolean is stored as integer
   );
 }
 
 export async function insertMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
-  const stmt = await sqlDb.prepare(`
-    INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-
-  await sqlDb.transaction(async (rows: BoxRow[]) => {
-    for (const row of rows) {
+  await sqlDb.exec('BEGIN TRANSACTION');
+  try {
+    for (const row of boxRows) {
       const serializedRow = serializeBoxRow(row);
-      await stmt.run(serializedRow.id, serializedRow.box, serializedRow.contract, serializedRow.parameters, serializedRow.unspent);
+      console.log('Inserting Box:', { id: serializedRow.id, box: serializedRow.box, contract: serializedRow.contract, parameters: serializedRow.parameters, unspent: serializedRow.unspent ? 1 : 0 });
+      await sqlDb.run(
+        `INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
+         VALUES (?, ?, ?, ?, ?)`,
+        serializedRow.id, serializedRow.box, serializedRow.contract, serializedRow.parameters, serializedRow.unspent ? 1 : 0  // Ensure boolean is stored as integer
+      );
     }
-  })(boxRows);
+    await sqlDb.exec('COMMIT');
+  } catch (error) {
+    await sqlDb.exec('ROLLBACK');
+    throw error;
+  }
 }
 
 export async function loadBoxRows(): Promise<BoxRow[]> {
@@ -60,6 +67,6 @@ export async function loadBoxRows(): Promise<BoxRow[]> {
     box: JSON.parse(row.box),
     contract: row.contract as BoxRow['contract'],
     parameters: JSON.parse(row.parameters),
-    unspent: row.unspent
+    unspent: Boolean(row.unspent)  // Ensure boolean is converted back from integer
   }));
 }

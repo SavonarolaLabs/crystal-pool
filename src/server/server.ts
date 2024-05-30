@@ -7,6 +7,7 @@ import { boxesRoute } from './boxes';
 import { orderBooksRoute } from './orderBooks';
 import { processNewSwap, processNewSwapSign } from './swapOrder';
 import { initDb } from '$lib/db/db';
+import { createOrderBook } from './orderBookUtils';
 
 const app = express();
 const server = http.createServer(app);
@@ -48,6 +49,8 @@ app.get('/test', (req, res) => {
 // WebSocket connection
 io.on('connection', (socket) => {
   console.log('A client connected:', socket.id);
+  const orderbook = createOrderBook('rsBTC_sigUSD', db);
+  io.emit('update', orderbook);
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
