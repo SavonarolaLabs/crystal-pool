@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import type { BoxRow, SerializedBoxRow } from '$lib/types/boxRow';
 
-const sqlDb = new Database('chain.db');
+export const sqlDb = new Database('chain.db');
 sqlDb.pragma('journal_mode = WAL');
 
 sqlDb.exec(`
@@ -48,4 +48,14 @@ export function insertMultipleBoxes(boxRows: BoxRow[]): void {
   insertMany(boxRows);
 }
 
-export default sqlDb;
+export function loadBoxRows(): BoxRow[] {
+  const stmt = sqlDb.prepare('SELECT id, box, contractType AS contract, parameters, unspent FROM boxes');
+  const rows = stmt.all() as Array<{ id: number; box: string; contract: string; parameters: string; unspent: boolean }>;
+  return rows.map((row) => ({
+    id: row.id,
+    box: JSON.parse(row.box),
+    contract: row.contract as BoxRow['contract'],
+    parameters: JSON.parse(row.parameters),
+    unspent: row.unspent
+  }));
+}
