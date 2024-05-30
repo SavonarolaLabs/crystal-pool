@@ -6,6 +6,7 @@ export const swapTokensDenom = `{
 	def getBuyingTokenId(box: Box)         	= box.R6[(Coll[Byte],Coll[Byte])].getOrElse((Coll[Byte](),Coll[Byte]()))._2
 	def getRate(box: Box)                  	= box.R7[Long].get
 	def getSellerMultisigAddress(box: Box)  = box.R8[Coll[Byte]].get
+  def getDenom(box: Box)                  = box.R9[Long].get
   //+R9 = 1000n
 
   //BOX 1: 
@@ -26,10 +27,10 @@ export const swapTokensDenom = `{
   
   // getRate -> getRateInMaxDenom()
 
+
 	def tokenId(box: Box) = box.tokens(0)._1
 	def tokenAmount(box: Box) = box.tokens(0)._2
-  	def sumTokenAmount(a:Long, b: Box) = a + tokenAmount(b)
-  	def sumTokenAmountXRate(a:Long, b: Box) = a + tokenAmount(b) * getRate(b)   // <---------------- REWORK
+
 
 //------------------------
 	def isSameContract(box: Box) = 
@@ -74,15 +75,25 @@ export const swapTokensDenom = `{
 //-------------------------
 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  	val maxDenom: Long = INPUTS
+		.filter(isLegitInput)
+		.fold(0L, {(r:Long, box:Box) => {
+			if(r > getDenom(box)) r else getDenom(box)
+		}}) // TAKE MAX DENOM
+
+    def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) //1>
+
+  	def sumTokenAmount(a:Long, b: Box) = a + tokenAmount(b)
+  	def sumTokenAmountXRate(a:Long, b: Box) = a + tokenAmount(b) * getRateInMaxDenom(b)   // <---------------- REWORK WITH MAX DENOM
 
 	val maxSellRate: Long = INPUTS
 		.filter(isLegitInput)
 		.fold(0L, {(r:Long, box:Box) => {
-			if(r > getRate(box)) r else getRate(box)
+			if(r > getRateInMaxDenom(box)) r else getRateInMaxDenom(box)
 		}}) //TODO: REWORK WITH - MAX DENOM - CHECK R9 WITH R6
 
   	def hasMaxSellRate(box: Box) =
-		getRate(box) == maxSellRate //TODO: CHECK R9 WITH R6
+    getRate(box)*maxDenom==getDenom(box)*maxSellRate //include denom
 
   	def isLegitSellOrderOutput(box: Box) =
 	  	isLegitInput(box)&&
@@ -123,9 +134,9 @@ export const swapTokensDenom = `{
 		.fold(0L, sumTokenAmountXRate)  // Учитывает макс деном  
 
 	val sellTokensXRate = inSellTokensXRate - outSellTokensXRate  // DELTA VOLUME в Макс деноме
-	val expectedRate = sellTokensXRate / tokensSold   // 23125124 - DENOM MAX
+	val expectedRate = sellTokensXRate / tokensSold   // 23125124 in DENOM MAX
 
-  	val isPaidAtFairRate = tokensPaid/tokensSold >= expectedRate  //sigUSD PAID (20) + ADD DENOM (1000) = > 20_000. * MAX_DENOM
+  	val isPaidAtFairRate = maxDenom*tokensPaid/tokensSold >= expectedRate  //sigUSD PAID (20) + ADD DENOM (1000) = > 20_000. * MAX_DENOM
 
 	if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)
