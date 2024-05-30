@@ -13,7 +13,7 @@ import {
 	SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
-import { TOKEN_ID_rsBTC, TOKEN_ID_sigUSD, tradingPairs } from '$lib/constants/tokens';
+import { tradingPairs } from '$lib/constants/tokens';
 
 interface HasId {
 	id: number;
