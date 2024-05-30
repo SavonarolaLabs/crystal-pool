@@ -23,9 +23,8 @@ import {
 	SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
 import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
-import { ContractType } from '$lib/types/boxRow';
 import { deposit } from '$lib/wallet/deposit';
-import { signTx, signTxMulti } from '$lib/wallet/multisig';
+import { signTx, signTxMulti } from '$lib/wallet/multisig-server';
 import { boxAtAddress } from '$lib/utils/test-helper';
 import { createSellOrderTx } from '$lib/wallet/sell';
 import { createSwapOrderTx } from '$lib/wallet/swap';
@@ -84,7 +83,7 @@ const BUYER_MNEMONIC = BOB_MNEMONIC;
 describe('contractTypeFromErgoTree', () => {
 	it('returns sell contract', () => {
 		expect(contractTypeFromErgoTree(depositBox), 'buy box').toBe(
-			ContractType.DEPOSIT
+			'DEPOSIT'
 		);
 	});
 });
@@ -103,7 +102,7 @@ describe('deposit box parser', () => {
 	});
 	it("box recognized and parsed",()=>{
 		const expected = {
-			contract: ContractType.DEPOSIT,
+			contract: 'DEPOSIT',
 			parameters: {
 				userPk: '9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU',
 				poolPk: '9fE4Hk2QXzij6eKt73ki93iWVKboZgRPgV95VZYmazdzqdjPEW8',
@@ -183,7 +182,7 @@ describe('buy order box parser', () => {
 	});
 	it("box recognized and parsed",()=>{
 		const expected = {
-			contract: ContractType.BUY,
+			contract: 'BUY',
 			parameters: {
 				userPk: '9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU',
 				poolPk: '9fE4Hk2QXzij6eKt73ki93iWVKboZgRPgV95VZYmazdzqdjPEW8',
@@ -267,7 +266,7 @@ describe(`sell order box parser`, () => {
 	});
 	it("box recognized and parsed",()=>{
 		const expected = {
-			contract: ContractType.SELL,
+			contract: 'SELL',
 			parameters: {
 				userPk: '9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU',
 				poolPk: '9fE4Hk2QXzij6eKt73ki93iWVKboZgRPgV95VZYmazdzqdjPEW8',

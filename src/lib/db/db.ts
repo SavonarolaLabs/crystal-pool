@@ -1,8 +1,8 @@
 import { type Box, type EIP12UnsignedTransaction } from '@fleet-sdk/common';
-import {
+import type {
 	ContractType,
-	type BoxParameters,
-	type BoxRow
+	BoxParameters,
+	BoxRow
 } from '$lib/types/boxRow';
 import type { TxRow } from '$lib/types/txRow';
 import { ErgoAddress, ErgoTree } from '@fleet-sdk/core';
@@ -71,11 +71,11 @@ export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
 export function contractTypeFromErgoTree(box: Box): ContractType {
 	const address = new ErgoTree(box.ergoTree).toAddress().toString();
 	if (address == DEPOSIT_ADDRESS) {
-		return ContractType.DEPOSIT;
+		return 'DEPOSIT';
 	} else if (address == BUY_ORDER_ADDRESS) {
-		return ContractType.BUY;
+		return 'BUY';
 	} else if (address == SELL_ORDER_ADDRESS) {
-		return ContractType.SELL;
+		return 'SELL';
 	} else if (address == SWAP_ORDER_ADDRESS) {
 		return ContractType.SWAP;
 	} else {
@@ -85,12 +85,12 @@ export function contractTypeFromErgoTree(box: Box): ContractType {
 
 export function parseBox(box: Box): BoxParameters | undefined {
 	const contractType = contractTypeFromErgoTree(box);
-	if (contractType == ContractType.DEPOSIT) {
+	if (contractType == 'DEPOSIT') {
 		const r4 = decodeR4(box);
 		const r5 = decodeR5(box);
 		if (r4 && r5) {
 			return {
-				contract: ContractType.DEPOSIT,
+				contract: 'DEPOSIT',
 				parameters: {
 					userPk: r4.userPk,
 					poolPk: r4.poolPk,
@@ -98,7 +98,7 @@ export function parseBox(box: Box): BoxParameters | undefined {
 				}
 			};
 		}
-	} else if (contractType == ContractType.BUY) {
+	} else if (contractType == 'BUY') {
 		const r4 = decodeR4(box);
 		const r5 = decodeR5(box);
 		const r6 = decodeTokenIdFromR6(box);
@@ -106,7 +106,7 @@ export function parseBox(box: Box): BoxParameters | undefined {
 		const r8 = decodeR8(box);
 		if (r4 && r5 && r6 && r7 && r8) {
 			return {
-				contract: ContractType.BUY,
+				contract: 'BUY',
 				parameters: {
 					userPk: r4.userPk,
 					poolPk: r4.poolPk,
@@ -117,7 +117,7 @@ export function parseBox(box: Box): BoxParameters | undefined {
 				}
 			};
 		}
-	} else if (contractType == ContractType.SELL) {
+	} else if (contractType == 'SELL') {
 		const r4 = decodeR4(box);
 		const r5 = decodeR5(box);
 		const r6 = decodeTokenIdFromR6(box);
@@ -125,7 +125,7 @@ export function parseBox(box: Box): BoxParameters | undefined {
 		const r8 = decodeR8(box);
 		if (r4 && r5 && r6 && r7 && r8) {
 			return {
-				contract: ContractType.SELL,
+				contract: 'SELL',
 				parameters: {
 					userPk: r4.userPk,
 					poolPk: r4.poolPk,

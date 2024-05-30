@@ -1,12 +1,6 @@
 import type { Box } from '@fleet-sdk/common';
 
-export enum ContractType {
-	DEPOSIT,
-	BUY,
-	SELL,
-	SWAP,
-	UNKNOWN
-}
+export type ContractType = 'DEPOSIT' | 'BUY' | 'SELL' | 'SWAP' | 'UNKNOWN';
 
 export type DepositParams = {
 	userPk: string;
@@ -49,5 +43,13 @@ export type BoxRow = {
 	box: Box;
 	contract: ContractType;
 	parameters: DepositParams | BuyParams | SellParams | SwapParams;
-	unspent: Boolean;
+	unspent: boolean;
+};
+
+export type SerializedBoxRow = {
+	id: number;
+	box: string;
+	contract: ContractType;
+	parameters: string;
+	unspent: boolean;
 };
