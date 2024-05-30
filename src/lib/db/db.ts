@@ -25,8 +25,9 @@ export type BoxDB = {
     txes: TxRow[];
 };
 
-export function initDb(): BoxDB {
-    const boxRows: BoxRow[] = loadBoxRows();
+export async function initDb(): BoxDB {
+    const boxRows: BoxRow[] = await loadBoxRows();
+	console.log("boxRows",boxRows);
     return {
         boxRows,
         txes: []

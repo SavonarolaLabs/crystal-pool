@@ -32,7 +32,7 @@ app.use(cors({
 app.use(json());
 
 // Initialize the database
-const db = initDb();
+const db = await initDb();
 
 // Register routes
 boxesRoute(app, io, db); // Pass the io instance and db

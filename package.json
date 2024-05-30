@@ -26,7 +26,6 @@
 		"@sveltejs/adapter-node": "^5.0.1",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
-		"@types/better-sqlite3": "^7.6.10",
 		"@types/express": "^4.17.21",
 		"@types/json-bigint": "^1.0.4",
 		"@types/node": "^20.12.8",
@@ -52,7 +51,6 @@
 		"@fleet-sdk/compiler": "^0.3.4",
 		"@fleet-sdk/core": "^0.3.4",
 		"@fleet-sdk/serializer": "^0.3.4",
-		"better-sqlite3": "^10.0.0",
 		"bignumber.js": "^9.1.2",
 		"bip32": "^4.0.0",
 		"bip39": "^3.1.0",
@@ -68,6 +66,8 @@
 		"safe-buffer": "^5.2.1",
 		"socket.io": "^4.7.5",
 		"socket.io-client": "^4.7.5",
+		"sqlite": "^5.1.1",
+		"sqlite3": "^5.1.7",
 		"tiny-secp256k1": "^2.2.3"
 	}
 }

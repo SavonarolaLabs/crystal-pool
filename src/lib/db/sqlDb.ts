@@ -1,11 +1,14 @@
-import Database from 'better-sqlite3';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 import type { BoxRow, SerializedBoxRow } from '$lib/types/boxRow';
-import { bigIntSerializer } from '../../server/bigIntSerializer';
 
-export const sqlDb = new Database('chain.db');
-sqlDb.pragma('journal_mode = WAL');
+export const sqlDb = await open({
+  filename: 'chain.db',
+  driver: sqlite3.Database
+});
 
-sqlDb.exec(`
+await sqlDb.exec(`
+  PRAGMA journal_mode = WAL;
   CREATE TABLE IF NOT EXISTS boxes (
     id INTEGER PRIMARY KEY,
     box TEXT NOT NULL,
@@ -18,41 +21,41 @@ sqlDb.exec(`
 function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
   return {
     ...boxRow,
-    box: bigIntSerializer(boxRow.box),
-    parameters: bigIntSerializer(boxRow.parameters)
+    box: JSON.stringify(boxRow.box),
+    parameters: JSON.stringify(boxRow.parameters)
   };
 }
 
-export function insertBox(boxRow: BoxRow): void {
+export async function insertBox(boxRow: BoxRow): Promise<void> {
   const serializedBoxRow = serializeBoxRow(boxRow);
   const { id, box, contract, parameters, unspent } = serializedBoxRow;
-  const stmt = sqlDb.prepare(`
-    INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-  stmt.run(id, box, contract, parameters, unspent);
+  await sqlDb.run(
+    `INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
+     VALUES (?, ?, ?, ?, ?)`,
+    id, box, contract, parameters, unspent
+  );
 }
 
-export function insertMultipleBoxes(boxRows: BoxRow[]): void {
-  const insert = sqlDb.prepare(`
+export async function insertMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
+  const stmt = await sqlDb.prepare(`
     INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
     VALUES (?, ?, ?, ?, ?)
   `);
 
-  const insertMany = sqlDb.transaction((rows: BoxRow[]) => {
+  await sqlDb.transaction(async (rows: BoxRow[]) => {
     for (const row of rows) {
       const serializedRow = serializeBoxRow(row);
-      insert.run(serializedRow.id, serializedRow.box, serializedRow.contract, serializedRow.parameters, serializedRow.unspent);
+      await stmt.run(serializedRow.id, serializedRow.box, serializedRow.contract, serializedRow.parameters, serializedRow.unspent);
     }
-  });
-
-  insertMany(boxRows);
+  })(boxRows);
 }
 
-export function loadBoxRows(): BoxRow[] {
-  const stmt = sqlDb.prepare('SELECT id, box, contractType AS contract, parameters, unspent FROM boxes');
-  const rows = stmt.all() as Array<{ id: number; box: string; contract: string; parameters: string; unspent: boolean }>;
-  return rows.map((row) => ({
+export async function loadBoxRows(): Promise<BoxRow[]> {
+  const rows = await sqlDb.all(`
+    SELECT id, box, contractType AS contract, parameters, unspent FROM boxes
+  `);
+
+  return rows.map((row: { id: number; box: string; contract: string; parameters: string; unspent: boolean }) => ({
     id: row.id,
     box: JSON.parse(row.box),
     contract: row.contract as BoxRow['contract'],
