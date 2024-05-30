@@ -38,8 +38,8 @@
 
 		const price = 100n;
 		const amount = 200n;
-		const sellingTokenId = TOKEN_rsBTS; //mintAndUse
-		const buyingTokenId = TOKEN_SIGUSD; //TokenID
+		const sellingTokenId = TOKEN_SIGUSD; //mintAndUse
+		const buyingTokenId = TOKEN_rsBTS; //TokenID
 		const pair = 'rsBTC_sigUSD';
 
 		const swapParams: SwapRequest = {
