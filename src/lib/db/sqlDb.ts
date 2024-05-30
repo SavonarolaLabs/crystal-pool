@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import type { BoxRow, SerializedBoxRow } from '$lib/types/boxRow';
+import { bigIntSerializer } from '../../server/bigIntSerializer';
 
 export const sqlDb = new Database('chain.db');
 sqlDb.pragma('journal_mode = WAL');
@@ -17,8 +18,8 @@ sqlDb.exec(`
 function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
   return {
     ...boxRow,
-    box: JSON.stringify(boxRow.box),
-    parameters: JSON.stringify(boxRow.parameters)
+    box: bigIntSerializer(boxRow.box),
+    parameters: bigIntSerializer(boxRow.parameters)
   };
 }
 
