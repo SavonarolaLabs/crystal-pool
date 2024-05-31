@@ -1,4 +1,4 @@
-export const swapTokensDenom = `{	
+{	
 	def getSellerPk(box: Box)              	= box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
 	def getPoolPk(box: Box)                	= box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(1)
 	def unlockHeight(box: Box)             	= box.R5[Int].get
@@ -127,5 +127,4 @@ export const swapTokensDenom = `{
 	}else{
     getSellerPk(SELF) && getPoolPk(SELF) || sigmaProp(isPaidAtFairRate) && getPoolPk(SELF)
 	}
-
-}`;
+}

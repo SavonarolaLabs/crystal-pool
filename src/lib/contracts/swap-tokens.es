@@ -1,7 +1,4 @@
-import { Network } from '@fleet-sdk/common';
-import { compile } from '@fleet-sdk/compiler';
-
-export const swapTokens = `{	
+{	
 	def getSellerPk(box: Box)              	= box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
 	def getPoolPk(box: Box)                	= box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(1)
 	def unlockHeight(box: Box)             	= box.R5[Int].get
@@ -106,15 +103,4 @@ export const swapTokens = `{
 	}else{
 		getSellerPk(SELF) && getPoolPk(SELF) || sigmaProp(isPaidAtFairRate) && getPoolPk(SELF)
 	}
-}`;
-
-function compileContract() {
-	const tree = compile(swapTokens, {
-		version: 0,
-		includeSize: false
-	});
-	return tree.toAddress(Network.Mainnet).toString();
 }
-
-console.log(`export const swapTokensAddress = "${compileContract()}"`);
-// "EY6QviSZUcZPg9WukwaSVqv1T2oh6t2EX1eQPoqsFjqzmNeKx64nbK5fsRrNXsyQTbcxX7ryfpqxpYfx2MrU2LhX5YCxJcvGXechX9MNBv7XLNZ1gFZ48PVjL7DHafJ5AT24FUBrCm5LxE1fn6j2tXCnXghPdZuxScaav45Cww97cNhV8YXJMimaMPvXkxyM8xRYmmnvfaLHg2BL4WV9Wa2dBs9Md1uhgH2Enhbre3uGFPnsfyeE1apo2Z8m7cYAgajsmWoUvHHa3ErugYASZJB3VRfeahEc6iBpBLPb8a3SrPgLmicpTsvXAzGTRueSDFSGRti76eJW797xHRbEJFpDWaUS4XCQERmjcJCPG3oh3LMXFo5VakW8LxHro7YedSWH2Z7z6eR4aX5xXuPfCwSbyLBiL6avzxjZsjMKHbTY8SqPFkGp3NWxdbf2WXBa3yrqRSTTEXjqhDkXzwDvnrsk3vttwGYq6t8PEvPT3MCEed5LnRyd2YDr4pxbATr2MChpqGXR9MXWFaS29bfjqxVfu7jmZ8bixy9dwnxp4MW8HtREnfiJJNt2kgbrmTxgqhgbmdNGjUGRnmCtZHJBRQEfMnwTruREiayQ7gLv3rwCg49wwnJLLDsWL8pnwigWGeqFKndeThM2CmEYtXR97rg1MxrVsKmbHsr9V2mCF3HYKKGeFkeLYVDR5p1bZjwwi8FtaXVSwfrpiLEWMViCwuq76MsaCxEas9hp4LzCGkMhwbu77oWHq8jE3BN9w2P6NKZPvNCSt92Ya8nFYzfaBuH3ZoBESxAvhdmoSVTgJNanE9HUMf3Xp7LMcABA2qRT9TWzgwBiV7ovJiPkNZZjCDwnpyXrV3mSnhscGi5RYwCkjv6FV3R6TEXCEU6oFwCBKo6p68XVf5ERqkqMUDStdVxTTY82KSQDmpd2r9opVRJcbmHCYhvM7Ur8mnG2ewDvZ5cD6LN6pENh3E1t57vhRQsDGYZG465JskpJER3zYmfuFBYn4z7GUFQgnPgbLYrg3PYyN9zx6DmdkLuUaxdh"

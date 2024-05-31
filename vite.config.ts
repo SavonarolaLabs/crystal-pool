@@ -6,13 +6,24 @@ export default defineConfig({
 	plugins: [sveltekit(), wasm()],
 	resolve: {
 		alias: {
-		  'ergo-lib-wasm-browser': 'node_modules/ergo-lib-wasm-browser/ergo_lib_wasm.js',
+			'ergo-lib-wasm-browser': 'node_modules/ergo-lib-wasm-browser/ergo_lib_wasm.js',
 		}
-	  },
-	  optimizeDeps: {
-		include: ['ergo-lib-wasm-browser', 'buffer']
+	},
+	optimizeDeps: {
+		include: ['ergo-lib-wasm-browser', 'buffer'],
 	},
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
+		include: ['src/**/*.{test,spec}.{js,ts}'],
+		server: {
+			deps: {
+				inline: ['@fleet-sdk/compiler'],
+			},
+		},
+	},
+	server: {
+		watch: {
+			// Include .es files in the watch list
+			ignored: ['!**/*.es', '!**/*.ts'],
+		}
 	}
 });
