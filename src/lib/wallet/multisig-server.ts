@@ -169,6 +169,14 @@ export async function signMultisig(
 	return signedTx;
 }
 
+export async function signMultisigEIP12(
+	unsignedTx: EIP12UnsignedTransaction,
+	userMnemonic: string,
+	userAddress: string
+) {
+	return (await signMultisig(unsignedTx,userMnemonic, userAddress)).to_js_eip12()
+}
+
 export async function txHasErrors(
 	signedTransaction: SignedTransaction
 ): Promise<false | string> {

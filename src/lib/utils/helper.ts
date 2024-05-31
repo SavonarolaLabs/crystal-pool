@@ -1,31 +1,30 @@
-import type {
-	Amount,
-	Box, TokenAmount
-} from '@fleet-sdk/common';
+import type { Amount, Box, TokenAmount } from '@fleet-sdk/common';
 import { ErgoAddress, Network } from '@fleet-sdk/core';
 
-import { MAINNET } from "$lib/constants/ergo";
+import { MAINNET } from '$lib/constants/ergo';
 
 const network = MAINNET ? Network.Mainnet : Network.Testnet;
 
 export function addressFromPk(pk: string) {
-  return ErgoAddress.fromPublicKey(pk, network).toString();
+	return ErgoAddress.fromPublicKey(pk, network).toString();
 }
 
-export function ergoTree(address:string): string{
-	return ErgoAddress.fromBase58(address).ergoTree
+export function ergoTree(address: string): string {
+	return ErgoAddress.fromBase58(address).ergoTree;
 }
 
-export function asBigInt(v: bigint | string) {
-	if (typeof v == 'string') {
-		try{
-			return BigInt(v);
-		}catch(e){
-			throw new Error("BigInt ERROR: "+v)
-		}
-	} else {
+export function asBigInt(v: bigint | string | number) {
+	if (typeof v == 'bigint') {
 		return v;
+	} else if (typeof v == 'string') {
+		try {
+			return BigInt(v);
+		} catch (e) {
+			console.error("asBigInt"+v)
+			return 0n
+		}
 	}
+	return 0n
 }
 
 export function sumNanoErg(boxes: Box<Amount>[]): bigint {
@@ -46,17 +45,21 @@ export function calcTokenChange(
 	return _subtractAssets(inputTokens, [tokensOut]);
 }
 
-export function sumAssetsFromBoxes(boxes: Box[]){
-	return boxes
-	.flatMap((box) => box.assets)
-	.reduce(sumAssets, []);
+export function sumAssetsFromBoxes(boxes: Box[]) {
+	return boxes.flatMap((box) => box.assets).reduce(sumAssets, []);
 }
 
-export function amountByTokenId(boxes: Box[], tokenId: string): Amount{
-	return (sumAssetsFromBoxes(boxes).find(t => t.tokenId == tokenId)?.amount)??0n
+export function amountByTokenId(boxes: Box[], tokenId: string): Amount {
+	return (
+		sumAssetsFromBoxes(boxes).find((t) => t.tokenId == tokenId)?.amount ??
+		0n
+	);
 }
 
-export function sumAssets(acc: TokenAmount<Amount>[], asset: TokenAmount<Amount>) {
+export function sumAssets(
+	acc: TokenAmount<Amount>[],
+	asset: TokenAmount<Amount>
+) {
 	const token = acc.find((t) => t.tokenId == asset.tokenId);
 	if (token) {
 		token.amount = asBigInt(token.amount) + asBigInt(asset.amount);
