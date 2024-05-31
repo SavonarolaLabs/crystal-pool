@@ -11,7 +11,12 @@ import {
 import { ALICE_MNEMONIC, BOB_MNEMONIC, SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
 import { utxos } from '$lib/data/utxos';
 import { boxesAtAddress, boxesAtAddressUnsigned } from '$lib/utils/test-helper';
-import { signMultisigEIP12, signTxInput, signTxMulti } from '$lib/wallet/multisig-server';
+import {
+	signMultisigEIP12,
+	signTxInput,
+	signTxMulti,
+	signTxMultiPartial
+} from '$lib/wallet/multisig-server';
 import { ErgoAddress, ErgoTree, SAFE_MIN_BOX_VALUE, type Box } from '@fleet-sdk/core';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { describe, expect, it } from 'vitest';
@@ -229,16 +234,20 @@ describe('New Swap order with R9', async () => {
 		);
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[0])?.parameters.unlockHeight).toBe(1300000);
 
-
-		const signedBobInput = await signTxInput(SHADOW_MNEMONIC, JSON.parse(JSON.stringify(executeSwapOrderTx)), 0);
+		const signedBobInput = await signTxInput(
+			SHADOW_MNEMONIC,
+			JSON.parse(JSON.stringify(executeSwapOrderTx)),
+			0
+		);
 		expect(signedBobInput, 'bob can sign index:0').toBeDefined();
 
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.contract).toBe('DEPOSIT');
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.parameters.userPk).toBe(ALICE_ADDRESS);
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.parameters.unlockHeight).toBe(1300000);
 
-		console.log(executeSwapOrderTx.inputs)
-		//const signed = signTxMulti(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS)
+		console.log(executeSwapOrderTx.inputs);
+		const signed = signTxMultiPartial(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
+
 		//const signed = signMultisigEIP12(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
 		//expect(signed).toBeDefined();
 
