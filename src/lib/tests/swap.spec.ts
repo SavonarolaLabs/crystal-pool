@@ -147,8 +147,6 @@ describe('New Swap order with R9', async () => {
 		amount: '10000'
 	};
 
-
-
 	it.only('Order + deposit[ALICE], change:ALICE: FULL execute', async () => {
 		let unsignedTx1 = createSwapOrderTxR9(
 			BOB_ADDRESS,
@@ -173,12 +171,7 @@ describe('New Swap order with R9', async () => {
 		const paymentInTokens = {
 			tokenId: sigUSD,
 			amount: BigInt(Number(buyAmount) * Number(price))
-		}; //TODO:FIX ROUNDING AND MAKE ACCURATE CALCULATIONS
-
-
-		let inputs = [...swapOrderBoxes,
-		...[utxos[DEPOSIT_ADDRESS][0]]];
-		console.log(sumAssetsFromBoxes(inputs))
+		};
 
 		const unsignedTransaction = executeSwap(
 			height,
