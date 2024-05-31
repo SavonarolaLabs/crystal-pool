@@ -161,8 +161,8 @@ describe('New Swap order with R9', async () => {
 			CONTRACT_WITH_R9
 		);
 
-		const signedTx = await signMultisigEIP12(unsignedTx1, BOB_MNEMONIC, BOB_ADDRESS);
-		const swapOrderBoxes = boxesAtAddress(signedTx, CONTRACT_WITH_R9);
+		const createSwapOrderTx = await signMultisigEIP12(unsignedTx1, BOB_MNEMONIC, BOB_ADDRESS);
+		const swapOrderBoxes = boxesAtAddress(createSwapOrderTx, CONTRACT_WITH_R9);
 		expect(swapOrderBoxes, 'swap order boxes').toBeDefined();
 		expect(swapOrderBoxes.length, 'swap order boxes length').toBe(1);
 
@@ -173,7 +173,7 @@ describe('New Swap order with R9', async () => {
 			amount: BigInt(Number(buyAmount) * Number(price))
 		};
 
-		const unsignedTransaction = executeSwap(
+		const executeSwapOrderTx = executeSwap(
 			height,
 			swapOrderBoxes,
 			[utxos[DEPOSIT_ADDRESS][0]],
@@ -181,10 +181,10 @@ describe('New Swap order with R9', async () => {
 			paymentInTokens,
 			SAFE_MIN_BOX_VALUE
 		);
-		expect(boxesAtAddressUnsigned(unsignedTransaction, DEPOSIT_ADDRESS).length).toBe(2);
-		expect(boxesAtAddressUnsigned(unsignedTransaction, SWAP_ORDER_ADDRESS).length).toBe(0);
+		expect(boxesAtAddressUnsigned(executeSwapOrderTx, DEPOSIT_ADDRESS).length).toBe(2);
+		expect(boxesAtAddressUnsigned(executeSwapOrderTx, SWAP_ORDER_ADDRESS).length).toBe(0);
 
-		const signed = signMultisigEIP12(unsignedTransaction, ALICE_MNEMONIC, ALICE_ADDRESS);
+		const signed = signMultisigEIP12(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
 		expect(signed).toBeDefined();
 
 		return;
