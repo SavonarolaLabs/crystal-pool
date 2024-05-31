@@ -115,8 +115,8 @@ export function contractTypeFromErgoTree(box: Box): ContractType {
     }
 }
 
-export function parseBox(box: Box): BoxParameters | undefined {
-    const contractType = contractTypeFromErgoTree(box);
+export function parseBox(box: Box, getContractType = contractTypeFromErgoTree): BoxParameters | undefined {
+    const contractType = getContractType(box);
     if (contractType == 'DEPOSIT') {
         const r4 = decodeR4(box);
         const r5 = decodeR5(box);

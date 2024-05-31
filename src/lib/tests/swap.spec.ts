@@ -2,7 +2,9 @@ import { compileContract } from '$lib/compiler/compile';
 import {
 	ALICE_ADDRESS,
 	BOB_ADDRESS,
+	BUY_ORDER_ADDRESS,
 	DEPOSIT_ADDRESS,
+	SELL_ORDER_ADDRESS,
 	SHADOWPOOL_ADDRESS,
 	SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
@@ -19,7 +21,9 @@ import {
 } from '$lib/wallet/multisig-server';
 import {
 	ErgoAddress,
-	SAFE_MIN_BOX_VALUE
+	ErgoTree,
+	SAFE_MIN_BOX_VALUE,
+	type Box
 } from '@fleet-sdk/core';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { describe, expect, it } from 'vitest';
@@ -27,6 +31,7 @@ import { createSwapOrderTxR9, executeSwap, createSwapOrderTx } from '../wallet/s
 import { TOKEN } from '$lib/constants/tokens';
 import { sumAssetsFromBoxes } from '$lib/utils/helper';
 import { parseBox } from '$lib/db/db';
+import type { BoxParameters, ContractType } from '$lib/types/boxRow';
 
 
 const CONTRACT_FOR_TEST = `{	
@@ -139,16 +144,35 @@ const CONTRACT_WITH_R9 = compileContract(CONTRACT_FOR_TEST);
 let height = 1_275_000;
 let unlockHeight = 1300000;
 
+function customRecognizer(box: Box): ContractType {
+    const address = new ErgoTree(box.ergoTree).toAddress().toString();
+    if (address == DEPOSIT_ADDRESS) {
+        return 'DEPOSIT';
+    } else if (address == BUY_ORDER_ADDRESS) {
+        return 'BUY';
+    } else if (address == SELL_ORDER_ADDRESS) {
+        return 'SELL';
+    } else if (address == CONTRACT_WITH_R9) {
+        return 'SWAP';
+    } else {
+        return 'UNKNOWN';
+    }
+}
+
+function parseBoxCustom(box: Box): BoxParameters | undefined{
+	return parseBox(box, customRecognizer);
+}
+
 describe('New Swap order with R9', async () => {
 
 	const tokenForSale = {
 		tokenId: TOKEN.rsBTC.tokenId,
-		price: '2',
-		amount: '1'
+		price: '0.002',
+		amount: '10000'
 	};
 	const paymentToken = {
 		tokenId: TOKEN.sigUSD.tokenId,
-		amount: 1n,
+		amount: 20n,
 	};
 
 	it.only('Order + deposit[ALICE], change:ALICE: FULL execute', async () => {
@@ -172,7 +196,7 @@ describe('New Swap order with R9', async () => {
 
 		const paymentInTokens = {
 			tokenId: paymentToken.tokenId,
-			amount: BigInt(Number(paymentToken.amount) * Number(tokenForSale.price))
+			amount: BigInt(Number(tokenForSale.amount) * Number(tokenForSale.price))
 		};
 
 		const executeSwapOrderTx = executeSwap(
@@ -185,10 +209,10 @@ describe('New Swap order with R9', async () => {
 		);
 		expect(boxesAtAddressUnsigned(executeSwapOrderTx, DEPOSIT_ADDRESS).length).toBe(2);
 		expect(boxesAtAddressUnsigned(executeSwapOrderTx, SWAP_ORDER_ADDRESS).length).toBe(0);
-		expect(parseBox(executeSwapOrderTx.inputs[0])?.contract).toBe('SWAP');
-		expect(parseBox(executeSwapOrderTx.inputs[0])?.parameters.userPk).toBe(BOB_ADDRESS);
-		expect(parseBox(executeSwapOrderTx.inputs[0])?.parameters.poolPk).toBe(SHADOWPOOL_ADDRESS);
-		expect(parseBox(executeSwapOrderTx.inputs[0])?.parameters.unlockHeight).toBe(1300000);
+		expect(parseBoxCustom(executeSwapOrderTx.inputs[0])?.contract).toBe('SWAP');
+		expect(parseBoxCustom(executeSwapOrderTx.inputs[0])?.parameters.userPk).toBe(BOB_ADDRESS);
+		expect(parseBoxCustom(executeSwapOrderTx.inputs[0])?.parameters.poolPk).toBe(SHADOWPOOL_ADDRESS);
+		expect(parseBoxCustom(executeSwapOrderTx.inputs[0])?.parameters.unlockHeight).toBe(1300000);
 		
 		const signedBobInput = await signTxInput(
 			SHADOW_MNEMONIC,
@@ -197,7 +221,7 @@ describe('New Swap order with R9', async () => {
 		);
 		expect(signedBobInput, "bob can sign index:0").toBeDefined();
 
-		expect(parseBox(executeSwapOrderTx.inputs[1])?.contract).toBe('DEPOSIT')
+		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.contract).toBe('DEPOSIT')
 
 		//const signed = signMultisigEIP12(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
 		//expect(signed).toBeDefined();
