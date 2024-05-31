@@ -15,6 +15,7 @@ import {
 import { parse } from '@fleet-sdk/serializer';
 import { tradingPairs } from '$lib/constants/tokens';
 import { insertBox, insertMultipleBoxes, loadBoxRows } from '$lib/db/sqlDb';
+import { utxos } from '$lib/data/utxos';
 
 interface HasId {
     id: number;
@@ -25,7 +26,7 @@ export type BoxDB = {
     txes: TxRow[];
 };
 
-export async function initDb(): BoxDB {
+export async function initDb(): Promise<BoxDB> {
     const boxRows: BoxRow[] = await loadBoxRows() ?? [];
     return {
         boxRows,
@@ -33,8 +34,15 @@ export async function initDb(): BoxDB {
     };
 }
 
-function nextId(table: HasId[]) {
+export function initDepositUtxo(db: BoxDB){
+    if(db.boxRows?.length == 0){
+        db_addBoxes(db, utxos[DEPOSIT_ADDRESS]);
+    }
+}
+
+function nextId(table: HasId[]): number {
     const maxId = Math.max(...table.map((row) => row.id), 0);
+    return maxId;
 }
 
 export function db_addBox(db: BoxDB, box: Box) {
@@ -83,6 +91,11 @@ export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
         hintbags: []
     };
     db.txes.push(newRow);
+}
+
+// application level
+export function userBoxes(address: string){
+
 }
 
 // parsing
@@ -188,7 +201,7 @@ export function pairAndSideByTokenIds(tokenId: string, additionalTokenId: string
     if (pair) {
         return {
             pair: pair.name,
-            side: pair.tokens.indexOf(tokenId) == 0 ? 'buy' : 'sell'
+            side: pair.tokens.indexOf(tokenId) == 0 ? 'sell' : 'buy'
         };
     } else {
         return {

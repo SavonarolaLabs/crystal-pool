@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import type { BoxRow, SerializedBoxRow } from '$lib/types/boxRow';
-import { bigIntSerializer } from '../../server/bigIntSerializer';
+import { serializeBigInt } from '../../server/serializeBigInt';
 
 export const sqlDb = await open({
   filename: 'chain.db',
@@ -22,15 +22,14 @@ await sqlDb.exec(`
 function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
   return {
     ...boxRow,
-    box: bigIntSerializer(boxRow.box),
-    parameters: bigIntSerializer(boxRow.parameters)
+    box: serializeBigInt(boxRow.box),
+    parameters: serializeBigInt(boxRow.parameters)
   };
 }
 
 export async function insertBox(boxRow: BoxRow): Promise<void> {
   const serializedBoxRow = serializeBoxRow(boxRow);
   const { id, box, contract, parameters, unspent } = serializedBoxRow;
-  console.log('Inserting Box:', { id, box, contract, parameters, unspent: unspent ? 1 : 0 });
   await sqlDb.run(
     `INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
      VALUES (?, ?, ?, ?, ?)`,
@@ -43,7 +42,6 @@ export async function insertMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
   try {
     for (const row of boxRows) {
       const serializedRow = serializeBoxRow(row);
-      console.log('Inserting Box:', { id: serializedRow.id, box: serializedRow.box, contract: serializedRow.contract, parameters: serializedRow.parameters, unspent: serializedRow.unspent ? 1 : 0 });
       await sqlDb.run(
         `INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
          VALUES (?, ?, ?, ?, ?)`,

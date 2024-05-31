@@ -12,6 +12,7 @@ import type { SignedTransaction } from '@fleet-sdk/common';
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
 import { createOrderBook } from './orderBookUtils';
+import { asBigInt } from '$lib/utils/helper';
 
 const NEW_SWAP_REQUEST = '/swapNew';
 const NEW_SWAP_SIGN = '/swapNewSign';
@@ -40,17 +41,15 @@ export function processNewSwap(app: Express, io: Server, db: BoxDB) {
 				tokenId: swapParams.sellingTokenId,
 				amount: swapParams.amount
 			},
-			BigInt(swapParams.price),
+			asBigInt(swapParams.price),
 			height, // need helper function
 			unlockHeight, // need helper function
 			swapParams.sellingTokenId,
 			swapParams.buyingTokenId
 		);
 
-		console.log('unsignedTx:');
-		console.log('🚀 ~ POST ~ unsignedTx:', unsignedTx);
-		const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
-		res.json({ unsignedTx, publicCommitsBob });
+		const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
+		res.json({ unsignedTx, publicCommitsPool });
 	});
 }
 
@@ -58,8 +57,8 @@ export function processNewSwapSign(app: Express, io: Server, db: BoxDB) {
 	app.post(NEW_SWAP_SIGN, async (req: Request, res: Response) => {
 	  const { extractedHints, unsignedTx } = req.body; // TODO: unsignedTx not from USER
   
-	  const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
-	  const signedTx = await c(unsignedTx, privateCommitsBob, extractedHints);
+	  const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
+	  const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
 	  const signedTxToStash = signedTx.to_js_eip12();
   
 	  // TODO: Add signedToStash -> to DB -> To orderbook ...

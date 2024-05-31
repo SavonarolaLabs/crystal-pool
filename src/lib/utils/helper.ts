@@ -18,7 +18,11 @@ export function ergoTree(address:string): string{
 
 export function asBigInt(v: bigint | string) {
 	if (typeof v == 'string') {
-		return BigInt(v);
+		try{
+			return BigInt(v);
+		}catch(e){
+			throw new Error("BigInt ERROR: "+v)
+		}
 	} else {
 		return v;
 	}
@@ -38,10 +42,10 @@ export function calcTokenChange(
 	let inputCopy: Box[] = JSON.parse(JSON.stringify(utxosIn));
 	const inputTokens = inputCopy
 		.flatMap((box) => box.assets)
-		.reduce(_sumAssets, []);
+		.reduce(sumAssets, []);
 	return _subtractAssets(inputTokens, [tokensOut]);
 }
-function _sumAssets(acc: TokenAmount<Amount>[], asset: TokenAmount<Amount>) {
+export function sumAssets(acc: TokenAmount<Amount>[], asset: TokenAmount<Amount>) {
 	const token = acc.find((t) => t.tokenId == asset.tokenId);
 	if (token) {
 		token.amount = asBigInt(token.amount) + asBigInt(asset.amount);

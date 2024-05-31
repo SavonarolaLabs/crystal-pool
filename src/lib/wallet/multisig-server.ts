@@ -54,16 +54,16 @@ function _removeSecrets(
 export async function a(unsignedTx: EIP12UnsignedTransaction): Promise<any> {
 	const proverBob = await getProver(SHADOW_MNEMONIC);
 	let reducedTx = reducedFromUnsignedTx(unsignedTx);
-	const privateCommitsBob = proverBob
+	const privateCommitsPool = proverBob
 		.generate_commitments_for_reduced_transaction(reducedTx)
 		.to_json();
 
-	let publicCommitsBob = _removeSecrets(
-		privateCommitsBob,
+	let publicCommitsPool = _removeSecrets(
+		privateCommitsPool,
 		SHADOWPOOL_ADDRESS
 	);
 
-	return { privateCommitsBob, publicCommitsBob };
+	return { privateCommitsPool, publicCommitsPool };
 }
 
 export async function b(
@@ -109,10 +109,10 @@ export async function b(
 
 export async function c(
 	unsignedTx: EIP12UnsignedTransaction,
-	privateCommitsBob: JSONTransactionHintsBag,
+	privateCommitsPool: JSONTransactionHintsBag,
 	hints: JSONTransactionHintsBag
 ) {
-	const hintsForBobSign = privateCommitsBob;
+	const hintsForBobSign = privateCommitsPool;
 
 	for (var row in hintsForBobSign.publicHints) {
 		for (var i = 0; i < hints.publicHints[row].length; i++) {
@@ -155,16 +155,16 @@ export async function signMultisig(
 	userMnemonic: string,
 	userAddress: string
 ) {
-	const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
+	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
 
 	const extractedHints = await b(
 		unsignedTx,
 		userMnemonic,
 		userAddress,
-		publicCommitsBob
+		publicCommitsPool
 	);
 
-	const signedTx = await c(unsignedTx, privateCommitsBob, extractedHints);
+	const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
 
 	return signedTx;
 }

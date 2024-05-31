@@ -1,4 +1,6 @@
 <script lang="ts">
+	import WalletBalanceBar from "./WalletBalanceBar.svelte";
+
 	function toggleTheme() {
 		if (typeof document !== 'undefined') {
 			const currentTheme =
@@ -50,6 +52,9 @@
 		</div>
 		<div class="header_leftWrapper">
 			<div class="header_leftMenu">
+				<div class="balance">
+					<WalletBalanceBar></WalletBalanceBar>
+				</div>
 				<div class="header_navItem">Wallet</div>
 				<div class="header_navItem">
 					<button on:click={toggleTheme}>
@@ -167,6 +172,10 @@
 
 	.header_leftMenu {
 		display: flex;
+		align-items: center;
+	}
+	.balance{
+		margin-inline-end: 20px;
 	}
 	.responsive-item-content {
 		width: fit-content;

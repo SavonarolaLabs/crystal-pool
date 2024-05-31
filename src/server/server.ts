@@ -3,11 +3,12 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { json } from 'body-parser';
 import cors from 'cors';
-import { boxesRoute } from './boxes';
+import { boxes } from './routes/boxes';
 import { orderBooksRoute } from './orderBooks';
 import { processNewSwap, processNewSwapSign } from './swapOrder';
-import { initDb } from '$lib/db/db';
+import { initDb, initDepositUtxo } from '$lib/db/db';
 import { createOrderBook } from './orderBookUtils';
+import { userBoxes } from './routes/userBoxes';
 
 const app = express();
 const server = http.createServer(app);
@@ -34,12 +35,14 @@ app.use(json());
 
 // Initialize the database
 const db = await initDb();
+initDepositUtxo(db);
 
 // Register routes
-boxesRoute(app, io, db); // Pass the io instance and db
-orderBooksRoute(app, db); // Pass the db
-processNewSwap(app, io, db); // Pass the io instance and db
-processNewSwapSign(app, io, db); // Pass the io instance and db
+boxes(app, db);
+orderBooksRoute(app, db);
+processNewSwap(app, io, db);
+processNewSwapSign(app, io, db);
+userBoxes(app, db);
 
 // Basic test route
 app.get('/test', (req, res) => {
