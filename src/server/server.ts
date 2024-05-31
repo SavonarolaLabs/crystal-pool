@@ -3,10 +3,12 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { json } from 'body-parser';
 import cors from 'cors';
-import { boxesRoute } from './boxes';
-import { orderBooksRoute } from './orderBooks';
-import { processNewSwap, processNewSwapSign } from './swapOrder';
-import { initDb } from '$lib/db/db';
+import { boxes } from './routes/boxes';
+import { userBoxes } from './routes/userBoxes';
+import { orderBooks } from './routes/orderBooks';
+import { createSwapOrder, signSwapOrder } from './routes/swapOrder';
+import { initDb, initDepositUtxo } from '$lib/db/db';
+import { createOrderBook } from './orderBookUtils';
 
 const app = express();
 const server = http.createServer(app);
@@ -32,13 +34,15 @@ app.use(cors({
 app.use(json());
 
 // Initialize the database
-const db = initDb();
+const db = await initDb();
+initDepositUtxo(db);
 
 // Register routes
-boxesRoute(app, io, db); // Pass the io instance and db
-orderBooksRoute(app, db); // Pass the db
-processNewSwap(app, io, db); // Pass the io instance and db
-processNewSwapSign(app, io, db); // Pass the io instance and db
+boxes(app, db);
+orderBooks(app, db);
+createSwapOrder(app, io, db);
+signSwapOrder(app, io, db);
+userBoxes(app, db);
 
 // Basic test route
 app.get('/test', (req, res) => {
@@ -48,6 +52,8 @@ app.get('/test', (req, res) => {
 // WebSocket connection
 io.on('connection', (socket) => {
   console.log('A client connected:', socket.id);
+  const orderbook = createOrderBook('rsBTC_sigUSD', db);
+  io.emit('update', orderbook);
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);

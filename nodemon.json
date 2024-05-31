@@ -1,9 +1,0 @@
-{
-	"watch": ["src/server"],
-	"ext": "ts",
-	"ignore": ["node_modules"],
-	"exec": "bun src/server/server.ts",
-	"restartable": "rs",
-	"verbose": true
-  }
-  

@@ -25,10 +25,10 @@ export async function POST({ request }) {
 		swapParams.buyingTokenId
 	);
 
-	const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
-	//return { unsignedTx, publicCommitsBob };
+	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
+	//return { unsignedTx, publicCommitsPool };
 
-	return new Response(JSON.stringify({ unsignedTx, publicCommitsBob }), {
+	return new Response(JSON.stringify({ unsignedTx, publicCommitsPool }), {
 		headers: {
 			'Content-Type': 'application/json'
 		}

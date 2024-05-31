@@ -1,4 +1,4 @@
-export function bigIntSerializer(payload: any): string {
+export function serializeBigInt(payload: any): string {
     return JSON.stringify(payload, (key, value) => {
       if (typeof value === 'bigint') {
         return value.toString();

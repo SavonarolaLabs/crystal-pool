@@ -8,6 +8,11 @@
 		signSwapTx
 	} from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
+	import { user_address, user_mnemonic } from '../ui_state';
+	import {
+		createAndMultisigSwapTx,
+		type SwapRequest
+	} from '../service/tradingService';
 
 	let buyPriceInput: string;
 	let buyAmountInput: string;
@@ -17,30 +22,17 @@
 	let sellAmountInput: string = '0.00001';
 	let sellTotalInput: string;
 
-	type SwapRequest = {
-		address: string;
-		price: string;
-		amount: string;
-		sellingTokenId: string;
-		buyingTokenId: string;
-	};
-
 	function bigIntReplacer(value: any): string {
 		return typeof value === 'bigint' ? value.toString() : value;
 	}
 
-	function getTestSwapParams() {
+	function dummySwapParams() {
 		const address = BOB_ADDRESS;
-		const TOKEN_SIGUSD =
-			'03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
-		const TOKEN_rsBTS =
-			'5bf691fbf0c4b17f8f8cece83fa947f62f480bfbd242bd58946f85535125db4d';
 
 		const price = 100n;
 		const amount = 200n;
-		const sellingTokenId = TOKEN_SIGUSD; //mintAndUse
-		const buyingTokenId = TOKEN_rsBTS; //TokenID
-		const pair = 'rsBTC_sigUSD';
+		const sellingTokenId = TOKEN.sigUSD.tokenId;
+		const buyingTokenId = TOKEN.rsBTC.tokenId;
 
 		const swapParams: SwapRequest = {
 			address: address,
@@ -53,63 +45,25 @@
 		return swapParams;
 	}
 
-	async function swapCore(swapParams: SwapRequest) {
-		//Part 2. Create Tx and Hints
-		const { unsignedTx, publicCommitsBob } = await createSwapTx(swapParams);
-		//Part 3. Check Transactions and Sign
-		const userMnemonic = BOB_MNEMONIC; //TODO: ?
-		const userAddress = BOB_ADDRESS;
-		const extractedHints = await b(
-			unsignedTx,
-			userMnemonic,
-			userAddress,
-			publicCommitsBob
-		);
-
-		//Part 4. Send Hints to server. Server sign and insert tx and boxes into DB and Order Book
-		let signedTx = await signSwapTx(extractedHints, unsignedTx);
-		return signedTx;
-	}
-
 	async function swapActionBuy() {
-		//TEST 1
-		//TODO: ADD VISUAL DIAGRAMM TO DOCS
-		//BLOCK I. execute current buy orders
-		//BLOCK II. create new buy order
-
-		//Part 1. Take inputs from UI
-		const swapParams = getTestSwapParams(); //TODO: Take Real Inputs\
+		const swapParams = dummySwapParams(); //TODO: Take Real Inputs\
 		//----------------------------
-		let signedTx = await swapCore(swapParams);
+		let signedTx = await createAndMultisigSwapTx(swapParams);
 		console.log(signedTx);
 		return;
 	}
 
-	function getDecimalsByTokenName(name: string) {
-		const keys = Object.keys(TOKEN);
-		const foundKey = keys.find((n) => n == name);
-		return TOKEN[foundKey].decimals;
-	}
-	function getTokenIdByTokenName(name: string) {
-		const keys = Object.keys(TOKEN);
-		const foundKey = keys.find((n) => n == name);
-		return TOKEN[foundKey].tokenId;
-	}
-
 	async function swapActionSell() {
-		//INPUT INFO
-		// SELL ORDER CONFIG
-		const userAddress = BOB_ADDRESS; //TODO:
-		const sellingToken = 'rsBTC';
-		const buyingToken = 'sigUSD';
+		const sellingToken = TOKEN.rsBTC;
+		const buyingToken = TOKEN.sigUSD;
 
 		// take user inputs
 		const amountInput = new BigNumber(sellAmountInput);
 		const priceInput = new BigNumber(sellPriceInput);
 
 		// load and calculate decimals
-		const decimalsToken = getDecimalsByTokenName(TOKEN.rsBTC.name);
-		const decimalsCurrency = getDecimalsByTokenName(TOKEN.sigUSD.name);
+		const decimalsToken = TOKEN.rsBTC.decimals;
+		const decimalsCurrency = TOKEN.sigUSD.decimals;
 		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
 		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
 
@@ -121,7 +75,6 @@
 		const real_amount = amountInput.multipliedBy(bigDecimalsToken);
 		const total = real_price.multipliedBy(real_amount);
 
-		// check results after converting toString()
 		console.log('real price: 1 sat in cents =', real_price.toString());
 		console.log('real amount: sats =', real_amount.toString());
 		console.log('total amount: cents =', total.toString());
@@ -135,15 +88,15 @@
 		// 0.004 rsBTC  -  PRICE  40  -  TOTAL: 16 cent
 
 		const swapParams: SwapRequest = {
-			address: BOB_ADDRESS,
+			address: $user_address,
 			price: real_price.toString(),
 			amount: real_amount.toString(),
-			sellingTokenId: getTokenIdByTokenName(sellingToken),
-			buyingTokenId: getTokenIdByTokenName(buyingToken)
+			sellingTokenId: sellingToken.tokenId,
+			buyingTokenId: buyingToken.tokenId
 		};
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
-		let signedTx = await swapCore(swapParams);
+		let signedTx = await createAndMultisigSwapTx(swapParams);
 		console.log(signedTx);
 	}
 </script>

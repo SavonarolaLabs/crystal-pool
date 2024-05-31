@@ -92,16 +92,16 @@ export async function signMultisig(
 	userMnemonic: string,
 	userAddress: string
 ) {
-	const { privateCommitsBob, publicCommitsBob } = await a(unsignedTx);
+	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
 
 	const extractedHints = await b(
 		unsignedTx,
 		userMnemonic,
 		userAddress,
-		publicCommitsBob
+		publicCommitsPool
 	);
 
-	const signedTx = await c(unsignedTx, privateCommitsBob, extractedHints);
+	const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
 
 	return signedTx;
 }

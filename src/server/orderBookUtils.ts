@@ -1,6 +1,6 @@
 import type { BoxDB } from '$lib/db/db';
-import { bigIntSerializer } from './bigIntSerializer';
 import { asBigInt } from '$lib/utils/helper';
+import { serializeBigInt } from './serializeBigInt';
 
 export function createOrderBook(tradingPair: string, db: BoxDB) {
     const filteredBoxRows = db.boxRows.filter(
@@ -20,19 +20,19 @@ export function createOrderBook(tradingPair: string, db: BoxDB) {
     const orderbook = {
         buy: buyOrders.map((r) => {
             return {
-                price: r.rate,
-                amount: r.amount,
-                value: asBigInt(r.rate) * asBigInt(r.amount)
+                price: Number(r.rate)*10**(9-2),
+                amount: Number(r.amount)/10**9,
+                value: (Number(r.rate) * Number(r.amount)/10**(2)).toFixed(2)
             };
         }),
         sell: sellOrders.map((r) => {
             return {
-                price: 1 / r.rate,
-                amount: r.amount,
-                value: 1n / asBigInt(r.rate) * asBigInt(r.amount)
+                price: Number(r.rate)*10**(9-2),
+                amount: Number(r.amount)/10**9,
+                value: (Number(r.rate) * Number(r.amount)/10**(2)).toFixed(2)
             };
         })
     };
 
-    return bigIntSerializer(orderbook);
+    return serializeBigInt(orderbook);
 }

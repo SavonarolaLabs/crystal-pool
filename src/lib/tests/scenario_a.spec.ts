@@ -114,8 +114,8 @@ async function initUserBalance(): Promise<Box[]> {
 }
 
 describe('screnario A', () => {
-	beforeAll(async () => {
-		db = initDb();
+	beforeAll(async() => {
+		db = await initDb();
 		const boxes = await initUserBalance();
 		db_addBoxes(db, boxes);
 	});
