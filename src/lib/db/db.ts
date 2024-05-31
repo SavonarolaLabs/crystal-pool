@@ -14,7 +14,7 @@ import {
 } from '$lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
 import { tradingPairs } from '$lib/constants/tokens';
-import { insertBox, insertMultipleBoxes, loadBoxRows } from '$lib/db/sqlDb';
+import { persistBox, persistMultipleBoxes, loadBoxRows } from '$lib/db/sqlDb';
 import { utxos } from '$lib/data/utxos';
 
 interface HasId {
@@ -56,7 +56,7 @@ export function db_addBox(db: BoxDB, box: Box) {
             unspent: true
         };
         db.boxRows.push(newRow);
-        insertBox(newRow);  // Insert into database
+        persistBox(newRow);  // Insert into database
     } else {
         console.error('db_addBox() invalid box: ', JSON.stringify(box));
     }
@@ -80,7 +80,7 @@ export function db_addBoxes(db: BoxDB, boxRows: Box[]) {
     }).filter(row => row !== null) as BoxRow[];
 
     db.boxRows.push(...newBoxRows);
-    insertMultipleBoxes(newBoxRows);  // Insert multiple rows into database
+    persistMultipleBoxes(newBoxRows);  // Insert multiple rows into database
 }
 
 export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {

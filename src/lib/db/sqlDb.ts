@@ -27,7 +27,7 @@ function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
   };
 }
 
-export async function insertBox(boxRow: BoxRow): Promise<void> {
+export async function persistBox(boxRow: BoxRow): Promise<void> {
   const serializedBoxRow = serializeBoxRow(boxRow);
   const { id, box, contract, parameters, unspent } = serializedBoxRow;
   await sqlDb.run(
@@ -37,7 +37,7 @@ export async function insertBox(boxRow: BoxRow): Promise<void> {
   );
 }
 
-export async function insertMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
+export async function persistMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
   await sqlDb.exec('BEGIN TRANSACTION');
   try {
     for (const row of boxRows) {
