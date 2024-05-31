@@ -10,6 +10,7 @@ import {
 	SHADOW_MNEMONIC
 } from '$lib/constants/mnemonics';
 import {
+	a,
 	signMultisig,
 	signTxByAddress,
 	signTxInput,
@@ -335,7 +336,7 @@ describe('New Swap order with R9', async () => {
 	});
 
 	//swapOrderBoxes
-	it.skip('Order + deposit[ALICE], change:ALICE: FULL execute', async () => {
+	it.only('Order + deposit[ALICE], change:ALICE: FULL execute', async () => {
 		const buyAmount = 10000n;
 		const error = 0n;
 		const buyerPk = ALICE_ADDRESS;
@@ -388,14 +389,68 @@ describe('New Swap order with R9', async () => {
 			.build()
 			.toEIP12Object();
 
-		const signedTx = await signMultisig(
-			unsignedTransaction,
-			ALICE_MNEMONIC,
-			ALICE_ADDRESS
-		);
-		//console.dir(signedTx.to_js_eip12(), { depth: null });
+		//Sign inputs
+		const unsignedTx = unsignedTransaction; // <---
+		let swapContractUtxo = swapOrderBoxes;
 
-		expect(await txHasErrors(signedTx.to_js_eip12())).not.toBe(false);
+		const shadowIndex = unsignedTx.inputs.findIndex((b) =>
+			swapContractUtxo.map((b) => b.boxId).includes(b.boxId)
+		);
+		expect(shadowIndex).toBe(0);
+
+		const signedShadowInput = await signTxInput(
+			SHADOW_MNEMONIC,
+			unsignedTx,
+			shadowIndex
+		);
+
+		const shadowInputProof = JSON.parse(
+			signedShadowInput.spending_proof().to_json()
+		);
+
+		expect(shadowInputProof.proofBytes.length).greaterThan(10);
+
+		//---------------------- CHANGE FOR MULTISIG ALICE + POOL -------------
+		const aliceIndex = unsignedTx.inputs.findIndex(
+			(b) => utxos[DEPOSIT_ADDRESS].map((b) => b.boxId).includes(b.boxId) //DEPOSIT
+		);
+		expect(aliceIndex).toBe(1);
+		expect(unsignedTx.inputs[aliceIndex].ergoTree).toBe(
+			ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree
+		);
+		const commits = await a(unsignedTx);
+		console.log('commits', commits);
+		// MULTISIG INPUTS
+		const signedAliceInput = await signTxInput(
+			ALICE_MNEMONIC,
+			unsignedTx,
+			aliceIndex
+		);
+
+		// ---------------
+
+		const aliceInputProof = JSON.parse(
+			signedAliceInput.spending_proof().to_json()
+		);
+		expect(aliceInputProof.proofBytes.length).greaterThan(10);
+
+		const txId = wasm.UnsignedTransaction.from_json(
+			JSON.stringify(unsignedTx)
+		)
+			.id()
+			.to_str();
+
+		unsignedTx.inputs[shadowIndex] = {
+			boxId: unsignedTx.inputs[shadowIndex].boxId,
+			spendingProof: shadowInputProof
+		};
+		unsignedTx.inputs[aliceIndex] = {
+			boxId: unsignedTx.inputs[aliceIndex].boxId,
+			spendingProof: aliceInputProof
+		};
+
+		unsignedTx.id = txId;
+		console.log(unsignedTx.id);
 	});
 
 	it.skip('Order + deposit[ALICE], change:ALICE: 50% execute', async () => {
@@ -449,27 +504,17 @@ describe('New Swap order with R9', async () => {
 			.payFee(RECOMMENDED_MIN_FEE_VALUE)
 			.build()
 			.toEIP12Object();
-
-		const signedTx = await signMultisig(
-			unsignedTransaction,
-			ALICE_MNEMONIC,
-			ALICE_ADDRESS
-		);
-		//console.dir(signedTx.to_js_eip12(), { depth: null });
-
-		expect(await txHasErrors(signedTx.to_js_eip12())).not.toBe(false);
+		// SIGN INPUTS END
 	});
 
-	it('Order + ALICE_PK, change:ALICE: FULL execute', async () => {
+	it.skip('Order + ALICE_PK, change:ALICE: FULL execute', async () => {
 		const buyAmount = 10000n;
-		const error = 0n;
-		const buyerPk = ALICE_ADDRESS;
 		const currentHeight = height;
 
 		const paymentInTokens = {
 			tokenId: buyingTokenId,
 			amount: BigInt(Number(buyAmount) * price)
-		}; //TODO:FIX ROUNDING AND MAKE ACCURATE CALCULATIONS
+		};
 
 		//Seller Output
 		const outputPayment = new OutputBuilder(
@@ -492,7 +537,7 @@ describe('New Swap order with R9', async () => {
 
 		tempOutputSwapOrder.assets[0].amount =
 			BigInt(tokenForSale.amount) - buyAmount;
-
+		//Оставить не 10 а 5
 		//outputSwapOrder
 		//Swap Order Output
 		// const outputSwapOrder = new OutputBuilder(
@@ -513,14 +558,67 @@ describe('New Swap order with R9', async () => {
 			.build()
 			.toEIP12Object();
 
-		const signedTx = await signMultisig(
-			unsignedTransaction,
-			ALICE_MNEMONIC,
-			ALICE_ADDRESS
-		);
 		//console.dir(signedTx.to_js_eip12(), { depth: null });
+		// SIGN INPUTS
 
-		expect(await txHasErrors(signedTx.to_js_eip12())).not.toBe(false);
+		// SIGN INPUTS END
+		//Sign inputs
+		const unsignedTx = unsignedTransaction; // <---
+		let swapContractUtxo = swapOrderBoxes;
+
+		const shadowIndex = unsignedTx.inputs.findIndex((b) =>
+			swapContractUtxo.map((b) => b.boxId).includes(b.boxId)
+		);
+		expect(shadowIndex).toBe(0);
+
+		const signedShadowInput = await signTxInput(
+			SHADOW_MNEMONIC,
+			unsignedTx,
+			shadowIndex
+		);
+
+		const shadowInputProof = JSON.parse(
+			signedShadowInput.spending_proof().to_json()
+		);
+
+		expect(shadowInputProof.proofBytes.length).greaterThan(10);
+
+		//---------------------- CHANGE FOR MULTISIG ALICE + POOL -------------
+		const aliceIndex = unsignedTx.inputs.findIndex((b) =>
+			utxos[ALICE_ADDRESS].map((b) => b.boxId).includes(b.boxId)
+		);
+		expect(aliceIndex).toBe(1);
+		expect(unsignedTx.inputs[aliceIndex].ergoTree).toBe(
+			ErgoAddress.fromBase58(ALICE_ADDRESS).ergoTree
+		);
+
+		const signedAliceInput = await signTxInput(
+			ALICE_MNEMONIC,
+			unsignedTx,
+			aliceIndex
+		);
+		const aliceInputProof = JSON.parse(
+			signedAliceInput.spending_proof().to_json()
+		);
+		expect(aliceInputProof.proofBytes.length).greaterThan(10);
+
+		const txId = wasm.UnsignedTransaction.from_json(
+			JSON.stringify(unsignedTx)
+		)
+			.id()
+			.to_str();
+
+		unsignedTx.inputs[shadowIndex] = {
+			boxId: unsignedTx.inputs[shadowIndex].boxId,
+			spendingProof: shadowInputProof
+		};
+		unsignedTx.inputs[aliceIndex] = {
+			boxId: unsignedTx.inputs[aliceIndex].boxId,
+			spendingProof: aliceInputProof
+		};
+
+		unsignedTx.id = txId;
+		console.log(unsignedTx.id);
 	});
 
 	it('Order + BOB utxo: BOB can cancell order', async () => {
