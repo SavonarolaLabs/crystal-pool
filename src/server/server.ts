@@ -4,11 +4,11 @@ import { Server } from 'socket.io';
 import { json } from 'body-parser';
 import cors from 'cors';
 import { boxes } from './routes/boxes';
-import { orderBooksRoute } from './orderBooks';
-import { processNewSwap, processNewSwapSign } from './swapOrder';
+import { userBoxes } from './routes/userBoxes';
+import { orderBooks } from './routes/orderBooks';
+import { createSwapOrder, signSwapOrder } from './routes/swapOrder';
 import { initDb, initDepositUtxo } from '$lib/db/db';
 import { createOrderBook } from './orderBookUtils';
-import { userBoxes } from './routes/userBoxes';
 
 const app = express();
 const server = http.createServer(app);
@@ -39,9 +39,9 @@ initDepositUtxo(db);
 
 // Register routes
 boxes(app, db);
-orderBooksRoute(app, db);
-processNewSwap(app, io, db);
-processNewSwapSign(app, io, db);
+orderBooks(app, db);
+createSwapOrder(app, io, db);
+signSwapOrder(app, io, db);
 userBoxes(app, db);
 
 // Basic test route
