@@ -45,6 +45,17 @@ export function calcTokenChange(
 		.reduce(sumAssets, []);
 	return _subtractAssets(inputTokens, [tokensOut]);
 }
+
+export function sumAssetsFromBoxes(boxes: Box[]){
+	return boxes
+	.flatMap((box) => box.assets)
+	.reduce(sumAssets, []);
+}
+
+export function amountByTokenId(boxes: Box[], tokenId: string): Amount{
+	return (sumAssetsFromBoxes(boxes).find(t => t.tokenId == tokenId)?.amount)??0n
+}
+
 export function sumAssets(acc: TokenAmount<Amount>[], asset: TokenAmount<Amount>) {
 	const token = acc.find((t) => t.tokenId == asset.tokenId);
 	if (token) {
