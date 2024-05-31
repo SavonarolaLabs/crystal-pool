@@ -9,17 +9,18 @@
 	} from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
 	import { user_address, user_mnemonic } from '../ui_state';
-	import { createAndMultisigSwapTx, type SwapRequest } from '../service/tradingService';
+	import {
+		createAndMultisigSwapTx,
+		type SwapRequest
+	} from '../service/tradingService';
 
 	let buyPriceInput: string;
 	let buyAmountInput: string;
 	let buyTotalInput: string;
 
-	let sellPriceInput: string = '70000000';
-	let sellAmountInput: string = '0.001';
+	let sellPriceInput: string = '20000';
+	let sellAmountInput: string = '0.00001';
 	let sellTotalInput: string;
-
-
 
 	function bigIntReplacer(value: any): string {
 		return typeof value === 'bigint' ? value.toString() : value;
@@ -51,7 +52,6 @@
 		console.log(signedTx);
 		return;
 	}
-
 
 	async function swapActionSell() {
 		const sellingToken = TOKEN.rsBTC;

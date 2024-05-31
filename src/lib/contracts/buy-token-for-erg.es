@@ -1,7 +1,4 @@
-import { Network } from '@fleet-sdk/common';
-import { compile } from '@fleet-sdk/compiler';
-
-export const buyTokenForErg = `{	
+{	
 	def getBuyerPk(box: Box)               = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
 	def getPoolPk(box: Box)                = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(1)
 	def unlockHeight(box: Box)             = box.R5[Int].get
@@ -99,14 +96,4 @@ export const buyTokenForErg = `{
 	}else{
 		getBuyerPk(SELF) && getPoolPk(SELF) || sigmaProp(isBuyerPaid) && getPoolPk(SELF)
 	}
-}`;
-
-function compileContract() {
-	const tree = compile(buyTokenForErg, {
-		version: 0,
-		includeSize: false
-	});
-	return tree.toAddress(Network.Mainnet).toString();
 }
-
-console.log(`export const buyOrderAddress = "${compileContract()}"`);
