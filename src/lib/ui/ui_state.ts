@@ -4,6 +4,12 @@ import { userBoxes } from './service/crystalPoolService';
 import { sumAssets } from '$lib/utils/helper';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 
+interface Order {
+    price: number;
+    amount: number;
+    value: number;
+}
+
 // orderbook
 export const orderbook_sell = writable([]);
 export const orderbook_buy = writable([]);
@@ -13,12 +19,43 @@ export const orderbook_latest = writable({
 	side: 'sell'
 });
 
-export async function setOrderBook(book: any) {
-	if (book?.buy) {
-		orderbook_buy.set(book.buy);
-		orderbook_sell.set(book.sell);
-	}
+function roundToStep(price: number, step: number): number {
+    return Math.floor(price / step) * step;
 }
+
+function groupOrdersByPrice(orders: any[], step: number): Order[] {
+    const groupedOrders: { [key: number]: Order } = {};
+    
+    for (const order of orders) {
+        const roundedPrice = roundToStep(order.price, step);
+        
+        if (!groupedOrders[roundedPrice]) {
+            groupedOrders[roundedPrice] = {
+                price: roundedPrice,
+                amount: 0,
+                value: 0
+            };
+        }
+        
+        groupedOrders[roundedPrice].amount += order.amount;
+        groupedOrders[roundedPrice].value += parseFloat(order.value);
+    }
+
+    return Object.values(groupedOrders);
+}
+
+export async function setOrderBook(book: any) {
+    const step = 0.01;
+    
+    if (book?.buy) {
+        const groupedBuyOrders = groupOrdersByPrice(book.buy, step);
+        const groupedSellOrders = groupOrdersByPrice(book.sell, step);
+        
+        orderbook_buy.set(groupedBuyOrders);
+        orderbook_sell.set(groupedSellOrders);
+    }
+}
+
 
 // wallet balance
 export const user_mnemonic = writable(BOB_MNEMONIC);

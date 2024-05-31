@@ -20,16 +20,16 @@ export function createOrderBook(tradingPair: string, db: BoxDB) {
     const orderbook = {
         buy: buyOrders.map((r) => {
             return {
-                price: Number(r.rate)*10**9,
+                price: Number(r.rate)*10**(9-2),
                 amount: Number(r.amount)/10**9,
-                value: Number(asBigInt(r.rate) * asBigInt(r.amount)).toFixed(2)
+                value: (Number(r.rate) * Number(r.amount)/10**(2)).toFixed(2)
             };
         }),
         sell: sellOrders.map((r) => {
             return {
-                price: Number(r.rate)*10**9,
+                price: Number(r.rate)*10**(9-2),
                 amount: Number(r.amount)/10**9,
-                value: Number(asBigInt(r.rate) * asBigInt(r.amount)).toFixed(2)
+                value: (Number(r.rate) * Number(r.amount)/10**(2)).toFixed(2)
             };
         })
     };
