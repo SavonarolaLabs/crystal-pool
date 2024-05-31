@@ -47,8 +47,7 @@ export function createSwapOrderTxR9(
 	contractAddress: string
 ): EIP12UnsignedTransaction {
 	const [bigRate, bigDenom] = splitSellRate(sellRate);
-	console.log('BigRate:', bigRate);
-	console.log('BigDenom', bigDenom);
+
 	const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, contractAddress)
 		.addTokens(token)
 		.setAdditionalRegisters({

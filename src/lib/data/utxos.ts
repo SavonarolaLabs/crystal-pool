@@ -2,41 +2,14 @@ export const utxos =
 {
   "9gJa6Mict6TVu9yipUX5aRUW87Yv8J62bbPEtkTje28sh5i3Lz8": [
     {
-      "boxId": "1ba08d32a9b70e3d38047650764a1ac3b6f9b2eb0148bcc328340338a4d27559",
-      "transactionId": "57fb04e45dd1bd63feb5b2191608d2c4f5f6bb4547efca64f664aa83a15582e3",
-      "blockId": "8ee92294745d0246f21a43d1ef791f220115395324d745b495120d4e33a50fd4",
-      "value": "973400000",
-      "index": 2,
-      "globalIndex": 5626551,
-      "creationHeight": 1265580,
-      "settlementHeight": 1265588,
-      "ergoTree": "0008cd02eb083423041003740c9e791b2fea5ecf6e273669630a25b7ecabf9145395e447",
-      "ergoTreeConstants": "",
-      "ergoTreeScript": "{SigmaProp(ProveDlog(ECPoint(eb0834,848edd,...)))}",
-      "address": "9gJa6Mict6TVu9yipUX5aRUW87Yv8J62bbPEtkTje28sh5i3Lz8",
-      "assets": [
-        {
-          "tokenId": "b73a806dee528632b8d76f07813a1f1b66b8e11bc32b3ad09f8051265f3664ab",
-          "index": 0,
-          "amount": "49999800000000000",
-          "name": "TestToken Test2",
-          "decimals": 9,
-          "type": "EIP-004"
-        }
-      ],
-      "additionalRegisters": {},
-      "spentTransactionId": null,
-      "mainChain": true
-    },
-    {
-      "boxId": "e7f7fd708e42aca91c47cd3717dc4cb92b343971a9873592c8ecde768bd05f0c",
-      "transactionId": "cbe878ba916b5462e48b040f6f268ef4ed6e47722a901b5afdc5dd2873a98b1c",
-      "blockId": "ccf62fa8022532d2f1d2ed80a7e0b7527aae177479d07fbdd72486e8b479bff6",
-      "value": "1000000",
-      "index": 0,
-      "globalIndex": 5493865,
-      "creationHeight": 1261443,
-      "settlementHeight": 1261445,
+      "boxId": "ebc5c60a5c9216ae81445a88548ddd45e8256450f8534315cc6aaa31cfb50310",
+      "transactionId": "181745cb2247b18eeb68994a411a6ac7cdbc66293df39c8c425878746f64b5c5",
+      "blockId": "5165e734d368ba05c25ec6e3da4d7e0183e710d07c92bb1909ba3fb98f4180ad",
+      "value": "541684968",
+      "index": 3,
+      "globalIndex": 5978395,
+      "creationHeight": 1275865,
+      "settlementHeight": 1275868,
       "ergoTree": "0008cd02eb083423041003740c9e791b2fea5ecf6e273669630a25b7ecabf9145395e447",
       "ergoTreeConstants": "",
       "ergoTreeScript": "{SigmaProp(ProveDlog(ECPoint(eb0834,848edd,...)))}",
@@ -49,9 +22,47 @@ export const utxos =
           "name": "SwapToken Test1",
           "decimals": 9,
           "type": "EIP-004"
+        },
+        {
+          "tokenId": "b73a806dee528632b8d76f07813a1f1b66b8e11bc32b3ad09f8051265f3664ab",
+          "index": 1,
+          "amount": "49999800000000000",
+          "name": "TestToken Test2",
+          "decimals": 9,
+          "type": "EIP-004"
         }
       ],
       "additionalRegisters": {},
+      "spentTransactionId": null,
+      "mainChain": true
+    },
+    {
+      "boxId": "f60bff91f7ae3f3a5f0c2d35b46ef8991f213a61d7f7e453d344fa52a42d9f9a",
+      "transactionId": "181745cb2247b18eeb68994a411a6ac7cdbc66293df39c8c425878746f64b5c5",
+      "blockId": "5165e734d368ba05c25ec6e3da4d7e0183e710d07c92bb1909ba3fb98f4180ad",
+      "value": "1000000",
+      "index": 1,
+      "globalIndex": 5978393,
+      "creationHeight": 1275865,
+      "settlementHeight": 1275868,
+      "ergoTree": "0008cd02eb083423041003740c9e791b2fea5ecf6e273669630a25b7ecabf9145395e447",
+      "ergoTreeConstants": "",
+      "ergoTreeScript": "{SigmaProp(ProveDlog(ECPoint(eb0834,848edd,...)))}",
+      "address": "9gJa6Mict6TVu9yipUX5aRUW87Yv8J62bbPEtkTje28sh5i3Lz8",
+      "assets": [
+        {
+          "tokenId": "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
+          "index": 0,
+          "amount": "50",
+          "name": "SigUSD",
+          "decimals": 2,
+          "type": "EIP-004"
+        }
+      ],
+      "additionalRegisters": {
+        "R4": "0564",
+        "R5": "05f0a7d59a03"
+      },
       "spentTransactionId": null,
       "mainChain": true
     }
@@ -63,7 +74,7 @@ export const utxos =
       "blockId": "530a9b80ee39e9d52a3147fd62b0f15b8bce4f51cc94803eb6564b9015da8ab0",
       "value": "982039682",
       "index": 2,
-      "globalIndex": 5956001,
+      "globalIndex": 5952325,
       "creationHeight": 1275107,
       "settlementHeight": 1275119,
       "ergoTree": "0008cd0233e9a9935c8bbb8ae09b2c944c1d060492a8832252665e043b0732bdf593bf2c",
@@ -154,7 +165,7 @@ export const utxos =
       "blockId": "f4a379f4cfecf31adcfc49832e56573d275df49073c051696c32f3494fca6cdc",
       "value": "1000000",
       "index": 0,
-      "globalIndex": 5903881,
+      "globalIndex": 5900205,
       "creationHeight": 1273646,
       "settlementHeight": 1273648,
       "ergoTree": "0008cd0233e9a9935c8bbb8ae09b2c944c1d060492a8832252665e043b0732bdf593bf2c",
@@ -191,7 +202,7 @@ export const utxos =
       "blockId": "530a9b80ee39e9d52a3147fd62b0f15b8bce4f51cc94803eb6564b9015da8ab0",
       "value": "10000000",
       "index": 0,
-      "globalIndex": 5955999,
+      "globalIndex": 5952323,
       "creationHeight": 1275107,
       "settlementHeight": 1275119,
       "ergoTree": "100204000402d801d601d9010163b2e4c6720104147300009591a3dad9010263e4c67202050401a7da720101a7ea02da720101a7dad9010263b2e4c67202041473010001a7",
@@ -221,7 +232,7 @@ export const utxos =
       "blockId": "f2857b84b52dabaa258a9037321ade5a6223c74b915322c08973e6c3d8ca5d7b",
       "value": "10000000",
       "index": 0,
-      "globalIndex": 5955966,
+      "globalIndex": 5952290,
       "creationHeight": 1275107,
       "settlementHeight": 1275116,
       "ergoTree": "100204000402d801d601d9010163b2e4c6720104147300009591a3dad9010263e4c67202050401a7da720101a7ea02da720101a7dad9010263b2e4c67202041473010001a7",
@@ -251,7 +262,7 @@ export const utxos =
       "blockId": "8ee92294745d0246f21a43d1ef791f220115395324d745b495120d4e33a50fd4",
       "value": "10000000",
       "index": 0,
-      "globalIndex": 5626549,
+      "globalIndex": 5622873,
       "creationHeight": 1265580,
       "settlementHeight": 1265588,
       "ergoTree": "100204000402d801d601d9010163b2e4c6720104147300009591a3dad9010263e4c67202050401a7da720101a7ea02da720101a7dad9010263b2e4c67202041473010001a7",
@@ -281,7 +292,7 @@ export const utxos =
       "blockId": "936f6d09915005e44ef4bd3f06f7dc69d5262b5c43a187e2caf1d101ef644c8e",
       "value": "10000000",
       "index": 0,
-      "globalIndex": 5625921,
+      "globalIndex": 5622245,
       "creationHeight": 1265000,
       "settlementHeight": 1265571,
       "ergoTree": "100204000402d801d601d9010163b2e4c6720104147300009591a3dad9010263e4c67202050401a7da720101a7ea02da720101a7dad9010263b2e4c67202041473010001a7",
