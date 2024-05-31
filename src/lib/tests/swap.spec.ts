@@ -218,6 +218,8 @@ describe('New Swap order with R9', async () => {
 			paymentInTokens,
 			SAFE_MIN_BOX_VALUE
 		);
+		expect(executeSwapOrderTx.inputs.length).toBe(2);
+
 		expect(boxesAtAddressUnsigned(executeSwapOrderTx, DEPOSIT_ADDRESS).length).toBe(2);
 		expect(boxesAtAddressUnsigned(executeSwapOrderTx, SWAP_ORDER_ADDRESS).length).toBe(0);
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[0])?.contract).toBe('SWAP');
@@ -227,13 +229,16 @@ describe('New Swap order with R9', async () => {
 		);
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[0])?.parameters.unlockHeight).toBe(1300000);
 
-		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.parameters.unlockHeight).toBe(1300000);
 
-		const signedBobInput = await signTxInput(SHADOW_MNEMONIC, executeSwapOrderTx, 0);
+		const signedBobInput = await signTxInput(SHADOW_MNEMONIC, JSON.parse(JSON.stringify(executeSwapOrderTx)), 0);
 		expect(signedBobInput, 'bob can sign index:0').toBeDefined();
 
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.contract).toBe('DEPOSIT');
+		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.parameters.userPk).toBe(ALICE_ADDRESS);
+		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.parameters.unlockHeight).toBe(1300000);
 
+		console.log(executeSwapOrderTx.inputs)
+		//const signed = signTxMulti(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS)
 		//const signed = signMultisigEIP12(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
 		//expect(signed).toBeDefined();
 

@@ -27,17 +27,14 @@ export async function signTxMulti(
 	userMnemonic: string,
 	userAddress: string
 ): Promise<SignedTransaction> {
-	return (
-		await signMultisig(unsignedTx, userMnemonic, userAddress)
-	).to_js_eip12();
+	console.log("signTxMulti")
+	console.log(unsignedTx.inputs)
+	return (await signMultisig(unsignedTx, userMnemonic, userAddress)).to_js_eip12();
 }
 
 type JSONTransactionHintsBag = any;
 
-function _removeSecrets(
-	privateCommitments: JSONTransactionHintsBag,
-	address: string
-) {
+function _removeSecrets(privateCommitments: JSONTransactionHintsBag, address: string) {
 	let copy = JSON.parse(JSON.stringify(privateCommitments));
 
 	const hBob = ErgoAddress.fromBase58(address).ergoTree.slice(6);
@@ -58,10 +55,7 @@ export async function a(unsignedTx: EIP12UnsignedTransaction): Promise<any> {
 		.generate_commitments_for_reduced_transaction(reducedTx)
 		.to_json();
 
-	let publicCommitsPool = _removeSecrets(
-		privateCommitsPool,
-		SHADOWPOOL_ADDRESS
-	);
+	let publicCommitsPool = _removeSecrets(privateCommitsPool, SHADOWPOOL_ADDRESS);
 
 	return { privateCommitsPool, publicCommitsPool };
 }
@@ -72,28 +66,26 @@ export async function b(
 	userAddress: string,
 	publicCommits: JSONTransactionHintsBag
 ) {
-	const publicBag = TransactionHintsBag.from_json(
-		JSON.stringify(publicCommits)
-	);
+	const publicBag = TransactionHintsBag.from_json(JSON.stringify(publicCommits));
 	const proverAlice = await getProver(userMnemonic);
 	const reducedTx = reducedFromUnsignedTx(unsignedTx);
-	const initialCommitsAlice =
-		proverAlice.generate_commitments_for_reduced_transaction(reducedTx);
+	const initialCommitsAlice = proverAlice.generate_commitments_for_reduced_transaction(reducedTx);
 
 	const combinedHints = TransactionHintsBag.empty();
 
 	for (let i = 0; i < unsignedTx.inputs.length; i++) {
-		combinedHints.add_hints_for_input(
-			i,
-			initialCommitsAlice.all_hints_for_input(i)
-		);
-		combinedHints.add_hints_for_input(i, publicBag.all_hints_for_input(i));
+		combinedHints.add_hints_for_input(0, initialCommitsAlice.all_hints_for_input(i));
+		combinedHints.add_hints_for_input(0, publicBag.all_hints_for_input(i));
 	}
 
-	const partialSignedTx = proverAlice.sign_reduced_transaction_multi(
-		reducedTx,
-		combinedHints
-	);
+	// NOTE: possible just sign here input by input
+	const partialSignedTx = proverAlice.sign_reduced_transaction_multi(reducedTx, combinedHints);
+	//const unsigned = UnsignedTransaction.from_json(JSON.stringify(unsignedTx))
+	//console.log("unsignedTx")
+	//console.log(unsignedTx.inputs)
+	//console.log("unsigned")
+	//console.log(unsigned.to_js_eip12().inputs)
+	//const partialSignedTx = proverAlice.sign_tx_input(1, fakeContext(wasm), unsigned, ErgoBoxes.from_boxes_json(unsignedTx.inputs),ErgoBoxes.empty())
 
 	const hAlice = ErgoAddress.fromBase58(userAddress).ergoTree.slice(6);
 	let extractedHints = extract_hints(
@@ -122,9 +114,7 @@ export async function c(
 			hintsForBobSign.secretHints[row].push(hints.secretHints[row][i]);
 		}
 	}
-	const convertedHintsForBobSign = TransactionHintsBag.from_json(
-		JSON.stringify(hintsForBobSign)
-	);
+	const convertedHintsForBobSign = TransactionHintsBag.from_json(JSON.stringify(hintsForBobSign));
 
 	const proverBob = await getProver(SHADOW_MNEMONIC);
 	let signedTx = proverBob.sign_reduced_transaction_multi(
@@ -137,9 +127,7 @@ export async function c(
 
 function reducedFromUnsignedTx(unsignedTx: EIP12UnsignedTransaction) {
 	const inputBoxes = ErgoBoxes.from_boxes_json(unsignedTx.inputs);
-	const wasmUnsignedTx = UnsignedTransaction.from_json(
-		JSON.stringify(unsignedTx)
-	);
+	const wasmUnsignedTx = UnsignedTransaction.from_json(JSON.stringify(unsignedTx));
 	let context = fakeContext(wasm);
 	let reducedTx = ReducedTransaction.from_unsigned_tx(
 		wasmUnsignedTx,
@@ -155,16 +143,13 @@ export async function signMultisig(
 	userMnemonic: string,
 	userAddress: string
 ) {
+	const unsignedMultisigCopy = JSON.parse(JSON.stringify(unsignedTx))
+	const unsignedMultisigCopy2 = JSON.parse(JSON.stringify(unsignedTx))
 	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
 
-	const extractedHints = await b(
-		unsignedTx,
-		userMnemonic,
-		userAddress,
-		publicCommitsPool
-	);
+	const extractedHints = await b(unsignedMultisigCopy, userMnemonic, userAddress, publicCommitsPool);
 
-	const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
+	const signedTx = await c(unsignedMultisigCopy2, privateCommitsPool, extractedHints);
 
 	return signedTx;
 }
@@ -174,12 +159,10 @@ export async function signMultisigEIP12(
 	userMnemonic: string,
 	userAddress: string
 ) {
-	return (await signMultisig(unsignedTx,userMnemonic, userAddress)).to_js_eip12()
+	return (await signMultisig(unsignedTx, userMnemonic, userAddress)).to_js_eip12();
 }
 
-export async function txHasErrors(
-	signedTransaction: SignedTransaction
-): Promise<false | string> {
+export async function txHasErrors(signedTransaction: SignedTransaction): Promise<false | string> {
 	const endpoint = 'https://gql.ergoplatform.com/';
 	const query = `
       mutation CheckTransaction($signedTransaction: SignedTransaction!) {
@@ -214,9 +197,7 @@ export async function txHasErrors(
 	}
 }
 
-export async function submitTx(
-	signedTransaction: SignedTransaction
-): Promise<false | string> {
+export async function submitTx(signedTransaction: SignedTransaction): Promise<false | string> {
 	const endpoint = 'https://gql.ergoplatform.com/';
 	const query = `
       mutation SubmitTransaction($signedTransaction: SignedTransaction!) {
@@ -418,9 +399,7 @@ const getWalletAddressSecret = (mnemonic: string, idx: number = 0) => {
 	const path = calcPathFromIndex(idx);
 	let bip32 = BIP32Factory(ecc);
 	const extended = bip32.fromSeed(seed).derivePath(path);
-	return wasm.SecretKey.dlog_from_bytes(
-		Uint8Array.from(extended.privateKey ?? Buffer.from(''))
-	);
+	return wasm.SecretKey.dlog_from_bytes(Uint8Array.from(extended.privateKey ?? Buffer.from('')));
 };
 
 const RootPathWithoutIndex = "m/44'/429'/0'/0";
