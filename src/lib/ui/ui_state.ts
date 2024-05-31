@@ -1,8 +1,8 @@
-import { BOB_ADDRESS } from '$lib/constants/addresses';
+import { ALICE_ADDRESS, BOB_ADDRESS } from '$lib/constants/addresses';
 import { get, writable } from 'svelte/store';
 import { userBoxes } from './service/crystalPoolService';
 import { sumAssets } from '$lib/utils/helper';
-import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
+import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 
 // orderbook
 export const orderbook_sell = writable([]);
@@ -23,6 +23,12 @@ export async function setOrderBook(book: any) {
 // wallet balance
 export const user_mnemonic = writable(BOB_MNEMONIC);
 export const user_address = writable(BOB_ADDRESS);
+
+export function setUserAlice(){
+	user_mnemonic.set(ALICE_MNEMONIC);
+	user_address.set(ALICE_ADDRESS);
+}
+
 export const user_tokens = writable([
 	{
 		name: 'rsBTC',
