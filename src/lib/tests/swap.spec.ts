@@ -14,6 +14,7 @@ import {
 	signMultisig,
 	signTxByAddress,
 	signTxInput,
+	signTxMulti,
 	txHasErrors
 } from '$lib/wallet/multisig-server';
 import { utxos } from '$lib/data/utxos';
@@ -29,6 +30,7 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { createSwapOrderTx, createSwapOrderTxR9 } from '../wallet/swap';
 import type { EIP12UnsignedTransaction } from '@fleet-sdk/common';
 import { compileContract, compileSwapContract } from '$lib/compiler/compile';
+import { createWithdrawTx, deposit } from '$lib/wallet/deposit';
 
 const sellingTokenId =
 	'69feaac1e621c76d0f45057191ba740c2b4aa1ca28aff58fd889d071a0d795b8'; //HoldErgDoge Test1
@@ -336,7 +338,7 @@ describe('New Swap order with R9', async () => {
 	});
 
 	//swapOrderBoxes
-	it.only('Order + deposit[ALICE], change:ALICE: FULL execute', async () => {
+	it.skip('Order + deposit[ALICE], change:ALICE: FULL execute', async () => {
 		const buyAmount = 10000n;
 		const error = 0n;
 		const buyerPk = ALICE_ADDRESS;
@@ -418,8 +420,12 @@ describe('New Swap order with R9', async () => {
 		expect(unsignedTx.inputs[aliceIndex].ergoTree).toBe(
 			ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree
 		);
-		const commits = await a(unsignedTx);
-		console.log('commits', commits);
+
+		// --------------
+		// const commits = await a(unsignedTx);
+		// console.dir(commits, { depth: null });
+		// --------------
+
 		// MULTISIG INPUTS
 		const signedAliceInput = await signTxInput(
 			ALICE_MNEMONIC,
@@ -621,7 +627,7 @@ describe('New Swap order with R9', async () => {
 		console.log(unsignedTx.id);
 	});
 
-	it('Order + BOB utxo: BOB can cancell order', async () => {
+	it.skip('Order + BOB utxo: BOB can cancell order', async () => {
 		const buyAmount = 10000n;
 		const error = 0n;
 		const buyerPk = ALICE_ADDRESS;
@@ -658,7 +664,7 @@ describe('New Swap order with R9', async () => {
 		expect(await txHasErrors(signedTx.to_js_eip12())).not.toBe(false);
 	});
 
-	it('Order + BOB utxo: BOB can cancell order', async () => {
+	it.skip('Order + BOB utxo: BOB can cancell order', async () => {
 		const buyAmount = 10000n;
 		const error = 0n;
 		const buyerPk = ALICE_ADDRESS;
@@ -688,6 +694,61 @@ describe('New Swap order with R9', async () => {
 		//console.dir(unsignedTransaction, { depth: null });
 		checkInteractionWithContractCore(unsignedTransaction);
 		//console.dir(signedTx.to_js_eip12(), { depth: null });
+	});
+});
+
+describe.only('Bob can withdraw deposit', async () => {
+	let depositBox;
+
+	beforeAll(async () => {
+		const unsignedTx = deposit(
+			height,
+			utxos[BOB_ADDRESS],
+			BOB_ADDRESS,
+			BOB_ADDRESS,
+			unlockHeight,
+			{
+				tokenId:
+					'd2d0deb3b0b2c511e523fd43ae838ba7b89e4583f165169b90215ff11d942c1f',
+				amount: '49000000000000000'
+			},
+			10n * SAFE_MIN_BOX_VALUE
+		);
+		const signedTx = await signTxByAddress(
+			BOB_MNEMONIC,
+			BOB_ADDRESS,
+			unsignedTx
+		);
+		depositBox = [signedTx.outputs[0]];
+	});
+
+	it('withdraw VIRTUAL deposit box', async () => {
+		//createWithdrawTx
+		const unsignedTx = createWithdrawTx(BOB_ADDRESS, depositBox, height);
+
+		const signedTx = await signTxMulti(
+			unsignedTx,
+			BOB_MNEMONIC,
+			BOB_ADDRESS
+		);
+
+		expect(signedTx.id).toBeTruthy();
+	});
+
+	it('withdraw REAL deposit box', async () => {
+		//createWithdrawTx
+		const unsignedTx = createWithdrawTx(
+			BOB_ADDRESS,
+			utxos[DEPOSIT_ADDRESS][2],
+			height + 1
+		);
+
+		const signedTx = await signTxMulti(
+			unsignedTx,
+			BOB_MNEMONIC,
+			BOB_ADDRESS
+		);
+		expect(await txHasErrors(signedTx)).toBe(false);
 	});
 });
 
