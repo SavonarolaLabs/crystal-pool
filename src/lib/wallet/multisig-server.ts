@@ -27,8 +27,6 @@ export async function signTxMulti(
 	userMnemonic: string,
 	userAddress: string
 ): Promise<SignedTransaction> {
-	console.log('signTxMulti');
-	console.log(unsignedTx.inputs);
 	return (await signMultisig(unsignedTx, userMnemonic, userAddress)).to_js_eip12();
 }
 
@@ -37,8 +35,6 @@ export async function signTxMultiPartial(
 	userMnemonic: string,
 	userAddress: string
 ): Promise<SignedTransaction> {
-	console.log('signTxMulti');
-	console.log(unsignedTx.inputs);
 	return (await signMultisigPartial(unsignedTx, userMnemonic, userAddress)).to_js_eip12();
 }
 
@@ -88,14 +84,7 @@ export async function b(
 		combinedHints.add_hints_for_input(0, publicBag.all_hints_for_input(i));
 	}
 
-	// NOTE: possible just sign here input by input
 	const partialSignedTx = proverAlice.sign_reduced_transaction_multi(reducedTx, combinedHints);
-	//const unsigned = UnsignedTransaction.from_json(JSON.stringify(unsignedTx))
-	//console.log("unsignedTx")
-	//console.log(unsignedTx.inputs)
-	//console.log("unsigned")
-	//console.log(unsigned.to_js_eip12().inputs)
-	//const partialSignedTx = proverAlice.sign_tx_input(1, fakeContext(wasm), unsigned, ErgoBoxes.from_boxes_json(unsignedTx.inputs),ErgoBoxes.empty())
 
 	const hAlice = ErgoAddress.fromBase58(userAddress).ergoTree.slice(6);
 	let extractedHints = extract_hints(
@@ -216,28 +205,12 @@ export async function bPartial(
 	publicCommits.publicHints[0] = [];
 	const combinedHints = TransactionHintsBag.empty();
 
-	// console.dir('publicCommits');
-	// console.dir(publicCommits, { depth: null });
-
-	// console.dir('initialCommitsAlice');
-	// console.dir(initialCommitsAlice.to_json(), { depth: null });
-
-	// console.dir('combinedHints');
-	// console.dir(combinedHints.to_json(), { depth: null });
 
 	for (let i = 0; i < unsignedTx.inputs.length; i++) {
 		combinedHints.add_hints_for_input(i, initialCommitsAlice.all_hints_for_input(i));
 		combinedHints.add_hints_for_input(i, publicBag.all_hints_for_input(i));
 	}
-	console.dir('combinedHints');
-	console.dir(combinedHints.to_json(), { depth: null });
-	// NOTE: possible just sign here input by input
-	//const partialSignedTx = proverAlice.sign_reduced_transaction_multi(reducedTx, combinedHints);
 	const unsigned = UnsignedTransaction.from_json(JSON.stringify(unsignedTx));
-	//console.log("unsignedTx")
-	//console.log(unsignedTx.inputs)
-	//console.log("unsigned")
-	//console.log(unsigned.to_js_eip12().inputs)
 	const signedByAlice = proverAlice.sign_transaction_multi(
 		fakeContext(wasm),
 		unsigned,

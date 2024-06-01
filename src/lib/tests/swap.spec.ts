@@ -223,6 +223,7 @@ describe('New Swap order with R9', async () => {
 			paymentInTokens,
 			SAFE_MIN_BOX_VALUE
 		);
+
 		expect(executeSwapOrderTx.inputs.length).toBe(2);
 
 		expect(boxesAtAddressUnsigned(executeSwapOrderTx, DEPOSIT_ADDRESS).length).toBe(2);
