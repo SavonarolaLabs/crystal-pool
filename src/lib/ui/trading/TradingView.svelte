@@ -1,5 +1,5 @@
 <script>
-	import FakeTrades from '../FakeTrades.svelte';
+	import MockTrades from '../MockTrades.svelte';
 	import Actions from './Actions.svelte';
 	import Chart from './Chart.svelte';
 	import Headline from './Headline.svelte';
@@ -10,7 +10,7 @@
     import { Toaster } from 'svelte-french-toast';
 </script>
 <Toaster />
-<FakeTrades />
+<!-- <MockTrades /> -->
 <div class="exchange_pageWrapper">
     <div class="exchange">
 	<!-- left -->
