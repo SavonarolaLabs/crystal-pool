@@ -121,10 +121,9 @@
     //10000
     //>=
     //2
-	
-  if(HEIGHT > unlockHeight(SELF)){
+	if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)
 	}else{
-    	sigmaProp(isPaidAtFairRate) && getPoolPk(SELF)
+		getSellerPk(SELF) && getPoolPk(SELF) || sigmaProp(isPaidAtFairRate) && getPoolPk(SELF)
 	}
 }

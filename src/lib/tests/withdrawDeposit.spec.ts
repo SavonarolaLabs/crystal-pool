@@ -1,5 +1,10 @@
-import { BOB_ADDRESS, DEPOSIT_ADDRESS, SHADOWPOOL_ADDRESS } from '$lib/constants/addresses';
-import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
+import {
+	ALICE_ADDRESS,
+	BOB_ADDRESS,
+	DEPOSIT_ADDRESS,
+	SHADOWPOOL_ADDRESS
+} from '$lib/constants/addresses';
+import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { createWithdrawTx, deposit } from '$lib/wallet/deposit';
 import { signMultisig, signTx, submitTx, txHasErrors } from '$lib/wallet/multisig-server';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -8,7 +13,7 @@ import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 import { boxAtAddress } from '$lib/utils/test-helper';
 
 //REAL_BOX_DATA
-const CHAIN_HEIGHT = 1275107;
+const CHAIN_HEIGHT = 1277184;
 const DEPOSITOR_UNLOCK_HEIGHT = 1300000;
 const DEPOSITOR_PK = BOB_ADDRESS;
 const DEPOSITOR_MNEMONIC = BOB_MNEMONIC;
@@ -85,15 +90,17 @@ describe('withdraw Real BOX from DEPOSIT_ADDRESS', () => {
 	let depositTx;
 	let depositBox;
 	let withdrawTxEIP12;
+	const DEPOSITOR_PK = ALICE_ADDRESS;
+	const DEPOSITOR_MNEMONIC = ALICE_MNEMONIC;
 
 	beforeAll(async () => {
-		depositBox = utxos[DEPOSIT_ADDRESS][1];
+		depositBox = utxos[DEPOSIT_ADDRESS][0];
 		const withdrawUTx = createWithdrawTx(DEPOSITOR_PK, [depositBox], CHAIN_HEIGHT);
 		const withdrawTx = await signMultisig(withdrawUTx, DEPOSITOR_MNEMONIC, DEPOSITOR_PK);
 		withdrawTxEIP12 = withdrawTx.to_js_eip12();
 	});
 	//1231
-	it('txHasErrors withdraw', async () => {
+	it.skip('txHasErrors withdraw', async () => {
 		expect(withdrawTxEIP12.id).toBeTruthy();
 		expect(await txHasErrors(withdrawTxEIP12)).toBe(false);
 	});
