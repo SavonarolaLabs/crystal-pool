@@ -2,10 +2,10 @@
 	import Actions from './Actions.svelte';
 	import Chart from './Chart.svelte';
 	import Headline from './Headline.svelte';
+	import MarketTrades from './MarketTrades.svelte';
 	import Markets from './Markets.svelte';
 	import OrderBook from './OrderBook.svelte';
 	import Orders from './Orders.svelte';
-	import Trades from './Trades.svelte';
 </script>
 
 <div class="exchange_pageWrapper">
@@ -32,7 +32,7 @@
     </div>
     <!-- bottom right -->
     <div class="trades">
-        <Trades></Trades>
+        <MarketTrades></MarketTrades>
     </div>
     <!-- bottom -->
     <div class="orders">

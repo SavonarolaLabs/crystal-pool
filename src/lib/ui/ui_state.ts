@@ -1,18 +1,47 @@
 import { ALICE_ADDRESS, BOB_ADDRESS } from '$lib/constants/addresses';
-import { get, writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 import { userBoxes } from './service/crystalPoolService';
 import { sumAssets } from '$lib/utils/helper';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 
-interface Order {
+// market trades
+
+interface MarketTrade {
+    price: number,
+    amount: number,
+    time: string,
+    side: string,
+}
+
+const dummy_trades = Array.from({ length: 11 }, () => ({
+    price: 69001.34,
+    amount: 1.302628,
+    time: '20:20:12',
+    side: Math.random() < 0.5 ? 'buy' : 'sell'
+}));
+
+export const market_trades: Writable<Array<MarketTrade>> = writable(dummy_trades);
+
+export function addRecentTrades(recentTrades: Array<MarketTrade>) {
+    market_trades.update(trades => {
+        const updatedTrades = [...recentTrades, ...trades];
+        if (updatedTrades.length > 50) {
+            updatedTrades.length = 50;
+        }
+        return updatedTrades;
+    });
+}
+
+// orderbook
+
+interface Order {    
     price: number;
     amount: number;
     value: number;
 }
 
-// orderbook
-export const orderbook_sell = writable([]);
-export const orderbook_buy = writable([]);
+export const orderbook_sell: Writable<Array<Order>> = writable([]);
+export const orderbook_buy: Writable<Array<Order>> = writable([]);
 export const orderbook_latest = writable({
 	price: '69,001.34',
 	value: '69,001.34',

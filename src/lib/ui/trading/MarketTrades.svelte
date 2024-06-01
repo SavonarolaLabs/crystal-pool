@@ -1,3 +1,6 @@
+<script>
+	import { market_trades } from "../ui_state";
+</script>
 <div class="trades">
 	<div class="tab">Market Trades</div>
 	<div class="trades_tableHeader">
@@ -7,11 +10,11 @@
 	</div>
 	<div class="trades_body">
 		<div class="trades_asks">
-			{#each new Array(13) as i}
+			{#each $market_trades as trade}
 				<div class="trades_row">
-					<div class="trades_price trades_sell">69,001.34</div>
-					<div class="trades_vol"><span>1.302628</span></div>
-					<div class="trades_time"><span>20:12:32</span></div>
+					<div class="trades_price" class:trades_sell={trade.side=='sell'} class:trades_buy={trade.side=='buy'}>{trade.price}</div>
+					<div class="trades_vol"><span>{trade.amount}</span></div>
+					<div class="trades_time"><span>{trade.time}</span></div>
 				</div>
 			{/each}
 		</div>
