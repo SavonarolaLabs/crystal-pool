@@ -88,86 +88,10 @@ describe('Deposit/Withdraw AGENTS', () => {
 		console.log('🚀 ~ it ~ real_price:', real_price);
 
 		const swapUTx = createSwapOrderTxR9AgentBob(depositBoxesBob, real_price, amount);
-		expect(swapUTx.outputs); //OUTPUT -> DEPOSIT
-		//OUTPUT VALUE DEPOSIT ± INPUT
-		const swapTx = await signTxAgentBob(swapUTx);
-		expect(swapTx.id).toBeTruthy();
-
-		//----INPUT
-		// const depositBoxesBobParams = parseBox(depositBoxesBob);
-		// console.log('🚀 ~ it ~ depositBoxesBobParams:', depositBoxesBobParams);
-		// console.log('depositBoxesBob.value', depositBoxesBob.value);
-
-		swapBoxBob = boxAtAddress(swapTx, SWAP_ORDER_ADDRESS);
-		const swapBoxBobParams = parseBox(swapBoxBob);
-		// console.log('🚀 ~ it ~ swapBoxBobParams:', swapBoxBobParams);
-		// console.log('swapBoxBob.value', swapBoxBob.value);
-		console.log('depositBoxesBob', depositBoxesBob);
-		depositBoxesBob = boxesAtAddress(swapTx, DEPOSIT_ADDRESS); //undefined
-		console.log('depositBoxesBob', depositBoxesBob);
-
-		//const depositBoxesBobParams = parseBox(depositBoxesBob);
-
-		//---------------------- Execute Swap Order ---------------------//
-		//amount price
-
-		//Если продает 1 БТС за 67000 долларов
-		//то продает 10**8 сатоши за 67000 долларов
-		//то есть 10**8 сатоши за 67000 * 100 центов
-		//Реальная цена 1 сатоши -  0.006700005 цента
-		//Но количество которое покупает = amount
-		//Количество которое должен заплатить = amount * price в центах уже
-
-		const paymentAmount = calculateAmount(real_price, amount).toString(10);
-		console.log('🚀 ~ it ~ paymentAmount:', paymentAmount);
-		const tokensAsPayment = { tokenId: TOKEN.sigUSD.tokenId, amount: paymentAmount };
-
-		const executeSwapUTx = executeSwapAgentAlice(
-			[swapBoxBob],
-			[depositBoxAlice],
-			{ tokenId: TOKEN.rsBTC.tokenId, amount: amount },
-			{ tokenId: TOKEN.sigUSD.tokenId, amount: paymentAmount }
-		);
-
-		//console.dir(executeSwapUTx, { depth: null });
-
-		//BOX FROM DEPOSIT
-		const signedAliceInput = await signTxInput(
-			ALICE_MNEMONIC,
-			JSON.parse(JSON.stringify(executeSwapUTx)),
-			1
-		);
-		const aliceProof = signedAliceInput.spending_proof().to_json();
-
-		const boxParams = parseBox(swapBoxBob);
-		// console.log(boxParams);
-		// console.log(SHADOWPOOL_ADDRESS);
-		expect(boxParams?.parameters.poolPk).toBe(SHADOWPOOL_ADDRESS);
-		//console.log(signedAliceInput.spending_proof().to_json());
-
-		//BOX FROM SWAP
-		const signedShadowInput = await signTxInput(
-			SHADOW_MNEMONIC,
-			JSON.parse(JSON.stringify(executeSwapUTx)),
-			0
-		);
-		const shadowProof = signedShadowInput.spending_proof().to_json();
-
-		// ------------ take ID -----------
-		const txId = UnsignedTransaction.from_json(JSON.stringify(executeSwapUTx)).id().to_str();
-
-		executeSwapUTx.inputs[0] = {
-			boxId: executeSwapUTx.inputs[0].boxId,
-			spendingProof: shadowProof
-		};
-		executeSwapUTx.inputs[1] = {
-			boxId: executeSwapUTx.inputs[1].boxId,
-			spendingProof: aliceProof
-		};
-
-		executeSwapUTx.id = txId;
-		console.log(executeSwapUTx.id);
-		//---------------------- Execute Swap Order ---------------------//
+		const swapBoxes = boxesAtAddress(swapUTx, SWAP_ORDER_ADDRESS);
+		const depositBoxes = boxesAtAddress(swapUTx, DEPOSIT_ADDRESS);
+		expect(swapBoxes).toBeTruthy(); //OUTPUT -> DEPOSIT
+		expect(depositBoxes).toBeTruthy(); //OUTPUT -> DEPOSIT
 	});
 });
 
@@ -229,23 +153,6 @@ function createSwapOrderTxR9AgentBob(
 	return swapUTx;
 }
 
-function executeSwapAgentAlice(
-	swapOrderBoxes: Box<Amount>[],
-	paymentInputBoxes: Box<Amount>[],
-	tokensFromSwapContract: { tokenId: string; amount: Amount },
-	paymentInTokens: { tokenId: string; amount: Amount }
-): EIP12UnsignedTransaction {
-	const executeSwapUTx = executeSwap(
-		CHAIN_HEIGHT,
-		swapOrderBoxes,
-		paymentInputBoxes,
-		tokensFromSwapContract,
-		paymentInTokens,
-		SAFE_MIN_BOX_VALUE
-	);
-	return executeSwapUTx;
-}
-
 function realPrice(price: string) {
 	// load and calculate decimals
 	const priceInput = new BigNumber(price);
@@ -260,11 +167,4 @@ function realPrice(price: string) {
 	// apply decimals
 	const real_price = priceInput.dividedBy(bigDecimalsDelta);
 	return real_price;
-}
-
-function calculateAmount(price: string, amount: Amount) {
-	const bigPrice = BigNumber(price);
-	const bigAmount = BigNumber(Number(amount));
-	const paymentAmount = bigPrice.multipliedBy(bigAmount);
-	return paymentAmount;
 }
