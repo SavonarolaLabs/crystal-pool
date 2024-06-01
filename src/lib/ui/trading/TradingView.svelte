@@ -1,4 +1,5 @@
 <script>
+	import FakeTrades from '../FakeTrades.svelte';
 	import Actions from './Actions.svelte';
 	import Chart from './Chart.svelte';
 	import Headline from './Headline.svelte';
@@ -6,8 +7,10 @@
 	import Markets from './Markets.svelte';
 	import OrderBook from './OrderBook.svelte';
 	import Orders from './Orders.svelte';
+    import { Toaster } from 'svelte-french-toast';
 </script>
-
+<Toaster />
+<FakeTrades />
 <div class="exchange_pageWrapper">
     <div class="exchange">
 	<!-- left -->
@@ -87,6 +90,11 @@
         grid-column: 3 / 4;
         grid-row: 3 / 4;
         background-color: var(--bg-level-secondary);
+
+        position: relative;
+		display: flex;
+		flex-flow: column nowrap;
+		z-index: 2;
     }
     .orders{
         grid-column: 1 / 4;

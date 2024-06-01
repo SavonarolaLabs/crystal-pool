@@ -3,6 +3,7 @@ import { get, writable, type Writable } from 'svelte/store';
 import { userBoxes } from './service/crystalPoolService';
 import { sumAssets } from '$lib/utils/helper';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
+import { showToast } from './toaster';
 
 // market trades
 
@@ -13,7 +14,7 @@ interface MarketTrade {
     side: string,
 }
 
-const dummy_trades = Array.from({ length: 11 }, () => ({
+const dummy_trades = Array.from({ length: 50 }, () => ({
     price: 69001.34,
     amount: 1.302628,
     time: '20:20:12',
@@ -29,6 +30,9 @@ export function addRecentTrades(recentTrades: Array<MarketTrade>) {
             updatedTrades.length = 50;
         }
         return updatedTrades;
+    });
+    recentTrades.forEach(trade => {
+        showToast(`SOLD: ${trade.amount}rsBTC for $${(trade.price*trade.amount).toFixed(2)}`, 'success');
     });
 }
 

@@ -1,37 +1,43 @@
 <script>
-	import { market_trades } from "../ui_state";
+	import { market_trades } from '../ui_state';
 </script>
-<div class="trades">
+
 	<div class="tab">Market Trades</div>
 	<div class="trades_tableHeader">
 		<h2 class="trades_column trades_price">Price(sigUSD)</h2>
 		<h2 class="trades_column trades_vol">Amount(rsBTC)</h2>
 		<h2 class="trades_column trades_time">Time</h2>
 	</div>
-	<div class="trades_body">
 		<div class="trades_asks">
 			{#each $market_trades as trade}
 				<div class="trades_row">
-					<div class="trades_price" class:trades_sell={trade.side=='sell'} class:trades_buy={trade.side=='buy'}>{trade.price}</div>
+					<div
+						class="trades_price"
+						class:trades_sell={trade.side == 'sell'}
+						class:trades_buy={trade.side == 'buy'}
+					>
+						{trade.price}
+					</div>
 					<div class="trades_vol"><span>{trade.amount}</span></div>
 					<div class="trades_time"><span>{trade.time}</span></div>
 				</div>
 			{/each}
 		</div>
-	</div>
-</div>
 
 <style lang="postcss">
-	.tab{
+	.tab {
 		display: flex;
-    	margin: 4px 0;
+		margin: 4px 0;
 		margin-inline-start: 10px;
-		heigh:32px;
+		heigh: 32px;
 		line-height: 32px;
 		padding-inline-start: 6px;
 	}
 	.trades {
-		height: 100%;
+		position: relative;
+		display: flex;
+		flex-flow: column nowrap;
+		z-index: 2;
 	}
 	.trades_controller {
 		display: flex;
@@ -89,14 +95,15 @@
 	}
 
 	.trades_body {
+		position: relative;
+		display: flex;
+		flex-flow: column nowrap;
+		z-index: 2;
 	}
-	.trades_asks,
-	.trades_bids {
-		overflow-x: hidden;
-		overflow-y: hidden;
-		height: calc((100% - 36px) / 2);
-		width: 100%;
-		font-size: 12px;
+	.trades_asks {
+		overflow: auto;
+		flex-grow: 1;
+		overscroll-behavior-y: contain;
 	}
 	.trades_row {
 		display: flex;

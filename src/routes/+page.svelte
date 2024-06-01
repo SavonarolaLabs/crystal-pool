@@ -1,5 +1,5 @@
 <script>
-	import Trading from '$lib/ui/trading/Trading.svelte';
+	import TradingView from '$lib/ui/trading/TradingView.svelte';
 	import Header from '$lib/ui/Header.svelte';
 	import Footer from '$lib/ui/Footer.svelte';
 	import { onMount } from 'svelte';
@@ -13,7 +13,7 @@
 </script>
 
 <Header></Header>
-<Trading></Trading>
+<TradingView></TradingView>
 <Footer></Footer>
 
 <style lang="postcss">
