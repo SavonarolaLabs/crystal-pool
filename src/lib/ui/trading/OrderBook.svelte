@@ -1,9 +1,5 @@
 <script lang="ts">
-	import {
-		orderbook_buy,
-		orderbook_latest,
-		orderbook_sell
-	} from '$lib/ui/ui_state';
+	import { orderbook_buy, orderbook_latest, orderbook_sell } from '$lib/ui/ui_state';
 
 	// buy -> green -> sigUSD,rsBTC
 	// sell -> red -> rsBTC,sigUSD
@@ -137,10 +133,10 @@
 						style="transform: scaleX(0.2249933);"
 					></div>
 					<div class="orderbook_price orderbook_sell">
-						{row.price}
+						{row.price.toFixed(2)}
 					</div>
-					<div class="orderbook_vol"><span>{row.amount}</span></div>
-					<div class="orderbook_amount"><span>{row.value}</span></div>
+					<div class="orderbook_vol"><span>{row.amount.toFixed(6)}</span></div>
+					<div class="orderbook_amount"><span>{row.value.toFixed(2)}</span></div>
 				</div>
 			{/each}
 		</div>
@@ -164,8 +160,8 @@
 				></span
 			><span class="orderbook_fiatPrice ml-2"
 				><span style="margin-inline-end: 4px;">≈</span><span dir="ltr"
-					><span style="margin-inline-end: 2px;">$</span><span
-						dir="ltr">{$orderbook_latest.value}</span
+					><span style="margin-inline-end: 2px;">$</span><span dir="ltr"
+						>{$orderbook_latest.value}</span
 					></span
 				></span
 			>
@@ -177,9 +173,9 @@
 						class="orderbook_bar orderbook_bidBar"
 						style="transform: scaleX(0.2249933);"
 					></div>
-					<div class="orderbook_price orderbook_buy">{row.price}</div>
-					<div class="orderbook_vol"><span>{row.amount}</span></div>
-					<div class="orderbook_amount"><span>{row.value}</span></div>
+					<div class="orderbook_price orderbook_buy">{row.price.toFixed(2)}</div>
+					<div class="orderbook_vol"><span>{row.amount.toFixed(6)}</span></div>
+					<div class="orderbook_amount"><span>{row.value.toFixed(2)}</span></div>
 				</div>
 			{/each}
 		</div>
