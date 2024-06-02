@@ -16,21 +16,31 @@ import {
 } from '$lib/wallet/multisig-server';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { utxos } from '$lib/data/utxos';
-import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
+import {
+	ErgoAddress,
+	OutputBuilder,
+	RECOMMENDED_MIN_FEE_VALUE,
+	SAFE_MIN_BOX_VALUE,
+	SInt,
+	TransactionBuilder
+} from '@fleet-sdk/core';
 import { boxAtAddress, boxesAtAddress } from '$lib/utils/test-helper';
-import type {
-	Amount,
-	Box,
-	EIP12UnsignedTransaction,
-	OneOrMore,
-	SignedTransaction,
-	TokenAmount
+import {
+	first,
+	type Amount,
+	type Box,
+	type EIP12UnsignedTransaction,
+	type OneOrMore,
+	type SignedTransaction,
+	type TokenAmount
 } from '@fleet-sdk/common';
 import { TOKEN } from '$lib/constants/tokens';
-import { createSwapOrderTxR9, executeSwap } from '$lib/wallet/swap';
+import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swap';
 import BigNumber from 'bignumber.js';
 import { parseBox } from '$lib/db/db';
 import { UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
+import { SByte, SColl, SGroupElement, SLong, SPair, SSigmaProp } from '@fleet-sdk/serializer';
+import { asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
 
 //REAL_BOX_DATA
 const CHAIN_HEIGHT = 1277300;
@@ -87,11 +97,81 @@ describe('Deposit/Withdraw AGENTS', () => {
 		const real_price = realPrice(price).toString(10);
 		console.log('🚀 ~ it ~ real_price:', real_price);
 
-		const swapUTx = createSwapOrderTxR9AgentBob(depositBoxesBob, real_price, amount);
+		function createSwapOrderTxR9_new(
+			sellerPK: string,
+			sellerMultisigAddress: string,
+			inputBoxes: OneOrMore<Box<Amount>>,
+			token: { tokenId: string; amount: Amount },
+			sellRate: string,
+			currentHeight: number,
+			unlockHeight: number,
+			sellingTokenId: string,
+			buyingTokenId: string,
+			contractAddress: string,
+			nanoErg: bigint
+		): EIP12UnsignedTransaction {
+			const [bigRate, bigDenom] = splitSellRate(sellRate);
+
+			const outputSwapOrder = new OutputBuilder(nanoErg, contractAddress)
+				.addTokens(token)
+				.setAdditionalRegisters({
+					R4: SColl(SSigmaProp, [
+						SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
+						SGroupElement(
+							first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys())
+						)
+					]).toHex(),
+					R5: SInt(unlockHeight).toHex(),
+					R6: SPair(SColl(SByte, sellingTokenId), SColl(SByte, buyingTokenId)).toHex(),
+					R7: SLong(bigRate).toHex(),
+					R8: SColl(
+						SByte,
+						ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree
+					).toHex(),
+					R9: SLong(bigDenom).toHex()
+				});
+
+			const change = new OutputBuilder(
+				sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
+				DEPOSIT_ADDRESS
+			)
+				.setAdditionalRegisters({
+					R4: inputBoxes[0].additionalRegisters.R4,
+					R5: inputBoxes[0].additionalRegisters.R5
+				})
+				.addTokens(calcTokenChange([...inputBoxes], token));
+
+			const unsignedTransaction = new TransactionBuilder(currentHeight)
+				.configureSelector((selector) =>
+					selector.ensureInclusion([inputBoxes].map((b) => b.boxId))
+				)
+				.from(inputBoxes)
+				.to([outputSwapOrder, change])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build()
+				.toEIP12Object();
+			return unsignedTransaction;
+		}
+
+		const swapUTx = createSwapOrderTxR9_new(
+			BOB_ADDRESS,
+			DEPOSIT_ADDRESS,
+			depositBoxesBob,
+			{ tokenId: TOKEN.rsBTC.tokenId, amount: amount },
+			real_price,
+			CHAIN_HEIGHT,
+			1300000,
+			TOKEN.rsBTC.tokenId,
+			TOKEN.sigUSD.tokenId,
+			SWAP_ORDER_ADDRESS,
+			SAFE_MIN_BOX_VALUE
+		); // return Value and Tokens to Deposit + R + Tokens
+
 		const swapBoxes = boxesAtAddress(swapUTx, SWAP_ORDER_ADDRESS);
 		const depositBoxes = boxesAtAddress(swapUTx, DEPOSIT_ADDRESS);
 		expect(swapBoxes).toBeTruthy(); //OUTPUT -> DEPOSIT
 		expect(depositBoxes).toBeTruthy(); //OUTPUT -> DEPOSIT
+		//console.log(depositBoxes);
 	});
 });
 
