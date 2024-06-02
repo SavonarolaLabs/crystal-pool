@@ -22,7 +22,7 @@ CrystalPool provides real-time balance and state updates. Each trading action ge
 To enhance the user experience, a built-in wallet is integrated into the trading client. The trading UI manages user balances based on the latest DEPOSIT, SWAP, BUY, and SELL activities. This built-in wallet ensures a seamless experience by signing transactions in the background. To maintain a trustless process, each transaction presents a simple summary **integrated in the UI** to the user, who can then choose to confirm or discard it.
 
 
-**Know Your Assumtions (KYA)**
+**Know Your Assumptions (KYA)**
 
 **Protocol:**
 All transactions are settled on L1 and incur a transaction fee. CrystalPool maintains a public set of unsubmitted transactions. User funds are protected by userPK at the level of smart-contracts. In case of service shutdown, users can withdraw their deposits/orders after the unlockHeight period.

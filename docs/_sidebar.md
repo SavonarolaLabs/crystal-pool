@@ -4,4 +4,4 @@
 - [Built-in Wallet](03-Built-in-Wallet.md)
 - [Token Swap Example](04-Token-Swap-Example.md)
 - [Smart Contracts](05-Smart-Contracts.md)
-- [Know Your Assumtions (KYA)](06-KYA.md)
+- [Know Your Assumptions (KYA)](06-KYA.md)
