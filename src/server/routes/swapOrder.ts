@@ -1,18 +1,15 @@
-import {
-	BOB_ADDRESS,
-	DEPOSIT_ADDRESS,
-	SWAP_ORDER_ADDRESS
-} from '$lib/constants/addresses';
+import { BOB_ADDRESS, DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
 import { db_addBoxes, type BoxDB } from '$lib/db/db';
 import { boxesAtAddress } from '$lib/utils/test-helper';
 import { a, c } from '$lib/wallet/multisig-server';
-import { createSwapOrderTx } from '$lib/wallet/swap';
+import { createSwapOrderTx, createSwapOrderTxR9 } from '$lib/wallet/swap';
 import type { SignedTransaction } from '@fleet-sdk/common';
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
 import { createOrderBook } from '../orderBookUtils';
 import { asBigInt } from '$lib/utils/helper';
+import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 
 type SwapRequest = {
 	address: string;
@@ -30,7 +27,7 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 		const unlockHeight = height + 200000;
 		//------------------------------------
 		// CreateTx unsignedTx
-		const unsignedTx = createSwapOrderTx(
+		const unsignedTx = createSwapOrderTxR9(
 			swapParams.address,
 			DEPOSIT_ADDRESS,
 			utxos[BOB_ADDRESS], // need helper function and boxes for tests
@@ -38,11 +35,13 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 				tokenId: swapParams.sellingTokenId,
 				amount: swapParams.amount
 			},
-			asBigInt(swapParams.price),
+			swapParams.price,
 			height, // need helper function
 			unlockHeight, // need helper function
 			swapParams.sellingTokenId,
-			swapParams.buyingTokenId
+			swapParams.buyingTokenId,
+			SWAP_ORDER_ADDRESS,
+			SAFE_MIN_BOX_VALUE
 		);
 
 		const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
@@ -52,22 +51,22 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 
 export function signSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/swap-order/sign', async (req: Request, res: Response) => {
-	  const { extractedHints, unsignedTx } = req.body; // TODO: unsignedTx not from USER
-  
-	  const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
-	  const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
-	  const signedTxToStash = signedTx.to_js_eip12();
-  
-	  // TODO: Add signedToStash -> to DB -> To orderbook ...
-	  storeSignedTx(db, signedTxToStash, SWAP_ORDER_ADDRESS);
-  
-	  // Create the order book
-	  const orderbook = createOrderBook('rsBTC_sigUSD', db);
-	  io.emit('update', orderbook);
-  
-	  res.json(signedTxToStash);
+		const { extractedHints, unsignedTx } = req.body; // TODO: unsignedTx not from USER
+
+		const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
+		const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
+		const signedTxToStash = signedTx.to_js_eip12();
+
+		// TODO: Add signedToStash -> to DB -> To orderbook ...
+		storeSignedTx(db, signedTxToStash, SWAP_ORDER_ADDRESS);
+
+		// Create the order book
+		const orderbook = createOrderBook('rsBTC_sigUSD', db);
+		io.emit('update', orderbook);
+
+		res.json(signedTxToStash);
 	});
-  }
+}
 
 export function storeSignedTx(db: BoxDB, signedTx: SignedTransaction, address: string) {
 	const boxes = boxesAtAddress(signedTx, address);
