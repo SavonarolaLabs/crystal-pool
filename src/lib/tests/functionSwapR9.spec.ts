@@ -120,8 +120,8 @@ describe('Deposit/Withdraw AGENTS', () => {
 		swapBoxes = updateContractBoxes(swapUTx, swapBoxes, SWAP_ORDER_ADDRESS); // достает из аутпутов
 		depositBoxes = updateContractBoxes(swapUTx, depositBoxes, DEPOSIT_ADDRESS); //
 
-		expect(swapBoxes).toBeTruthy(); //OUTPUT -> DEPOSIT
-		expect(depositBoxes).toBeTruthy(); //OUTPUT -> DEPOSIT
+		expect(swapBoxes).toBeTruthy();
+		expect(depositBoxes).toBeTruthy();
 	});
 });
 
@@ -131,8 +131,6 @@ function getBobDeposits(allBoxes: Box[]) {
 function getAliceDeposits(allBoxes: Box[]) {
 	return getDepositsBoxesByAddress(allBoxes, ALICE_ADDRESS);
 }
-
-//TO HELPER
 
 function depositAgentAlice(
 	tokens: OneOrMore<TokenAmount<Amount>>,

@@ -16,21 +16,41 @@ import {
 } from '$lib/wallet/multisig-server';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { utxos } from '$lib/data/utxos';
-import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
-import { boxAtAddress, boxesAtAddress } from '$lib/utils/test-helper';
-import type {
-	Amount,
-	Box,
-	EIP12UnsignedTransaction,
-	OneOrMore,
-	SignedTransaction,
-	TokenAmount
+import {
+	ErgoAddress,
+	OutputBuilder,
+	RECOMMENDED_MIN_FEE_VALUE,
+	SAFE_MIN_BOX_VALUE,
+	SByte,
+	SColl,
+	SGroupElement,
+	SInt,
+	SSigmaProp,
+	TransactionBuilder
+} from '@fleet-sdk/core';
+import {
+	boxAtAddress,
+	boxesAtAddress,
+	boxesFromAddress,
+	getDepositsBoxesByAddress,
+	updateContractBoxes
+} from '$lib/utils/test-helper';
+import {
+	first,
+	type Amount,
+	type Box,
+	type EIP12UnsignedTransaction,
+	type OneOrMore,
+	type SignedTransaction,
+	type TokenAmount
 } from '@fleet-sdk/common';
 import { TOKEN } from '$lib/constants/tokens';
-import { createSwapOrderTxR9, executeSwap } from '$lib/wallet/swap';
+import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swap';
 import BigNumber from 'bignumber.js';
 import { parseBox } from '$lib/db/db';
 import { UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
+import { SLong, SPair } from '@fleet-sdk/serializer';
+import { asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
 
 //REAL_BOX_DATA
 const CHAIN_HEIGHT = 1277300;
@@ -41,9 +61,8 @@ const DEPOSITOR_MNEMONIC = BOB_MNEMONIC;
 describe('Deposit/Withdraw AGENTS', () => {
 	let depositTxAlice;
 	let depositTxBob;
-	let depositBoxesAlice: Box[];
-	let depositBoxesBob: Box[];
-	let swapBoxBob: Box;
+	let swapBoxes: Box[];
+	let depositBoxes: Box[];
 
 	const DEPOSIT_TOKEN_BTC = {
 		name: TOKEN.rsBTC.name,
@@ -68,15 +87,23 @@ describe('Deposit/Withdraw AGENTS', () => {
 		depositTxAlice = await signTxAgentAlice(depositUTxAlice);
 		depositTxBob = await signTxAgentBob(depositUTxBob);
 
-		depositBoxesAlice = boxesAtAddress(depositTxAlice, DEPOSIT_ADDRESS);
-		depositBoxesBob = boxesAtAddress(depositTxBob, DEPOSIT_ADDRESS);
+		depositBoxes = updateContractBoxes(depositTxAlice, depositBoxes, DEPOSIT_ADDRESS); //
+		depositBoxes = updateContractBoxes(depositTxBob, depositBoxes, DEPOSIT_ADDRESS); //
 	});
 	it('withdraw virtual depositBox', async () => {
-		const withdrawUTxAlice = createWithdrawTx(ALICE_ADDRESS, depositBoxesAlice, CHAIN_HEIGHT);
+		const withdrawUTxAlice = createWithdrawTx(
+			ALICE_ADDRESS,
+			getAliceDeposits(depositBoxes),
+			CHAIN_HEIGHT
+		);
 		const withdrawTxAlice = await signMultisig(withdrawUTxAlice, ALICE_MNEMONIC, ALICE_ADDRESS);
 		expect(withdrawTxAlice.to_js_eip12().id).toBeTruthy();
 
-		const withdrawUTxBob = createWithdrawTx(BOB_ADDRESS, depositBoxesBob, CHAIN_HEIGHT);
+		const withdrawUTxBob = createWithdrawTx(
+			BOB_ADDRESS,
+			getBobDeposits(depositBoxes),
+			CHAIN_HEIGHT
+		);
 		const withdrawTxBob = await signMultisig(withdrawUTxBob, BOB_MNEMONIC, BOB_ADDRESS);
 		expect(withdrawTxBob.to_js_eip12().id).toBeTruthy();
 	});
@@ -85,91 +112,93 @@ describe('Deposit/Withdraw AGENTS', () => {
 		const price = '20000'; //input
 		const amount = 10000n; // BigInt(10 ** TOKEN.rsBTC.decimals); //1 BTC
 		const real_price = realPrice(price).toString(10);
-		console.log('🚀 ~ it ~ real_price:', real_price);
+		const nanoErg = SAFE_MIN_BOX_VALUE;
 
-		const swapUTx = createSwapOrderTxR9AgentBob(depositBoxesBob, real_price, amount);
-		expect(swapUTx.outputs); //OUTPUT -> DEPOSIT
-		//OUTPUT VALUE DEPOSIT ± INPUT
+		//BLOCK create swap
+		const swapUTx = createSwapOrderTxR9AgentBob(
+			getBobDeposits(depositBoxes),
+			real_price,
+			amount,
+			nanoErg
+		);
+
 		const swapTx = await signTxAgentBob(swapUTx);
 		expect(swapTx.id).toBeTruthy();
 
-		//----INPUT
-		// const depositBoxesBobParams = parseBox(depositBoxesBob);
-		// console.log('🚀 ~ it ~ depositBoxesBobParams:', depositBoxesBobParams);
-		// console.log('depositBoxesBob.value', depositBoxesBob.value);
+		swapBoxes = updateContractBoxes(swapTx, swapBoxes, SWAP_ORDER_ADDRESS);
+		depositBoxes = updateContractBoxes(swapTx, depositBoxes, DEPOSIT_ADDRESS);
 
-		swapBoxBob = boxAtAddress(swapTx, SWAP_ORDER_ADDRESS);
-		const swapBoxBobParams = parseBox(swapBoxBob);
-		// console.log('🚀 ~ it ~ swapBoxBobParams:', swapBoxBobParams);
-		// console.log('swapBoxBob.value', swapBoxBob.value);
-		console.log('depositBoxesBob', depositBoxesBob);
-		depositBoxesBob = boxesAtAddress(swapTx, DEPOSIT_ADDRESS); //undefined
-		console.log('depositBoxesBob', depositBoxesBob);
-
-		//const depositBoxesBobParams = parseBox(depositBoxesBob);
-
-		//---------------------- Execute Swap Order ---------------------//
-		//amount price
-
-		//Если продает 1 БТС за 67000 долларов
-		//то продает 10**8 сатоши за 67000 долларов
-		//то есть 10**8 сатоши за 67000 * 100 центов
-		//Реальная цена 1 сатоши -  0.006700005 цента
-		//Но количество которое покупает = amount
-		//Количество которое должен заплатить = amount * price в центах уже
+		expect(swapBoxes).toBeTruthy();
+		expect(depositBoxes).toBeTruthy();
 
 		const paymentAmount = calculateAmount(real_price, amount).toString(10);
-		console.log('🚀 ~ it ~ paymentAmount:', paymentAmount);
 		const tokensAsPayment = { tokenId: TOKEN.sigUSD.tokenId, amount: paymentAmount };
 
+		//BLOCK execute
 		const executeSwapUTx = executeSwapAgentAlice(
-			[swapBoxBob],
-			[depositBoxAlice],
+			[...swapBoxes],
+			[...getAliceDeposits(depositBoxes)],
 			{ tokenId: TOKEN.rsBTC.tokenId, amount: amount },
 			{ tokenId: TOKEN.sigUSD.tokenId, amount: paymentAmount }
 		);
 
-		//console.dir(executeSwapUTx, { depth: null });
-
-		//BOX FROM DEPOSIT
-		const signedAliceInput = await signTxInput(
-			ALICE_MNEMONIC,
-			JSON.parse(JSON.stringify(executeSwapUTx)),
-			1
-		);
-		const aliceProof = signedAliceInput.spending_proof().to_json();
-
-		const boxParams = parseBox(swapBoxBob);
-		// console.log(boxParams);
-		// console.log(SHADOWPOOL_ADDRESS);
-		expect(boxParams?.parameters.poolPk).toBe(SHADOWPOOL_ADDRESS);
-		//console.log(signedAliceInput.spending_proof().to_json());
-
 		//BOX FROM SWAP
+		const shadowIndex = executeSwapUTx.inputs.findIndex((b) =>
+			swapBoxes.map((b) => b.boxId).includes(b.boxId)
+		);
+		expect(shadowIndex).toBe(0);
+
 		const signedShadowInput = await signTxInput(
 			SHADOW_MNEMONIC,
 			JSON.parse(JSON.stringify(executeSwapUTx)),
-			0
+			shadowIndex
 		);
 		const shadowProof = signedShadowInput.spending_proof().to_json();
+		expect(shadowProof).toBeTruthy();
+
+		//BOX FROM DEPOSIT
+		const aliceIndex = executeSwapUTx.inputs.findIndex(
+			(b) =>
+				getAliceDeposits(depositBoxes)
+					.map((b) => b.boxId)
+					.includes(b.boxId) //DEPOSIT
+		);
+		expect(aliceIndex).toBe(1);
+
+		const signedAliceInput = await signTxInput(
+			ALICE_MNEMONIC,
+			JSON.parse(JSON.stringify(executeSwapUTx)),
+			aliceIndex
+		);
+		const aliceProof = signedAliceInput.spending_proof().to_json();
+		expect(aliceProof).toBeTruthy();
 
 		// ------------ take ID -----------
 		const txId = UnsignedTransaction.from_json(JSON.stringify(executeSwapUTx)).id().to_str();
 
-		executeSwapUTx.inputs[0] = {
-			boxId: executeSwapUTx.inputs[0].boxId,
+		executeSwapUTx.inputs[shadowIndex] = {
+			boxId: executeSwapUTx.inputs[shadowIndex].boxId,
 			spendingProof: shadowProof
 		};
-		executeSwapUTx.inputs[1] = {
-			boxId: executeSwapUTx.inputs[1].boxId,
+		executeSwapUTx.inputs[aliceIndex] = {
+			boxId: executeSwapUTx.inputs[aliceIndex].boxId,
 			spendingProof: aliceProof
 		};
 
 		executeSwapUTx.id = txId;
-		console.log(executeSwapUTx.id);
-		//---------------------- Execute Swap Order ---------------------//
+		const executeSwapTx = executeSwapUTx;
+
+		swapBoxes = updateContractBoxes(executeSwapTx, swapBoxes, SWAP_ORDER_ADDRESS);
+		depositBoxes = updateContractBoxes(executeSwapTx, depositBoxes, DEPOSIT_ADDRESS);
 	});
 });
+
+function getBobDeposits(allBoxes: Box[]) {
+	return getDepositsBoxesByAddress(allBoxes, BOB_ADDRESS);
+}
+function getAliceDeposits(allBoxes: Box[]) {
+	return getDepositsBoxesByAddress(allBoxes, ALICE_ADDRESS);
+}
 
 function depositAgentAlice(
 	tokens: OneOrMore<TokenAmount<Amount>>,
@@ -209,12 +238,62 @@ async function signTxAgentAlice(tx: EIP12UnsignedTransaction): Promise<SignedTra
 	return await signTx(tx, ALICE_MNEMONIC);
 }
 
+function createSwapOrderTxR9_new(
+	sellerPK: string,
+	sellerMultisigAddress: string,
+	inputBoxes: OneOrMore<Box<Amount>>,
+	token: { tokenId: string; amount: Amount },
+	sellRate: string,
+	currentHeight: number,
+	unlockHeight: number,
+	sellingTokenId: string,
+	buyingTokenId: string,
+	contractAddress: string,
+	nanoErg: bigint
+): EIP12UnsignedTransaction {
+	const [bigRate, bigDenom] = splitSellRate(sellRate);
+
+	const outputSwapOrder = new OutputBuilder(nanoErg, contractAddress)
+		.addTokens(token)
+		.setAdditionalRegisters({
+			R4: SColl(SSigmaProp, [
+				SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
+				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
+			]).toHex(),
+			R5: SInt(unlockHeight).toHex(),
+			R6: SPair(SColl(SByte, sellingTokenId), SColl(SByte, buyingTokenId)).toHex(),
+			R7: SLong(bigRate).toHex(),
+			R8: SColl(SByte, ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree).toHex(),
+			R9: SLong(bigDenom).toHex()
+		});
+
+	const change = new OutputBuilder(
+		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
+		DEPOSIT_ADDRESS
+	)
+		.setAdditionalRegisters({
+			R4: inputBoxes[0].additionalRegisters.R4,
+			R5: inputBoxes[0].additionalRegisters.R5
+		})
+		.addTokens(calcTokenChange([...inputBoxes], token));
+
+	const unsignedTransaction = new TransactionBuilder(currentHeight)
+		.configureSelector((selector) => selector.ensureInclusion([inputBoxes].map((b) => b.boxId)))
+		.from(inputBoxes)
+		.to([outputSwapOrder, change])
+		.payFee(RECOMMENDED_MIN_FEE_VALUE)
+		.build()
+		.toEIP12Object();
+	return unsignedTransaction;
+}
+
 function createSwapOrderTxR9AgentBob(
 	inputBoxes: OneOrMore<Box<Amount>>,
 	price: string,
-	amount: Amount
+	amount: Amount,
+	nanoErg: bigint
 ): EIP12UnsignedTransaction {
-	const swapUTx = createSwapOrderTxR9(
+	const swapUTx = createSwapOrderTxR9_new(
 		BOB_ADDRESS,
 		DEPOSIT_ADDRESS,
 		inputBoxes,
@@ -224,7 +303,8 @@ function createSwapOrderTxR9AgentBob(
 		1300000,
 		TOKEN.rsBTC.tokenId,
 		TOKEN.sigUSD.tokenId,
-		SWAP_ORDER_ADDRESS
+		SWAP_ORDER_ADDRESS,
+		nanoErg
 	);
 	return swapUTx;
 }
@@ -235,6 +315,7 @@ function executeSwapAgentAlice(
 	tokensFromSwapContract: { tokenId: string; amount: Amount },
 	paymentInTokens: { tokenId: string; amount: Amount }
 ): EIP12UnsignedTransaction {
+	//console.log(paymentInputBoxes);
 	const executeSwapUTx = executeSwap(
 		CHAIN_HEIGHT,
 		swapOrderBoxes,
