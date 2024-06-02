@@ -32,7 +32,7 @@ export function updateContractBoxes(
 	oldBoxes: Box[],
 	contract: string
 ): Box[] {
-	const boxesToDelete = boxesFromAddress(tx, contract);
+	const boxesToDelete = tx.inputs;
 	const boxesToAdd = boxesAtAddress(tx, contract);
 	let newBoxes = oldBoxes?.filter((b) => !boxesToDelete.some((d) => d.boxId == b.boxId));
 	if (!newBoxes) {
