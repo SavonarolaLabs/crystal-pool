@@ -33,7 +33,7 @@
                 markdown: {
                     renderer: {
                         code: function(code, lang) {
-                            return '<pre><code class="hljs ' + lang + '">' + hljs.highlight(code, {language: lang}).value + '</code></pre>';
+                            return '<pre><code class="hljs scala">' + hljs.highlight(code, {language: 'scala'}).value + '</code></pre>';
                         }
                     }
                 }
