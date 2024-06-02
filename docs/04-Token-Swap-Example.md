@@ -24,18 +24,18 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 │   amount:  1000         │      │       │   amount:  1000         │
 │  }]                     │      │       │  }]                     │
 └─────────────────────────┘      │       │  additionalRegisters:{  │
-                                 │       │   R4: [BOB,POOL]        │
-                                 │       │   R5: unlockHeight      │
-                                 │       │  }                      │
-                                 │       └─────────────────────────┘
-                                 │       ┌─────────────────────────┐
-                                 │       │  address: BOB           │
-                                 ├────►  │  ...                    │
-                                 │       └─────────────────────────┘
-                                 │       ┌─────────────────────────┐
-                                 │       │  address: FEE           │
-                                 └────►  │  value: 0.0011Erg       │
-                                         └─────────────────────────┘
+                                    │       │   R4: [BOB,POOL]        │
+                                    │       │   R5: unlockHeight      │
+                                    │       │  }                      │
+                                    │       └─────────────────────────┘
+                                    │       ┌─────────────────────────┐
+                                    │       │  address: BOB           │
+                                    ├────►  │  ...                    │
+                                    │       └─────────────────────────┘
+                                    │       ┌─────────────────────────┐
+                                    │       │  address: FEE           │
+                                    └────►  │  value: 0.0011Erg       │
+                                            └─────────────────────────┘
 ```
 
 2. Bob creates a swap order
