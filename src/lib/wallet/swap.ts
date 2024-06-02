@@ -21,7 +21,7 @@ import { SByte, SLong, SPair } from '@fleet-sdk/serializer';
 
 import { amountByTokenId, asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
 
-function splitSellRate(sellRate: string): [bigint, bigint] {
+export function splitSellRate(sellRate: string): [bigint, bigint] {
 	let floatRate = parseFloat(sellRate);
 	let exponent = 0;
 	while (floatRate % 1 !== 0) {
