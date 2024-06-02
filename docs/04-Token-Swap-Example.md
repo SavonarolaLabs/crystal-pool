@@ -52,13 +52,13 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 │   R5: unlockHeight      │      │       │   R5: unlockHeight      │
 │  }                      │      │       │   R6: [Erdoge,rsBTC]    │
 └─────────────────────────┘      │       │   R7: swapRate          │
-                                 │       │   R8: DEPOSIT           │
-                                 │       │  }                      │
-                                 │       └─────────────────────────┘
-                                 │       ┌─────────────────────────┐
-                                 │       │  address: FEE           │
-                                 └────►  │  value: 0.0011Erg       │
-                                         └─────────────────────────┘
+                                    │       │   R8: DEPOSIT           │
+                                    │       │  }                      │
+                                    │       └─────────────────────────┘
+                                    │       ┌─────────────────────────┐
+                                    │       │  address: FEE           │
+                                    └────►  │  value: 0.0011Erg       │
+                                            └─────────────────────────┘
 ```
 
 3. Alice deposits 0.00001 rsBTC
@@ -71,18 +71,18 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 │   amount:  0.00001      │      │       │   amount:  0.00001      │
 │  }]                     │      │       │  }]                     │
 └─────────────────────────┘      │       │  additionalRegisters:{  │
-                                 │       │   R4: [ALICE,POOL]      │
-                                 │       │   R5: unlockHeight      │
-                                 │       │  }                      │
-                                 │       └─────────────────────────┘
-                                 │       ┌─────────────────────────┐
-                                 │       │  address: ALICE         │
-                                 ├────►  │  ...                    │
-                                 │       └─────────────────────────┘
-                                 │       ┌─────────────────────────┐
-                                 │       │  address: FEE           │
-                                 └────►  │  value: 0.0011Erg       │
-                                         └─────────────────────────┘
+                                    │       │   R4: [ALICE,POOL]      │
+                                    │       │   R5: unlockHeight      │
+                                    │       │  }                      │
+                                    │       └─────────────────────────┘
+                                    │       ┌─────────────────────────┐
+                                    │       │  address: ALICE         │
+                                    ├────►  │  ...                    │
+                                    │       └─────────────────────────┘
+                                    │       ┌─────────────────────────┐
+                                    │       │  address: FEE           │
+                                    └────►  │  value: 0.0011Erg       │
+                                            └─────────────────────────┘
 ```
 
 4. Alice swaps 0.00001 rsBTC for 1k Erdoge
@@ -114,8 +114,8 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 │   R5: unlockHeight      │        │     └─────────────────────────┘
 │  }                      │        │     ┌─────────────────────────┐
 └─────────────────────────┘        │     │  address: FEE           │
-                                   └──►  │  value: 0.0011Erg       │
-                                         └─────────────────────────┘
+                                      └──►  │  value: 0.0011Erg       │
+                                            └─────────────────────────┘
 ```
 
 5. Alice withdraws 1k Erdoge
