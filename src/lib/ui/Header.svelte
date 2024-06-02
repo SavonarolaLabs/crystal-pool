@@ -1,6 +1,6 @@
 <script lang="ts">
 	import WalletBalanceBar from "./WalletBalanceBar.svelte";
-	import { setUserAlice } from "./ui_state";
+	import { setUserAlice, setUserBob, toggleWallet, user_name } from "./ui_state";
 
 	function toggleTheme() {
 		if (typeof document !== 'undefined') {
@@ -57,7 +57,7 @@
 					<WalletBalanceBar></WalletBalanceBar>
 				</div>
 				<div class="header_navItem">
-					<button on:click={setUserAlice}>Wallet</button>
+					<button on:click={toggleWallet}>Wallet</button>
 				</div>
 				<div class="header_navItem">
 					<button on:click={toggleTheme}>

@@ -4,6 +4,7 @@ import { userBoxes } from './service/crystalPoolService';
 import { sumAssets } from '$lib/utils/helper';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { showToast } from './toaster';
+import { TOKEN } from '$lib/constants/tokens';
 
 // market trades
 
@@ -95,42 +96,56 @@ export async function setOrderBook(book: any) {
 }
 
 // wallet balance
+export const user_name = writable('Bob');
 export const user_mnemonic = writable(BOB_MNEMONIC);
 export const user_address = writable(BOB_ADDRESS);
 
 export function setUserAlice() {
+	user_name.set('Alice');
 	user_mnemonic.set(ALICE_MNEMONIC);
 	user_address.set(ALICE_ADDRESS);
 }
 
+export function setUserBob() {
+	user_name.set('Bob');
+	user_mnemonic.set(BOB_MNEMONIC);
+	user_address.set(BOB_ADDRESS);
+}
+
+export function toggleWallet() {
+	get(user_name) == 'Bob' ? setUserAlice() : setUserBob();
+	fetchBalance();
+}
+
 export const user_tokens = writable([
 	{
-		name: 'rsBTC',
-		tokenId: '5bf691fbf0c4b17f8f8cece83fa947f62f480bfbd242bd58946f85535125db4d',
+		name: TOKEN.rsBTC.name,
+		tokenId: TOKEN.rsBTC.tokenId,
 		amount: 0,
-		decimals: 9
+		decimals: TOKEN.rsBTC.decimals
 	},
 	{
-		name: 'sigUSD',
-		tokenId: '03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04',
+		name: TOKEN.sigUSD.name,
+		tokenId: TOKEN.sigUSD.tokenId,
 		amount: 0,
-		decimals: 2
+		decimals: TOKEN.sigUSD.decimals
 	}
 ]);
 
 export async function fetchBalance() {
-	console.log('refetching balance');
+	console.log('refetching balance', get(user_name));
 	const address = get(user_address);
 	if (address) {
 		const boxes = await userBoxes(address);
-		const tokens = boxes
+		console.log(boxes);
+		const updatedTokens = boxes
 			.flatMap((row: { box: { assets: any } }) => row.box.assets)
 			.reduce(sumAssets, []);
 		user_tokens.update((all) => {
 			all.forEach((t) => {
 				t.amount = Number(
-					tokens.find((x: { tokenId: string }) => x.tokenId == t.tokenId)?.amount ??
-						t.amount
+					updatedTokens.find((x: { tokenId: string }) => x.tokenId == t.tokenId)?.amount ??
+						0n
 				);
 			});
 			return all;
