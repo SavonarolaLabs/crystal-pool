@@ -20,29 +20,55 @@ export function createOrderBook(tradingPair: string, db: BoxDB) {
 	const buyOrders = allOrders.filter((order) => order.side == 'buy');
 	const sellOrders = allOrders.filter((order) => order.side == 'sell');
 
-	console.log('sellOrders', sellOrders);
+	console.log('buyOrders', buyOrders);
 	const orderbook = {
 		buy: buyOrders.map((r) => {
 			return {
-				price: Number(priceWithDenom(r.rate, r.denom)),
-				amount: Number(amountWithDecimals(r.amount)),
-				value: Number(volume(r.rate, r.denom, r.amount))
+				price: Number(buyPrice(r.rate, r.denom)),
+				amount: Number(buyAmount(r.rate, r.denom, r.amount)),
+				value: Number(buyValue(r.amount))
 			};
 		}),
 		sell: sellOrders.map((r) => {
 			return {
-				price: Number(priceWithDenom(r.rate, r.denom)),
-				amount: Number(amountWithDecimals(r.amount)),
-				value: Number(volume(r.rate, r.denom, r.amount))
+				price: Number(sellPrice(r.rate, r.denom)),
+				amount: Number(sellAmount(r.amount)),
+				value: Number(sellValue(r.rate, r.denom, r.amount))
 			};
 		})
 	};
-	console.log('orderbook');
-	console.log(orderbook);
+	console.log('sell');
+	console.log(orderbook.buy);
 	return serializeBigInt(orderbook);
 }
 
-function priceWithDenom(price: bigint, denom: bigint) {
+function buyValue(amount: Amount) {
+	const decimalsCurrency = TOKEN.sigUSD.decimals;
+	return BigNumber(amount.toString()).dividedBy(BigNumber(10).pow(decimalsCurrency));
+}
+
+function buyAmount(price: bigint, denom: bigint, amount: Amount) {
+	//0.00001
+	const decimalsToken = TOKEN.rsBTC.decimals;
+	const real_price = BigNumber(price.toString()).dividedBy(denom.toString());
+	const real_amount = real_price
+		.multipliedBy(amount.toString())
+		.dividedBy(BigNumber(10).pow(decimalsToken));
+	return real_amount.toString(10);
+}
+
+function buyPrice(price: bigint, denom: bigint) {
+	const real_price = BigNumber(price.toString()).dividedBy(denom.toString());
+	//500n
+	const decimalsToken = TOKEN.rsBTC.decimals;
+	const decimalsCurrency = TOKEN.sigUSD.decimals;
+	const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
+	const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
+
+	return bigDecimalsToken.dividedBy(BigNumber(real_price)).dividedBy(bigDecimalsCurrency);
+}
+
+function sellPrice(price: bigint, denom: bigint) {
 	const real_price = BigNumber(price.toString()).dividedBy(denom.toString());
 
 	const decimalsToken = TOKEN.rsBTC.decimals;
@@ -55,12 +81,12 @@ function priceWithDenom(price: bigint, denom: bigint) {
 	return initial_input.toString(10);
 }
 
-function amountWithDecimals(amount: Amount) {
+function sellAmount(amount: Amount) {
 	const decimals = TOKEN.rsBTC.decimals;
 	return BigNumber(amount.toString()).dividedBy(BigNumber(10).pow(decimals)).toString(10);
 }
 
-function volume(price: bigint, denom: bigint, amount: Amount) {
+function sellValue(price: bigint, denom: bigint, amount: Amount) {
 	const decimalsCurrency = TOKEN.sigUSD.decimals;
 	const real_price = BigNumber(price.toString()).dividedBy(denom.toString());
 	return real_price
