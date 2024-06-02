@@ -33,9 +33,12 @@ CrystalPool is simple concept for self-custodial instant trading on L1. At Ergoh
   - [ ] withdraw
 
 - **Pool Service:**
-  - [x] db (sqlite3)
+  - [x] webserver
   - [x] websocket
+  - [x] db (sqlite3)
   - [x] wallet functions
+  - [x] create swap order tx
+  - [x] sign swap order tx
   - [ ] monitor current mempool space
   - [ ] publish transactions
   - [ ] sign inividual multisig inputs
@@ -62,8 +65,6 @@ CrystalPool is simple concept for self-custodial instant trading on L1. At Ergoh
   - [ ] Build for Linux
   - [ ] Build for iOS
   - [ ] Build for Android
-
-
 
 **Key Parts:**
 
