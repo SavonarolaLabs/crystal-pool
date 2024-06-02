@@ -1,8 +1,4 @@
-import {
-	DEPOSIT_ADDRESS,
-	SHADOWPOOL_ADDRESS,
-	SWAP_ORDER_ADDRESS
-} from '$lib/constants/addresses';
+import { DEPOSIT_ADDRESS, SHADOWPOOL_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
 import {
 	first,
 	type Amount,
@@ -23,9 +19,9 @@ import {
 } from '@fleet-sdk/core';
 import { SByte, SLong, SPair } from '@fleet-sdk/serializer';
 
-import { amountByTokenId, asBigInt, calcTokenChange, sumNanoErg } from "$lib/utils/helper";
+import { amountByTokenId, asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
 
-function splitSellRate(sellRate: string): [bigint, bigint] {
+export function splitSellRate(sellRate: string): [bigint, bigint] {
 	let floatRate = parseFloat(sellRate);
 	let exponent = 0;
 	while (floatRate % 1 !== 0) {
@@ -51,37 +47,23 @@ export function createSwapOrderTxR9(
 ): EIP12UnsignedTransaction {
 	const [bigRate, bigDenom] = splitSellRate(sellRate);
 
-	const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, contractAddress)
+	const outputSwapOrder = new OutputBuilder(SAFE_MIN_BOX_VALUE, contractAddress)
 		.addTokens(token)
 		.setAdditionalRegisters({
 			R4: SColl(SSigmaProp, [
-				SGroupElement(
-					first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())
-				),
-				SGroupElement(
-					first(
-						ErgoAddress.fromBase58(
-							SHADOWPOOL_ADDRESS
-						).getPublicKeys()
-					)
-				)
+				SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
+				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
 			]).toHex(),
 			R5: SInt(unlockHeight).toHex(),
-			R6: SPair(
-				SColl(SByte, sellingTokenId),
-				SColl(SByte, buyingTokenId)
-			).toHex(),
+			R6: SPair(SColl(SByte, sellingTokenId), SColl(SByte, buyingTokenId)).toHex(),
 			R7: SLong(bigRate).toHex(),
-			R8: SColl(
-				SByte,
-				ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree
-			).toHex(),
+			R8: SColl(SByte, ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree).toHex(),
 			R9: SLong(bigDenom).toHex()
 		});
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
 		.from(inputBoxes)
-		.to(output)
+		.to(outputSwapOrder)
 		.sendChangeTo(sellerPK)
 		.payFee(RECOMMENDED_MIN_FEE_VALUE)
 		.build()
@@ -95,53 +77,56 @@ export function executeSwap(
 	paymentInputBoxes: Box<Amount>[],
 	tokensFromSwapContract: { tokenId: string; amount: Amount },
 	tokensAsPayment: { tokenId: string; amount: Amount },
-	nanoErg: string | bigint = 2n * RECOMMENDED_MIN_FEE_VALUE +
-		SAFE_MIN_BOX_VALUE
+	nanoErg: string | bigint = 2n * RECOMMENDED_MIN_FEE_VALUE + SAFE_MIN_BOX_VALUE
 ): EIP12UnsignedTransaction {
-		const paymentOutputBox = new OutputBuilder(
-			nanoErg,
-			DEPOSIT_ADDRESS
-		).setAdditionalRegisters({
-				R4: swapOrderInputBoxes[0].additionalRegisters.R4,
-				R5: swapOrderInputBoxes[0].additionalRegisters.R5,
-				R6: swapOrderInputBoxes[0].additionalRegisters.R6
-		}).addTokens(tokensAsPayment);
+	const paymentOutputBox = new OutputBuilder(nanoErg, DEPOSIT_ADDRESS)
+		.setAdditionalRegisters({
+			R4: swapOrderInputBoxes[0].additionalRegisters.R4,
+			R5: swapOrderInputBoxes[0].additionalRegisters.R5,
+			R6: swapOrderInputBoxes[0].additionalRegisters.R6
+		})
+		.addTokens(tokensAsPayment);
 
-		let remainingSwapOrderBox = undefined;
-		const remainingTokens = asBigInt(tokensFromSwapContract.amount) - asBigInt(amountByTokenId(swapOrderInputBoxes, tokensFromSwapContract.tokenId))
-		if(remainingTokens > 0n){
-			const remainingRateBox = swapOrderInputBoxes[0] // TODO select the proper box;
-			remainingSwapOrderBox = new OutputBuilder(
-				nanoErg,
-				DEPOSIT_ADDRESS
-			).setAdditionalRegisters(remainingRateBox.additionalRegisters).addTokens({
+	let remainingSwapOrderBox = undefined;
+	const remainingTokens =
+		asBigInt(tokensFromSwapContract.amount) -
+		asBigInt(amountByTokenId(swapOrderInputBoxes, tokensFromSwapContract.tokenId));
+	if (remainingTokens > 0n) {
+		const remainingRateBox = swapOrderInputBoxes[0]; // TODO select the proper box;
+		remainingSwapOrderBox = new OutputBuilder(nanoErg, DEPOSIT_ADDRESS)
+			.setAdditionalRegisters(remainingRateBox.additionalRegisters)
+			.addTokens({
 				tokenId: tokensFromSwapContract.tokenId,
 				amount: remainingTokens
 			});
-		}
-	
-		const change = new OutputBuilder(
-			sumNanoErg(swapOrderInputBoxes) + sumNanoErg(paymentInputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
-			DEPOSIT_ADDRESS
+	}
+
+	const change = new OutputBuilder(
+		sumNanoErg(swapOrderInputBoxes) +
+			sumNanoErg(paymentInputBoxes) -
+			asBigInt(nanoErg) -
+			RECOMMENDED_MIN_FEE_VALUE,
+		DEPOSIT_ADDRESS
+	)
+		.setAdditionalRegisters({
+			R4: paymentInputBoxes[0].additionalRegisters.R4,
+			R5: paymentInputBoxes[0].additionalRegisters.R5
+		})
+		.addTokens(
+			calcTokenChange([...swapOrderInputBoxes, ...paymentInputBoxes], tokensAsPayment)
+		);
+
+	const uTx = new TransactionBuilder(blockchainHeight)
+		.configureSelector((selector) =>
+			selector.ensureInclusion(swapOrderInputBoxes.map((b) => b.boxId))
 		)
-			.setAdditionalRegisters({
-				R4: paymentInputBoxes[0].additionalRegisters.R4,
-				R5: paymentInputBoxes[0].additionalRegisters.R5,
-			})
-			.addTokens(calcTokenChange([...swapOrderInputBoxes, ...paymentInputBoxes], tokensAsPayment));
+		.from([...swapOrderInputBoxes, ...paymentInputBoxes])
+		.to([paymentOutputBox, change, remainingSwapOrderBox].filter((x) => x) as OutputBuilder[])
+		.payFee(RECOMMENDED_MIN_FEE_VALUE)
+		.build()
+		.toEIP12Object();
 
-
-		const uTx = new TransactionBuilder(blockchainHeight)
-			.configureSelector((selector) =>
-				selector.ensureInclusion(swapOrderInputBoxes.map(b => b.boxId))
-			)
-			.from([...swapOrderInputBoxes, ...paymentInputBoxes])
-			.to([paymentOutputBox, change, remainingSwapOrderBox].filter(x=>x) as OutputBuilder[])
-			.payFee(RECOMMENDED_MIN_FEE_VALUE)
-			.build()
-			.toEIP12Object();
-
-		return uTx;
+	return uTx;
 }
 
 export function createSwapOrderTx(
@@ -159,27 +144,13 @@ export function createSwapOrderTx(
 		.addTokens(token)
 		.setAdditionalRegisters({
 			R4: SColl(SSigmaProp, [
-				SGroupElement(
-					first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())
-				),
-				SGroupElement(
-					first(
-						ErgoAddress.fromBase58(
-							SHADOWPOOL_ADDRESS
-						).getPublicKeys()
-					)
-				)
+				SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
+				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
 			]).toHex(),
 			R5: SInt(unlockHeight).toHex(),
-			R6: SPair(
-				SColl(SByte, sellingTokenId),
-				SColl(SByte, buyingTokenId)
-			).toHex(),
+			R6: SPair(SColl(SByte, sellingTokenId), SColl(SByte, buyingTokenId)).toHex(),
 			R7: SLong(sellRate).toHex(),
-			R8: SColl(
-				SByte,
-				ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree
-			).toHex()
+			R8: SColl(SByte, ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree).toHex()
 		});
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)

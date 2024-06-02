@@ -6,6 +6,6 @@
 	if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)
 	}else{
-		getSellerPk(SELF) && getPoolPk(SELF)
+		getSellerPk(SELF) // && getPoolPk(SELF)
 	}
 }
