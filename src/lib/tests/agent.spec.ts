@@ -108,7 +108,7 @@ describe('Deposit/Withdraw AGENTS', () => {
 		expect(withdrawTxBob.to_js_eip12().id).toBeTruthy();
 	});
 
-	it('create swap order', async () => {
+	it('execute swap order', async () => {
 		const price = '20000'; //input
 		const amount = 10000n; // BigInt(10 ** TOKEN.rsBTC.decimals); //1 BTC
 		const real_price = realPrice(price).toString(10);
@@ -172,6 +172,128 @@ describe('Deposit/Withdraw AGENTS', () => {
 		);
 		const aliceProof = signedAliceInput.spending_proof().to_json();
 		expect(aliceProof).toBeTruthy();
+
+		// ------------ take ID -----------
+		const txId = UnsignedTransaction.from_json(JSON.stringify(executeSwapUTx)).id().to_str();
+
+		executeSwapUTx.inputs[shadowIndex] = {
+			boxId: executeSwapUTx.inputs[shadowIndex].boxId,
+			spendingProof: shadowProof
+		};
+		executeSwapUTx.inputs[aliceIndex] = {
+			boxId: executeSwapUTx.inputs[aliceIndex].boxId,
+			spendingProof: aliceProof
+		};
+
+		executeSwapUTx.id = txId;
+		const executeSwapTx = executeSwapUTx;
+
+		swapBoxes = updateContractBoxes(executeSwapTx, swapBoxes, SWAP_ORDER_ADDRESS);
+		depositBoxes = updateContractBoxes(executeSwapTx, depositBoxes, DEPOSIT_ADDRESS);
+	});
+});
+
+describe('Separate Swap Execution', () => {
+	let depositTxAlice;
+	let depositTxBob;
+	let swapBoxes: Box[];
+	let depositBoxes: Box[];
+
+	const DEPOSIT_TOKEN_BTC = {
+		name: TOKEN.rsBTC.name,
+		tokenId: TOKEN.rsBTC.tokenId,
+		amount: 10n * 10n ** BigInt(TOKEN.rsBTC.decimals),
+		decimals: TOKEN.rsBTC.decimals
+	};
+
+	const DEPOSIT_TOKEN_SIGUSD = {
+		name: 'SigUSD',
+		tokenId: TOKEN.sigUSD.tokenId,
+		amount: 10n * 70_000n * 10n ** BigInt(TOKEN.sigUSD.decimals),
+		decimals: TOKEN.sigUSD.decimals
+	};
+
+	beforeAll(async () => {
+		const value = 5n * 10n ** 9n;
+
+		const depositUTxAlice = depositAgentAlice(DEPOSIT_TOKEN_SIGUSD, value);
+		const depositUTxBob = depositAgentBob(DEPOSIT_TOKEN_BTC, value);
+
+		depositTxAlice = await signTxAgentAlice(depositUTxAlice);
+		depositTxBob = await signTxAgentBob(depositUTxBob);
+
+		depositBoxes = updateContractBoxes(depositTxAlice, depositBoxes, DEPOSIT_ADDRESS); //
+		depositBoxes = updateContractBoxes(depositTxBob, depositBoxes, DEPOSIT_ADDRESS); //
+	});
+
+	it('execute swap order A/B/C', async () => {
+		const price = '20000'; //input
+		const amount = 10000n; // BigInt(10 ** TOKEN.rsBTC.decimals); //1 BTC
+		const real_price = realPrice(price).toString(10);
+		const nanoErg = SAFE_MIN_BOX_VALUE;
+
+		//BLOCK create swap
+		const swapUTx = createSwapOrderTxR9AgentBob(
+			getBobDeposits(depositBoxes),
+			real_price,
+			amount,
+			nanoErg
+		);
+
+		const swapTx = await signTxAgentBob(swapUTx);
+		expect(swapTx.id).toBeTruthy();
+
+		swapBoxes = updateContractBoxes(swapTx, swapBoxes, SWAP_ORDER_ADDRESS);
+		depositBoxes = updateContractBoxes(swapTx, depositBoxes, DEPOSIT_ADDRESS);
+
+		expect(swapBoxes).toBeTruthy();
+		expect(depositBoxes).toBeTruthy();
+
+		const paymentAmount = calculateAmount(real_price, amount).toString(10);
+		const tokensAsPayment = { tokenId: TOKEN.sigUSD.tokenId, amount: paymentAmount };
+
+		//BLOCK execute
+		// Part1. Zapros -> na server
+
+		const executeSwapUTx = executeSwapAgentAlice(
+			[...swapBoxes],
+			[...getAliceDeposits(depositBoxes)],
+			{ tokenId: TOKEN.rsBTC.tokenId, amount: amount },
+			{ tokenId: TOKEN.sigUSD.tokenId, amount: paymentAmount }
+		);
+		// Poluchit tx
+
+		// Part2 Sign DepositInput -> Send Signed Input
+		//BOX FROM DEPOSIT
+		const aliceIndex = executeSwapUTx.inputs.findIndex(
+			(b) =>
+				getAliceDeposits(depositBoxes)
+					.map((b) => b.boxId)
+					.includes(b.boxId) //DEPOSIT
+		);
+		expect(aliceIndex).toBe(1);
+
+		const signedAliceInput = await signTxInput(
+			ALICE_MNEMONIC,
+			JSON.parse(JSON.stringify(executeSwapUTx)),
+			aliceIndex
+		);
+		const aliceProof = signedAliceInput.spending_proof().to_json();
+		expect(aliceProof).toBeTruthy();
+
+		//Part 3. Sign Input and Add txId //BOX FROM SWAP
+		const shadowIndex = executeSwapUTx.inputs.findIndex((b) =>
+			swapBoxes.map((b) => b.boxId).includes(b.boxId)
+		);
+		expect(shadowIndex).toBe(0);
+
+		const signedShadowInput = await signTxInput(
+			SHADOW_MNEMONIC,
+			JSON.parse(JSON.stringify(executeSwapUTx)),
+			shadowIndex
+		);
+		const shadowProof = signedShadowInput.spending_proof().to_json();
+		expect(shadowProof).toBeTruthy();
 
 		// ------------ take ID -----------
 		const txId = UnsignedTransaction.from_json(JSON.stringify(executeSwapUTx)).id().to_str();
