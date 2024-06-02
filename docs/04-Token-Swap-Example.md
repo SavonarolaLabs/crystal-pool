@@ -15,7 +15,7 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 ##Transactions:
 
 1. Bob deposits 1k Erdoge
-```scala
+```
 ┌─────────────────────────┐              ┌─────────────────────────┐   
 │  address: BOB           │              │  address: DEPOSIT       │   
 │  value: 0.1Erg          │              │  value: 0.0989Erg       │   
@@ -39,7 +39,7 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 ```
 
 2. Bob creates a swap order
-```scala
+```
 ┌─────────────────────────┐              ┌─────────────────────────┐   
 │  address: DEPOSIT       │              │  address: SWAP          │   
 │  value: 0989Erg         │              │  value: 0978Erg         │   
@@ -86,7 +86,7 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 ```
 
 4. Alice swaps 0.00001 rsBTC for 1k Erdoge
-```scala
+```
 ┌─────────────────────────┐              ┌─────────────────────────┐   
 │  address: SWAP          │              │  address: DEPOSIT       │   
 │  value: 0.0978Erg       │              │  value: 0.0978Erg       │   
