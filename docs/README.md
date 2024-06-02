@@ -2,6 +2,10 @@
 
 Welcome to the CrystalPool documentation. This book provides an in-depth look into the development of a **self-custodial** limit order exchange on Ergo L1 with **instant** order execution and clear KYA.
 
+## Screenshot
+
+![CrystalPool UI](./ui.png?raw=true "Crystal Pool UI")
+
 ## Table of Contents
 
 - [Summary](01-Summary.md)
@@ -13,4 +17,4 @@ Welcome to the CrystalPool documentation. This book provides an in-depth look in
 
 ## Screenshot
 
-![CrystalPool UI](ui.png?raw=true "Crystal Pool UI")
+![CrystalPool UI](./ui.png?raw=true "Crystal Pool UI")
