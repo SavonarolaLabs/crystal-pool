@@ -1,6 +1,6 @@
-# CrystalPool: Realtime Order-Based Exchange on L1
+# CrystalPool: Instant trades on L1
 
-Welcome to the CrystalPool project documentation. This book provides an in-depth look into the development of a **self-custodial** exchange on Ergo L1 with **real time** User Experience and clear KYA risks.
+Welcome to the CrystalPool documentation. This book provides an in-depth look into the development of a **self-custodial** limit order exchange on Ergo L1 with **instant** order execution and clear KYA.
 
 ## Table of Contents
 
