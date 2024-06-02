@@ -6,6 +6,7 @@
 		"utxo": "bun src/lib/utils/script_loadUnspetUtxo.ts > src/lib/data/utxos.ts",
 		"compile": "bun src/lib/compiler/update-address-constants.ts",
 		"dev": "vite dev",
+		"restart": "npm run db:clear || npm run server:stop && npm run server",
 		"server": "pm2 stop crystal-pool && pm2 start ecosystem.config.cjs && pm2 logs",
 		"server:logs": "pm2 logs",
 		"server:stop": "pm2 stop crystal-pool",

@@ -4,16 +4,12 @@ import { db_addBoxes, type BoxDB } from '$lib/db/db';
 import { boxesAtAddress } from '$lib/utils/test-helper';
 import { a, c } from '$lib/wallet/multisig-server';
 import {
-	createSwapOrderTx,
-	createSwapOrderTxR9,
-	executeSwap,
-	splitSellRate
+	createExecuteSwapOrderTx, createSwapOrderTxR9
 } from '$lib/wallet/swap';
 import type { SignedTransaction } from '@fleet-sdk/common';
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
 import { createOrderBook } from '../orderBookUtils';
-import { asBigInt } from '$lib/utils/helper';
 import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 
 type SwapRequest = {
@@ -50,63 +46,14 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 		);
 
 		const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
-		res.json({ unsignedTx, publicCommitsPool });
+		res.json(unsignedTx);
 	});
 }
 
 export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/execute-swap', async (req: Request, res: Response) => {
 		const swapParams: SwapRequest = req.body; // Swap Params
-		const [rate, denom] = splitSellRate(swapParams.price);
-
-		//-----------------------------------
-		const height = 1273521;
-		const unlockHeight = height + 200000;
-
-		// address: string;
-		// price: string;
-		// amount: string;
-		// sellingTokenId: string;
-		// buyingTokenId: string;
-
-		//3 - Add Inputs
-
-		const buyingAmount = 0n; //amount?
-		const paymentAmount = 0n; //calculate?
-
-		//2 - Find Contract Box
-
-		const swapOrderInputBoxes: any = db.boxRows.filter(
-			(b) =>
-				b.contract == 'SWAP' &&
-				b.parameters?.side == 'sell' &&
-				b.parameters?.rate == rate &&
-				b.parameters?.denom == denom
-		);
-
-		const paymentInputBoxes: any = db.boxRows.filter(
-			(b) =>
-				b.contract == 'DEPOSIT' &&
-				b.parameters.userPk == swapParams.address
-		);
-		console.log("paymentInputBoxes.length")
-		console.log(paymentInputBoxes.length)
-
-		res.json({});
-		return 
-
-		const tokensFromSwapContract = { tokenId: swapParams.buyingTokenId, amount: buyingAmount };
-		const tokensAsPayment = { tokenId: swapParams.sellingTokenId, amount: paymentAmount };
-
-
-		//------------------------------------
-		const unsignedTx = executeSwap(
-			height, // need helper function
-			swapOrderInputBoxes,
-			paymentInputBoxes,
-			tokensFromSwapContract,
-			tokensAsPayment
-		);
+		const unsignedTx = createExecuteSwapOrderTx(swapParams, db);
 		res.json(unsignedTx);
 	});
 }

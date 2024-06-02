@@ -20,6 +20,8 @@ import {
 import { SByte, SLong, SPair } from '@fleet-sdk/serializer';
 
 import { amountByTokenId, asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
+import type { SwapRequest } from '../../server/routes/swapOrder';
+import type { BoxDB } from '$lib/db/db';
 
 export function splitSellRate(sellRate: string): [bigint, bigint] {
 	let floatRate = parseFloat(sellRate);
@@ -172,4 +174,50 @@ export function createSwapOrderTx(
 		.build()
 		.toEIP12Object();
 	return unsignedTransaction;
+}
+
+
+export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
+	const height = 1273521;
+	
+	const swapOrderInputBoxes: any = db.boxRows.filter(
+		(b) =>
+			b.contract == 'SWAP' &&
+			b.parameters?.side == 'sell' &&
+			b.parameters?.rate == rate &&
+			b.parameters?.denom == denom
+	);
+
+	const paymentInputBoxes: any = db.boxRows.filter(
+		(b) =>
+			b.contract == 'DEPOSIT' &&
+			b.parameters.userPk == swapParams.address
+	);
+	if (swapOrderInputBoxes.length < 1 || paymentInputBoxes.length < 1) {
+		console.dir({ swapOrderInputBoxes, paymentInputBoxes });
+		throw new Error(
+			'not enough boxes, swapOrderInputBoxes:' +
+				swapOrderInputBoxes.length +
+				', swapOrderInputBoxes:' +
+				paymentInputBoxes.length
+		);
+	}
+
+	const buyingAmount = +swapOrderInputBoxes[0].box.assets[0].amount;
+	const paymentAmount = +swapParams.price * +swapParams.amount;
+
+	const tokensFromSwapContract = {
+		tokenId: swapParams.buyingTokenId,
+		amount: BigInt(buyingAmount)
+	};
+	const tokensAsPayment = { tokenId: swapParams.sellingTokenId, amount: BigInt(paymentAmount) };
+
+	const unsignedTx = executeSwap(
+		height,
+		swapOrderInputBoxes,
+		paymentInputBoxes,
+		tokensFromSwapContract,
+		tokensAsPayment
+	);
+	return unsignedTx;
 }
