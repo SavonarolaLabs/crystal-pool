@@ -1,9 +1,11 @@
 **CrystalPool: Instant trading on L1**
 
 **Authors:** c8 c8e4@proton.me, savonarola  
+
 **Github:** https://github.com/SavonarolaLabs/crystal-pool
 
 **Documentation:** https://savonarolalabs.github.io/crystal-pool/#/
+
 **Date:** May 23, 2024
 
 CrystalPool is a simple concept for a self-custodial exchange that offers instant order execution and UX that is comparable to centralized exchanges. At ErgohackVIII this project aims to deliver a proof of concept for: a user interface UI for trading, an order book management system, and core functionalities for handling and storing chains of unsubmitted transactions. 100% of the code is open-source.
