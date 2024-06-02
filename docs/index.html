@@ -4,9 +4,8 @@
         <meta charset="UTF-8" />
         <title>CrystalPool Documentation</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" media="(prefers-color-scheme: dark)" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
-		<link rel="stylesheet" media="(prefers-color-scheme: light)" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
+        <link rel="stylesheet" media="(prefers-color-scheme: dark)" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
+        <link rel="stylesheet" media="(prefers-color-scheme: light)" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
     </head>
     <body>
         <div id="app"></div>
@@ -14,25 +13,9 @@
             window.$docsify = {
                 name: 'CrystalPool',
                 repo: 'https://github.com/SavonarolaLabs/turbo-mempool',
-                loadSidebar: true,
-                markdown: {
-                    renderer: {
-                        code: function(code, lang) {
-                            return '<pre><code class="hljs scala">' + hljs.highlight(code, {language: 'scala'}).value + '</code></pre>';
-                        }
-                    }
-                }
+                loadSidebar: true
             };
         </script>
         <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/scala.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
-                document.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightBlock(block);
-                });
-            });
-        </script>
     </body>
 </html>
