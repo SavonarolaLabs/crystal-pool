@@ -10,3 +10,7 @@ Welcome to the CrystalPool documentation. This book provides an in-depth look in
 - [Built-in Wallet](04-Built-in-Wallet.md)
 - [Know Your Assumtions (KYA)](05-KYA.md)
 - [Smart Contracts](06-Smart-Contracts.md)
+
+## Screenshot
+
+![CrystalPool UI](ui.png?raw=true "Crystal Pool UI")
