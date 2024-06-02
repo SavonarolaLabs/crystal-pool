@@ -2,21 +2,6 @@
 In this Example Bob puchases rsBTC for 1k Erdoge from Alice.
 Exchange price 1 Erdoge = 1 sat
 
-```plaintext
-&#9474;  address: BOB           &#9474;              &#9474;  address: DEPOSIT       &#9474;
-&#9474;  value: 0.1Erg          &#9474;              &#9474;  value: 0.0989Erg       &#9474;
-&#9474;  assets:[{              &#9474;              &#9474;  assets:[{              &#9474;
-&#9474;   tokenId: Erdoge       &#9474;  &#9472;&#9472;&#9472;&#9472;&#9474;&#9472;&#9472;&#9472;&#9472;&#9474;  &#9474;   tokenId: Erdoge       &#9474;
-&#9474;   amount:  1000         &#9474;      &#9474;       &#9474;   amount:  1000         &#9474;
-&#9474;  }]                     &#9474;      &#9474;       &#9474;  }]                     &#9474;
-&#9474;  additionalRegisters:{  &#9474;      &#9474;       &#9474;  additionalRegisters:{  &#9474;
-&#9474;   R4: [BOB,POOL]        &#9474;      &#9474;       &#9474;   R4: [BOB,POOL]        &#9474;
-&#9474;   R5: unlockHeight      &#9474;      &#9474;       &#9474;   R5: unlockHeight      &#9474;
-&#9474;  }                      &#9474;      &#9474;       &#9474;  }                      &#9474;
-&#9474;                         &#9474;      &#9474;       &#9474;                         &#9474;
-&#9472;&#9472;&#9472;&#9472;&#9474;              &#9472;&#9472;&#9472;&#9472;&#9474;              &#9472;&#9472;&#9472;&#9472;&#9474;
-```
-
 ##Steps
 
 1. Bob deposits 1k Erdoge, 0.01ERG to DEPOSIT_CONTRACT (signed by bobPK)
