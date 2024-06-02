@@ -16,87 +16,87 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 
 1. Bob deposits 1k Erdoge
 ```
-┌─────────────────────────┐              ┌─────────────────────────┐   
-│  address: BOB           │              │  address: DEPOSIT       │   
-│  value: 0.1Erg          │              │  value: 0.0989Erg       │   
-│  assets:[{              │              │  assets:[{              │   
-│   tokenId: Erdoge       │  ────┬────►  │   tokenId: Erdoge       │   
-│   amount:  1000         │      │       │   amount:  1000         │   
-│  }]                     │      │       │  }]                     │   
-└─────────────────────────┘      │       │  additionalRegisters:{  │   
-                                 │       │   R4: [BOB,POOL]        │   
-                                 │       │   R5: unlockHeight      │   
-                                 │       │  }                      │   
-                                 │       └─────────────────────────┘   
-                                 │       ┌─────────────────────────┐   
-                                 │       │  address: BOB           │   
-                                 ├────►  │  ...                    │   
-                                 │       └─────────────────────────┘ 
-                                 │       ┌─────────────────────────┐   
-                                 │       │  address: FEE           │   
-                                 └────►  │  value: 0.0011Erg       │   
+┌─────────────────────────┐              ┌─────────────────────────┐
+│  address: BOB           │              │  address: DEPOSIT       │
+│  value: 0.1Erg          │              │  value: 0.0989Erg       │
+│  assets:[{              │              │  assets:[{              │
+│   tokenId: Erdoge       │  ────┬────►  │   tokenId: Erdoge       │
+│   amount:  1000         │      │       │   amount:  1000         │
+│  }]                     │      │       │  }]                     │
+└─────────────────────────┘      │       │  additionalRegisters:{  │
+                                 │       │   R4: [BOB,POOL]        │
+                                 │       │   R5: unlockHeight      │
+                                 │       │  }                      │
+                                 │       └─────────────────────────┘
+                                 │       ┌─────────────────────────┐
+                                 │       │  address: BOB           │
+                                 ├────►  │  ...                    │
+                                 │       └─────────────────────────┘
+                                 │       ┌─────────────────────────┐
+                                 │       │  address: FEE           │
+                                 └────►  │  value: 0.0011Erg       │
                                          └─────────────────────────┘
 ```
 
 2. Bob creates a swap order
 ```
-┌─────────────────────────┐              ┌─────────────────────────┐   
-│  address: DEPOSIT       │              │  address: SWAP          │   
-│  value: 0989Erg         │              │  value: 0978Erg         │   
-│  assets:[{              │              │  assets:[{              │   
-│   tokenId: Erdoge       │  ────┬────►  │   tokenId: Erdoge       │   
-│   amount:  1000         │      │       │   amount:  1000         │   
-│  }]                     │      │       │  }]                     │   
-│  additionalRegisters:{  │      │       │  additionalRegisters:{  │   
-│   R4: [BOB,POOL]        │      │       │   R4: [BOB,POOL]        │   
-│   R5: unlockHeight      │      │       │   R5: unlockHeight      │   
+┌─────────────────────────┐              ┌─────────────────────────┐
+│  address: DEPOSIT       │              │  address: SWAP          │
+│  value: 0989Erg         │              │  value: 0978Erg         │
+│  assets:[{              │              │  assets:[{              │
+│   tokenId: Erdoge       │  ────┬────►  │   tokenId: Erdoge       │
+│   amount:  1000         │      │       │   amount:  1000         │
+│  }]                     │      │       │  }]                     │
+│  additionalRegisters:{  │      │       │  additionalRegisters:{  │
+│   R4: [BOB,POOL]        │      │       │   R4: [BOB,POOL]        │
+│   R5: unlockHeight      │      │       │   R5: unlockHeight      │
 │  }                      │      │       │   R6: [Erdoge,rsBTC]    │
 └─────────────────────────┘      │       │   R7: swapRate          │
-                                 │       │   R8: DEPOSIT           │  
+                                 │       │   R8: DEPOSIT           │
                                  │       │  }                      │
-                                 │       └─────────────────────────┘   
-                                 │       ┌─────────────────────────┐   
-                                 │       │  address: FEE           │   
-                                 └────►  │  value: 0.0011Erg       │   
-                                         └─────────────────────────┘ 
+                                 │       └─────────────────────────┘
+                                 │       ┌─────────────────────────┐
+                                 │       │  address: FEE           │
+                                 └────►  │  value: 0.0011Erg       │
+                                         └─────────────────────────┘
 ```
 
 3. Alice deposits 0.00001 rsBTC
 ```
-┌─────────────────────────┐              ┌─────────────────────────┐   
-│  address: ALICE         │              │  address: DEPOSIT       │   
-│  value: 0.1Erg          │              │  value: 0.0989Erg       │   
-│  assets:[{              │              │  assets:[{              │   
-│   tokenId: rsBTC        │  ────┬────►  │   tokenId: rsBTC        │   
-│   amount:  0.00001      │      │       │   amount:  0.00001      │   
-│  }]                     │      │       │  }]                     │   
-└─────────────────────────┘      │       │  additionalRegisters:{  │   
-                                 │       │   R4: [ALICE,POOL]      │   
-                                 │       │   R5: unlockHeight      │   
-                                 │       │  }                      │   
-                                 │       └─────────────────────────┘   
-                                 │       ┌─────────────────────────┐   
-                                 │       │  address: ALICE         │   
-                                 ├────►  │  ...                    │   
-                                 │       └─────────────────────────┘ 
-                                 │       ┌─────────────────────────┐   
-                                 │       │  address: FEE           │   
-                                 └────►  │  value: 0.0011Erg       │   
+┌─────────────────────────┐              ┌─────────────────────────┐
+│  address: ALICE         │              │  address: DEPOSIT       │
+│  value: 0.1Erg          │              │  value: 0.0989Erg       │
+│  assets:[{              │              │  assets:[{              │
+│   tokenId: rsBTC        │  ────┬────►  │   tokenId: rsBTC        │
+│   amount:  0.00001      │      │       │   amount:  0.00001      │
+│  }]                     │      │       │  }]                     │
+└─────────────────────────┘      │       │  additionalRegisters:{  │
+                                 │       │   R4: [ALICE,POOL]      │
+                                 │       │   R5: unlockHeight      │
+                                 │       │  }                      │
+                                 │       └─────────────────────────┘
+                                 │       ┌─────────────────────────┐
+                                 │       │  address: ALICE         │
+                                 ├────►  │  ...                    │
+                                 │       └─────────────────────────┘
+                                 │       ┌─────────────────────────┐
+                                 │       │  address: FEE           │
+                                 └────►  │  value: 0.0011Erg       │
                                          └─────────────────────────┘
 ```
 
 4. Alice swaps 0.00001 rsBTC for 1k Erdoge
 ```
-┌─────────────────────────┐              ┌─────────────────────────┐   
-│  address: SWAP          │              │  address: DEPOSIT       │   
-│  value: 0.0978Erg       │              │  value: 0.0978Erg       │   
-│  assets:[{              │              │  assets:[{              │   
-│   tokenId: Erdoge       │  ──┐   ┌──►  │   tokenId: Erdoge       │   
-│   amount:  1000         │    │   │     │   amount:  1000         │   
-│  }]                     │    │   │     │  }]                     │   
-│  additionalRegisters:{  │    │   │     │  additionalRegisters:{  │   
-│   R4: [BOB,POOL]        │    │   │     │   R4: [ALICE,POOL]      │   
-│   R5: unlockHeight      │    │   │     │   R5: unlockHeight      │   
+┌─────────────────────────┐              ┌─────────────────────────┐
+│  address: SWAP          │              │  address: DEPOSIT       │
+│  value: 0.0978Erg       │              │  value: 0.0978Erg       │
+│  assets:[{              │              │  assets:[{              │
+│   tokenId: Erdoge       │  ──┐   ┌──►  │   tokenId: Erdoge       │
+│   amount:  1000         │    │   │     │   amount:  1000         │
+│  }]                     │    │   │     │  }]                     │
+│  additionalRegisters:{  │    │   │     │  additionalRegisters:{  │
+│   R4: [BOB,POOL]        │    │   │     │   R4: [ALICE,POOL]      │
+│   R5: unlockHeight      │    │   │     │   R5: unlockHeight      │
 │   R6: [Erdoge,rsBTC]    │    │   │     │  }                      │
 │   R7: swapRate          │    ├───┤     └─────────────────────────┘
 │   R8: DEPOSIT           │    │   │     ┌─────────────────────────┐
@@ -120,29 +120,29 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 
 5. Alice withdraws 1k Erdoge
 ```
-┌─────────────────────────┐              ┌─────────────────────────┐   
-│  address: DEPOSIT       │              │  address: ALICE         │   
-│  value: 0.0978Erg       │              │  value: 0.0967Erg       │   
-│  assets:[{              │              │  assets:[{              │   
-│   tokenId: Erdoge       │  ────┬────►  │   tokenId: Erdoge       │   
-│   amount:  1000         │      │       │   amount:  1000         │   
-│  }]                     │      │       │  }]                     │   
-│  additionalRegisters:{  │      │       └─────────────────────────┘   
-│   R4: [ALICE,POOL]      │      │       ┌─────────────────────────┐   
-│   R5: unlockHeight      │      │       │  address: FEE           │   
+┌─────────────────────────┐              ┌─────────────────────────┐
+│  address: DEPOSIT       │              │  address: ALICE         │
+│  value: 0.0978Erg       │              │  value: 0.0967Erg       │
+│  assets:[{              │              │  assets:[{              │
+│   tokenId: Erdoge       │  ────┬────►  │   tokenId: Erdoge       │
+│   amount:  1000         │      │       │   amount:  1000         │
+│  }]                     │      │       │  }]                     │
+│  additionalRegisters:{  │      │       └─────────────────────────┘
+│   R4: [ALICE,POOL]      │      │       ┌─────────────────────────┐
+│   R5: unlockHeight      │      │       │  address: FEE           │
 │  }                      │      └────►  │  value: 0.0011Erg       │
 └─────────────────────────┘              └─────────────────────────┘
 Bob withdraws 0.00001 rsBTC
-┌─────────────────────────┐              ┌─────────────────────────┐   
-│  address: DEPOSIT       │              │  address: ALICE         │   
-│  value: 0.0978Erg       │              │  value: 0.0967Erg       │   
-│  assets:[{              │              │  assets:[{              │   
-│   tokenId: Erdoge       │  ────┬────►  │   tokenId: Erdoge       │   
-│   amount:  1000         │      │       │   amount:  1000         │   
-│  }]                     │      │       │  }]                     │   
-│  additionalRegisters:{  │      │       └─────────────────────────┘   
-│   R4: [ALICE,POOL]      │      │       ┌─────────────────────────┐   
-│   R5: unlockHeight      │      │       │  address: FEE           │   
+┌─────────────────────────┐              ┌─────────────────────────┐
+│  address: DEPOSIT       │              │  address: ALICE         │
+│  value: 0.0978Erg       │              │  value: 0.0967Erg       │
+│  assets:[{              │              │  assets:[{              │
+│   tokenId: Erdoge       │  ────┬────►  │   tokenId: Erdoge       │
+│   amount:  1000         │      │       │   amount:  1000         │
+│  }]                     │      │       │  }]                     │
+│  additionalRegisters:{  │      │       └─────────────────────────┘
+│   R4: [ALICE,POOL]      │      │       ┌─────────────────────────┐
+│   R5: unlockHeight      │      │       │  address: FEE           │
 │  }                      │      └────►  │  value: 0.0011Erg       │
 └─────────────────────────┘              └─────────────────────────┘
 ```
