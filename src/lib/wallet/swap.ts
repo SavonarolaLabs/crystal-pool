@@ -92,6 +92,15 @@ export function executeSwap(
 	tokensAsPayment: { tokenId: string; amount: Amount },
 	nanoErg: string | bigint = 2n * RECOMMENDED_MIN_FEE_VALUE + SAFE_MIN_BOX_VALUE
 ): EIP12UnsignedTransaction {
+	console.log('export function executeSwap')
+	console.dir({
+		blockchainHeight,
+swapOrderInputBoxes,
+paymentInputBoxes,
+tokensFromSwapContract,
+tokensAsPayment,
+nanoErg
+	})
 	const paymentOutputBox = new OutputBuilder(nanoErg, DEPOSIT_ADDRESS)
 		.setAdditionalRegisters({
 			R4: swapOrderInputBoxes[0].additionalRegisters.R4,
@@ -178,6 +187,7 @@ export function createSwapOrderTx(
 
 
 export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
+	const [rate, denom] = splitSellRate(swapParams.price);
 	const height = 1273521;
 	
 	const swapOrderInputBoxes: any = db.boxRows.filter(
@@ -187,6 +197,7 @@ export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
 			b.parameters?.rate == rate &&
 			b.parameters?.denom == denom
 	);
+	swapOrderInputBoxes.length = 1;
 
 	const paymentInputBoxes: any = db.boxRows.filter(
 		(b) =>
@@ -198,7 +209,7 @@ export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
 		throw new Error(
 			'not enough boxes, swapOrderInputBoxes:' +
 				swapOrderInputBoxes.length +
-				', swapOrderInputBoxes:' +
+				', paymentInputBoxes:' +
 				paymentInputBoxes.length
 		);
 	}
@@ -214,8 +225,8 @@ export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
 
 	const unsignedTx = executeSwap(
 		height,
-		swapOrderInputBoxes,
-		paymentInputBoxes,
+		swapOrderInputBoxes.map(b => b.box),
+		paymentInputBoxes.map(b => b.box),
 		tokensFromSwapContract,
 		tokensAsPayment
 	);

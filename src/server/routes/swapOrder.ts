@@ -54,7 +54,7 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/execute-swap', async (req: Request, res: Response) => {
 		const swapParams: SwapRequest = req.body; // Swap Params
 		const unsignedTx = createExecuteSwapOrderTx(swapParams, db);
-		res.json({});
+		res.json(unsignedTx);
 	});
 }
 
