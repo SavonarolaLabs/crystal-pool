@@ -10,6 +10,7 @@ CrystalPool is simple concept for self-custodial instant trading on L1. At Ergoh
 
 - **User Interface:**
   - [x] integrated wallet
+  - [ ] ensure tx matches intent before signing
   - [x] websocket
   - [x] Web UI with alipay css
   - [x] Real-time market trades
