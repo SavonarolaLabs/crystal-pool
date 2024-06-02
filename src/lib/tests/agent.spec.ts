@@ -197,9 +197,9 @@ describe('Separate Swap Execution', () => {
 		const value = 5n * 10n ** 9n;
 
 		const depositUTxAlice = depositAgentAlice(DEPOSIT_TOKEN_SIGUSD, value);
-		const depositUTxBob = depositAgentBob(DEPOSIT_TOKEN_BTC, value);
-
 		depositTxAlice = await signTxAgentAlice(depositUTxAlice);
+		
+		const depositUTxBob = depositAgentBob(DEPOSIT_TOKEN_BTC, value);
 		depositTxBob = await signTxAgentBob(depositUTxBob);
 
 		depositBoxes = updateContractBoxes(depositTxAlice, depositBoxes, DEPOSIT_ADDRESS); //

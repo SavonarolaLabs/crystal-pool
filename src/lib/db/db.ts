@@ -9,9 +9,11 @@ import {
 	SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
-import { tradingPairs } from '$lib/constants/tokens';
+import { TOKEN, tradingPairs } from '$lib/constants/tokens';
 import { persistBox, persistMultipleBoxes, loadBoxRows } from '$lib/db/sqlDb';
-import { utxos } from '$lib/data/utxos';
+import { depositAlice } from '$lib/server-agent/alice';
+import { depositBob } from '$lib/server-agent/bob';
+import { initDeposits } from '$lib/server-agent/simulator';
 
 interface HasId {
 	id: number;
@@ -30,9 +32,10 @@ export async function initDb(): Promise<BoxDB> {
 	};
 }
 
-export function initDepositUtxo(db: BoxDB) {
+export async function initDepositUtxo(db: BoxDB) {
 	if (db.boxRows?.length == 0) {
-		db_addBoxes(db, utxos[DEPOSIT_ADDRESS]);
+		const aliceAndBobDeposits = await initDeposits();
+		db_addBoxes(db, aliceAndBobDeposits);
 	}
 }
 

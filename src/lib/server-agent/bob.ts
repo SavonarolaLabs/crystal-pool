@@ -1,6 +1,7 @@
-import { BOB_ADDRESS } from "$lib/constants/addresses";
+import { BOB_ADDRESS, DEPOSIT_ADDRESS } from "$lib/constants/addresses";
 import { BOB_MNEMONIC } from "$lib/constants/mnemonics";
 import { utxos } from "$lib/data/utxos";
+import { boxesAtAddress } from "$lib/utils/test-helper";
 import { deposit } from "$lib/wallet/deposit";
 import { signTx } from "$lib/wallet/multisig-server";
 import type { Amount, EIP12UnsignedTransaction, OneOrMore, SignedTransaction, TokenAmount } from "@fleet-sdk/common";
@@ -23,4 +24,10 @@ export function depositAgentBob(
 
 export async function signTxAgentBob(tx: EIP12UnsignedTransaction): Promise<SignedTransaction> {
 	return await signTx(tx, BOB_MNEMONIC);
+}
+
+export async function depositBob(token: OneOrMore<TokenAmount<Amount>>, value:bigint){
+	const depositUTxBob = depositAgentBob(token, value);
+	const depositTxBob = await signTxAgentBob(depositUTxBob);
+	return boxesAtAddress(depositTxBob, DEPOSIT_ADDRESS)
 }
