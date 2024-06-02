@@ -3,7 +3,12 @@ import { utxos } from '$lib/data/utxos';
 import { db_addBoxes, type BoxDB } from '$lib/db/db';
 import { boxesAtAddress } from '$lib/utils/test-helper';
 import { a, c } from '$lib/wallet/multisig-server';
-import { createSwapOrderTx, createSwapOrderTxR9, executeSwap } from '$lib/wallet/swap';
+import {
+	createSwapOrderTx,
+	createSwapOrderTxR9,
+	executeSwap,
+	splitSellRate
+} from '$lib/wallet/swap';
 import type { SignedTransaction } from '@fleet-sdk/common';
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
@@ -52,6 +57,8 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/execute-swap', async (req: Request, res: Response) => {
 		const swapParams: SwapRequest = req.body; // Swap Params
+		const [rate, denom] = splitSellRate(swapParams.price);
+
 		//-----------------------------------
 		const height = 1273521;
 		const unlockHeight = height + 200000;
@@ -68,9 +75,19 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 		const paymentAmount = 0n; //calculate?
 
 		//2 - Find Contract Box
-		const paymentInputBoxes = []; //Take Deposits
+
+		const paymentInputBoxes: any = db.boxRows.filter(
+			(b) =>
+				b.contract == 'SWAP' &&
+				b.parameters?.side == 'sell' &&
+				b.parameters?.rate == rate &&
+				b.parameters?.denom == denom
+		);
+
+		const swapOrderInputBoxes: any = [];
 		const tokensFromSwapContract = { tokenId: swapParams.buyingTokenId, amount: buyingAmount };
 		const tokensAsPayment = { tokenId: swapParams.sellingTokenId, amount: paymentAmount };
+
 
 		//------------------------------------
 		const unsignedTx = executeSwap(

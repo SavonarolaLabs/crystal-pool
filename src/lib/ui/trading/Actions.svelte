@@ -322,7 +322,7 @@
 					</div>
 				</div>
 
-				<button class="buySellButton buyButton" on:click={swapActionBuy}>Buy</button>
+				<button class="buySellButton buyButton" on:click={swapExecuteBuy}>Buy</button>
 			</div>
 			<div class="actions_doWrapper">
 				<div class="actions_balance">
