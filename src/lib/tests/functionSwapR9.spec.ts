@@ -169,54 +169,6 @@ async function signTxAgentBob(tx: EIP12UnsignedTransaction): Promise<SignedTrans
 async function signTxAgentAlice(tx: EIP12UnsignedTransaction): Promise<SignedTransaction> {
 	return await signTx(tx, ALICE_MNEMONIC);
 }
-function createSwapOrderTxR9_new(
-	sellerPK: string,
-	sellerMultisigAddress: string,
-	inputBoxes: OneOrMore<Box<Amount>>,
-	token: { tokenId: string; amount: Amount },
-	sellRate: string,
-	currentHeight: number,
-	unlockHeight: number,
-	sellingTokenId: string,
-	buyingTokenId: string,
-	contractAddress: string,
-	nanoErg: bigint
-): EIP12UnsignedTransaction {
-	const [bigRate, bigDenom] = splitSellRate(sellRate);
-
-	const outputSwapOrder = new OutputBuilder(nanoErg, contractAddress)
-		.addTokens(token)
-		.setAdditionalRegisters({
-			R4: SColl(SSigmaProp, [
-				SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
-				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
-			]).toHex(),
-			R5: SInt(unlockHeight).toHex(),
-			R6: SPair(SColl(SByte, sellingTokenId), SColl(SByte, buyingTokenId)).toHex(),
-			R7: SLong(bigRate).toHex(),
-			R8: SColl(SByte, ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree).toHex(),
-			R9: SLong(bigDenom).toHex()
-		});
-
-	const change = new OutputBuilder(
-		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
-		DEPOSIT_ADDRESS
-	)
-		.setAdditionalRegisters({
-			R4: inputBoxes[0].additionalRegisters.R4,
-			R5: inputBoxes[0].additionalRegisters.R5
-		})
-		.addTokens(calcTokenChange([...inputBoxes], token));
-
-	const unsignedTransaction = new TransactionBuilder(currentHeight)
-		.configureSelector((selector) => selector.ensureInclusion([inputBoxes].map((b) => b.boxId)))
-		.from(inputBoxes)
-		.to([outputSwapOrder, change])
-		.payFee(RECOMMENDED_MIN_FEE_VALUE)
-		.build()
-		.toEIP12Object();
-	return unsignedTransaction;
-}
 
 function createSwapOrderTxR9AgentBob(
 	inputBoxes: OneOrMore<Box<Amount>>,
@@ -224,7 +176,7 @@ function createSwapOrderTxR9AgentBob(
 	amount: Amount,
 	nanoErg: bigint
 ): EIP12UnsignedTransaction {
-	const swapUTx = createSwapOrderTxR9_new(
+	const swapUTx = createSwapOrderTxR9(
 		BOB_ADDRESS,
 		DEPOSIT_ADDRESS,
 		inputBoxes,

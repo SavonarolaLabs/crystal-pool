@@ -202,7 +202,8 @@ describe('New Swap order with R9', async () => {
 			unlockHeight,
 			tokenForSale.tokenId,
 			paymentToken.tokenId,
-			CONTRACT_WITH_R9
+			CONTRACT_WITH_R9,
+			SAFE_MIN_BOX_VALUE
 		);
 
 		const bobSwapTx = await signTxMulti(unsignedTx1, BOB_MNEMONIC, BOB_ADDRESS);

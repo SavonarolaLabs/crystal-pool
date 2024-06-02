@@ -43,11 +43,12 @@ export function createSwapOrderTxR9(
 	unlockHeight: number,
 	sellingTokenId: string,
 	buyingTokenId: string,
-	contractAddress: string
+	contractAddress: string,
+	nanoErg: bigint
 ): EIP12UnsignedTransaction {
 	const [bigRate, bigDenom] = splitSellRate(sellRate);
 
-	const outputSwapOrder = new OutputBuilder(SAFE_MIN_BOX_VALUE, contractAddress)
+	const outputSwapOrder = new OutputBuilder(nanoErg, contractAddress)
 		.addTokens(token)
 		.setAdditionalRegisters({
 			R4: SColl(SSigmaProp, [
@@ -61,10 +62,20 @@ export function createSwapOrderTxR9(
 			R9: SLong(bigDenom).toHex()
 		});
 
+	const change = new OutputBuilder(
+		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
+		DEPOSIT_ADDRESS
+	)
+		.setAdditionalRegisters({
+			R4: inputBoxes[0].additionalRegisters.R4,
+			R5: inputBoxes[0].additionalRegisters.R5
+		})
+		.addTokens(calcTokenChange([...inputBoxes], token));
+
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
+		.configureSelector((selector) => selector.ensureInclusion([inputBoxes].map((b) => b.boxId)))
 		.from(inputBoxes)
-		.to(outputSwapOrder)
-		.sendChangeTo(sellerPK)
+		.to([outputSwapOrder, change])
 		.payFee(RECOMMENDED_MIN_FEE_VALUE)
 		.build()
 		.toEIP12Object();
