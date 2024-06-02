@@ -1,56 +1,36 @@
 import {
 	ALICE_ADDRESS,
 	BOB_ADDRESS,
-	DEPOSIT_ADDRESS,
-	SHADOWPOOL_ADDRESS,
-	SWAP_ORDER_ADDRESS
+	DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
 import { ALICE_MNEMONIC, BOB_MNEMONIC, SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
-import { createWithdrawTx, deposit } from '$lib/wallet/deposit';
+import { createWithdrawTx } from '$lib/wallet/deposit';
 import {
 	signMultisig,
 	signTx,
-	signTxInput,
-	submitTx,
-	txHasErrors
+	signTxInput
 } from '$lib/wallet/multisig-server';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { utxos } from '$lib/data/utxos';
 import {
-	ErgoAddress,
-	OutputBuilder,
-	RECOMMENDED_MIN_FEE_VALUE,
-	SAFE_MIN_BOX_VALUE,
-	SByte,
-	SColl,
-	SGroupElement,
-	SInt,
-	SSigmaProp,
-	TransactionBuilder
+	SAFE_MIN_BOX_VALUE
 } from '@fleet-sdk/core';
 import {
-	boxAtAddress,
-	boxesAtAddress,
-	boxesFromAddress,
 	getDepositsBoxesByAddress,
 	updateContractBoxes
 } from '$lib/utils/test-helper';
 import {
-	first,
 	type Amount,
 	type Box,
 	type EIP12UnsignedTransaction,
 	type OneOrMore,
-	type SignedTransaction,
-	type TokenAmount
+	type SignedTransaction
 } from '@fleet-sdk/common';
 import { TOKEN } from '$lib/constants/tokens';
-import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swap';
+import { createSwapOrderTxR9, executeSwap } from '$lib/wallet/swap';
 import BigNumber from 'bignumber.js';
-import { parseBox } from '$lib/db/db';
 import { UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
-import { SLong, SPair } from '@fleet-sdk/serializer';
-import { asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
+import { depositAgentAlice, signTxAgentAlice } from '$lib/server-agent/alice';
+import { depositAgentBob, signTxAgentBob } from '$lib/server-agent/bob';
 
 //REAL_BOX_DATA
 const CHAIN_HEIGHT = 1277300;
@@ -322,43 +302,6 @@ function getAliceDeposits(allBoxes: Box[]) {
 	return getDepositsBoxesByAddress(allBoxes, ALICE_ADDRESS);
 }
 
-function depositAgentAlice(
-	tokens: OneOrMore<TokenAmount<Amount>>,
-	value: bigint
-): EIP12UnsignedTransaction {
-	const depositUTx = deposit(
-		1277300,
-		utxos[ALICE_ADDRESS], //<-------- FROM
-		ALICE_ADDRESS, //<-------- ChangeAddress
-		ALICE_ADDRESS, //<-------- Deposit Receiver Address
-		1300000,
-		tokens,
-		value
-	);
-	return depositUTx;
-}
-function depositAgentBob(
-	tokens: OneOrMore<TokenAmount<Amount>>,
-	value: bigint
-): EIP12UnsignedTransaction {
-	const depositUTx = deposit(
-		1277300,
-		utxos[BOB_ADDRESS], //<-------- FROM
-		BOB_ADDRESS, //<-------- ChangeAddress
-		BOB_ADDRESS, //<-------- Deposit Receiver Address
-		1300000,
-		tokens,
-		value
-	);
-	return depositUTx;
-}
-
-async function signTxAgentBob(tx: EIP12UnsignedTransaction): Promise<SignedTransaction> {
-	return await signTx(tx, BOB_MNEMONIC);
-}
-async function signTxAgentAlice(tx: EIP12UnsignedTransaction): Promise<SignedTransaction> {
-	return await signTx(tx, ALICE_MNEMONIC);
-}
 
 function createSwapOrderTxR9AgentBob(
 	inputBoxes: OneOrMore<Box<Amount>>,

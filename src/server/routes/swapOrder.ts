@@ -76,7 +76,7 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 
 		//2 - Find Contract Box
 
-		const paymentInputBoxes: any = db.boxRows.filter(
+		const swapOrderInputBoxes: any = db.boxRows.filter(
 			(b) =>
 				b.contract == 'SWAP' &&
 				b.parameters?.side == 'sell' &&
@@ -84,7 +84,17 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 				b.parameters?.denom == denom
 		);
 
-		const swapOrderInputBoxes: any = [];
+		const paymentInputBoxes: any = db.boxRows.filter(
+			(b) =>
+				b.contract == 'DEPOSIT' &&
+				b.parameters.userPk == swapParams.address
+		);
+		console.log("paymentInputBoxes.length")
+		console.log(paymentInputBoxes.length)
+
+		res.json({});
+		return 
+
 		const tokensFromSwapContract = { tokenId: swapParams.buyingTokenId, amount: buyingAmount };
 		const tokensAsPayment = { tokenId: swapParams.sellingTokenId, amount: paymentAmount };
 
