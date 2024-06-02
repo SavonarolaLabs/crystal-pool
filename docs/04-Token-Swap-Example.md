@@ -132,7 +132,10 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
 │   R5: unlockHeight      │      │       │  address: FEE           │
 │  }                      │      └────►  │  value: 0.0011Erg       │
 └─────────────────────────┘              └─────────────────────────┘
-Bob withdraws 0.00001 rsBTC
+```
+
+6. Bob withdraws 0.00001 rsBTC
+```
 ┌─────────────────────────┐              ┌─────────────────────────┐
 │  address: DEPOSIT       │              │  address: ALICE         │
 │  value: 0.0978Erg       │              │  value: 0.0967Erg       │
