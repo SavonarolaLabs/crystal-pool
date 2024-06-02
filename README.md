@@ -1,4 +1,4 @@
-**CrystalPool: Realtime Order-Based Exchange on L1**
+**CrystalPool: Instant trading on L1**
 
 **Authors:** c8 c8e4@proton.me, savonarola  
 CrystalPool is a simple concept for a self-custodial exchange that offers real time user experience (UX) that is comparable to centralized exchanges (CEX). At ErgohackVIII this project aims to deliver a proof of concept for: a user interface (UI) for trading, an order book management system, and core functionalities for handling and storing chains of unsubmitted transactions. 100% of the code is open-source.
