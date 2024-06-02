@@ -2,6 +2,7 @@
 
 **Authors:** c8 c8e4@proton.me, savonarola  
 **Github:** https://github.com/SavonarolaLabs/crystal-pool
+
 **Documentation:** https://savonarolalabs.github.io/crystal-pool/#/
 **Date:** May 23, 2024
 
