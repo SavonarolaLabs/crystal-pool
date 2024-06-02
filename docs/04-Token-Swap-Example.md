@@ -9,6 +9,7 @@ Exchange price 1 Erdoge = 1 sat
 3. Alice deposits 0.00001 rsBTC, 0.01ERG to DEPOSIT_CONTRACT (signed by alicePK)
 4. Alice swaps 0.00001 rsBTC for 1k Erdoge from SWAP_CONTRACT to to DEPOSIT_CONTRACT (signed by alicePK && poolPk)
 5. Alice withdraws 1k Erdoge (signed by alicePK && poolPk)
+6. Bob withdraws 0.00001 rsBTC (signed by bobPK && poolPk)
 
 Please Note: Given example only demonstrates a minimal life cycle from deposit to withdraw without highlighting the core proposition of real time trading between Alice and Bob, that can occur between deposit and withdraw.
 
@@ -27,10 +28,6 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
                                     │       │   R4: [BOB,POOL]        │
                                     │       │   R5: unlockHeight      │
                                     │       │  }                      │
-                                    │       └─────────────────────────┘
-                                    │       ┌─────────────────────────┐
-                                    │       │  address: BOB           │
-                                    ├────►  │  ...                    │
                                     │       └─────────────────────────┘
                                     │       ┌─────────────────────────┐
                                     │       │  address: FEE           │
@@ -74,10 +71,6 @@ Please Note: Given example only demonstrates a minimal life cycle from deposit t
                                     │       │   R4: [ALICE,POOL]      │
                                     │       │   R5: unlockHeight      │
                                     │       │  }                      │
-                                    │       └─────────────────────────┘
-                                    │       ┌─────────────────────────┐
-                                    │       │  address: ALICE         │
-                                    ├────►  │  ...                    │
                                     │       └─────────────────────────┘
                                     │       ┌─────────────────────────┐
                                     │       │  address: FEE           │
