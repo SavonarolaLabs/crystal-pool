@@ -2,6 +2,41 @@ export const utxos =
 {
   "9gJa6Mict6TVu9yipUX5aRUW87Yv8J62bbPEtkTje28sh5i3Lz8": [
     {
+      "boxId": "5a942fc760d6ad26bb0d1addb858afa35ed70fffeffee21568eac01131f0f4b9",
+      "transactionId": "b18e046345955ddd6eb0b60d7f459cd50def8f9cc492a3b5bb34ffcdc8c80146",
+      "blockId": "ce5f7f31a8328049b2bb828b2218685621d684fe64ad7cc8411aee2f18fbcb13",
+      "value": "4958800000",
+      "index": 2,
+      "globalIndex": 6061419,
+      "creationHeight": 1278011,
+      "settlementHeight": 1278014,
+      "ergoTree": "0008cd02eb083423041003740c9e791b2fea5ecf6e273669630a25b7ecabf9145395e447",
+      "ergoTreeConstants": "",
+      "ergoTreeScript": "{SigmaProp(ProveDlog(ECPoint(eb0834,848edd,...)))}",
+      "address": "9gJa6Mict6TVu9yipUX5aRUW87Yv8J62bbPEtkTje28sh5i3Lz8",
+      "assets": [
+        {
+          "tokenId": "f60bff91f7ae3f3a5f0c2d35b46ef8991f213a61d7f7e453d344fa52a42d9f9a",
+          "index": 0,
+          "amount": "50000000000",
+          "name": "SigUSD",
+          "decimals": 2,
+          "type": "EIP-004"
+        },
+        {
+          "tokenId": "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
+          "index": 1,
+          "amount": "100",
+          "name": "SigUSD",
+          "decimals": 2,
+          "type": "EIP-004"
+        }
+      ],
+      "additionalRegisters": {},
+      "spentTransactionId": null,
+      "mainChain": true
+    },
+    {
       "boxId": "809097daccbacb96e46a129d0b23deb5f6da3cd8eeec1e95ac0430a5a0a255d1",
       "transactionId": "84a9efc6188e91fb6fc23aab6467002e453745867dd17e9d1376bc70d7ba72e4",
       "blockId": "0ea8fe97ff1b481ee7b8c93ae4b89d8951fa09d0233d90d45c51205937eecd17",
@@ -43,74 +78,27 @@ export const utxos =
       "additionalRegisters": {},
       "spentTransactionId": null,
       "mainChain": true
-    },
+    }
+  ],
+  "9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU": [
     {
-      "boxId": "0493c728647002cfc87b38e1c00c263b6916025d59f06ca14dd83ff0589f64aa",
-      "transactionId": "84a9efc6188e91fb6fc23aab6467002e453745867dd17e9d1376bc70d7ba72e4",
-      "blockId": "0ea8fe97ff1b481ee7b8c93ae4b89d8951fa09d0233d90d45c51205937eecd17",
-      "value": "1000000",
+      "boxId": "7da528e92bf7521b085d9828128f28d3857120b350514037f3488b1a4ce6e07f",
+      "transactionId": "b18e046345955ddd6eb0b60d7f459cd50def8f9cc492a3b5bb34ffcdc8c80146",
+      "blockId": "ce5f7f31a8328049b2bb828b2218685621d684fe64ad7cc8411aee2f18fbcb13",
+      "value": "50000000",
       "index": 0,
-      "globalIndex": 6032747,
-      "creationHeight": 1277291,
-      "settlementHeight": 1277294,
-      "ergoTree": "0008cd02eb083423041003740c9e791b2fea5ecf6e273669630a25b7ecabf9145395e447",
+      "globalIndex": 6061417,
+      "creationHeight": 1278011,
+      "settlementHeight": 1278014,
+      "ergoTree": "0008cd0233e9a9935c8bbb8ae09b2c944c1d060492a8832252665e043b0732bdf593bf2c",
       "ergoTreeConstants": "",
-      "ergoTreeScript": "{SigmaProp(ProveDlog(ECPoint(eb0834,848edd,...)))}",
-      "address": "9gJa6Mict6TVu9yipUX5aRUW87Yv8J62bbPEtkTje28sh5i3Lz8",
+      "ergoTreeScript": "{SigmaProp(ProveDlog(ECPoint(33e9a9,377709,...)))}",
+      "address": "9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU",
       "assets": [
         {
           "tokenId": "f60bff91f7ae3f3a5f0c2d35b46ef8991f213a61d7f7e453d344fa52a42d9f9a",
           "index": 0,
-          "amount": "100000000000",
-          "name": "SigUSD",
-          "decimals": 2,
-          "type": "EIP-004"
-        }
-      ],
-      "additionalRegisters": {
-        "R4": "0e06536967555344",
-        "R5": "0e00",
-        "R6": "0e0132"
-      },
-      "spentTransactionId": null,
-      "mainChain": true
-    },
-    {
-      "boxId": "198b25a44877410c238e26932dec868dc374feae4f8c8523610077a36b12d82b",
-      "transactionId": "631584cb1d320ba1116fe701b90c8dc0bd5d64f1aaef60c6b3c138ebccfbe81f",
-      "blockId": "b796a1a2912bb7ef216221fee8ee51409c2f9f9a080915b57fc691526995eec2",
-      "value": "5000000000",
-      "index": 0,
-      "globalIndex": 6032224,
-      "creationHeight": 1277284,
-      "settlementHeight": 1277286,
-      "ergoTree": "0008cd02eb083423041003740c9e791b2fea5ecf6e273669630a25b7ecabf9145395e447",
-      "ergoTreeConstants": "",
-      "ergoTreeScript": "{SigmaProp(ProveDlog(ECPoint(eb0834,848edd,...)))}",
-      "address": "9gJa6Mict6TVu9yipUX5aRUW87Yv8J62bbPEtkTje28sh5i3Lz8",
-      "assets": [],
-      "additionalRegisters": {},
-      "spentTransactionId": null,
-      "mainChain": true
-    },
-    {
-      "boxId": "27e6b8a5d4ec0673a06ab91861dd1d9a019739c7e965fd0bbfecab78ebf33183",
-      "transactionId": "8a817efd6dc885a14b4fa72f6f9c684e37d79247547c1f8faa4abf05d88e5ec1",
-      "blockId": "37f43b90f8de7dc72ed7d741077c109f5cc997fa3af3d41455fab5075ff0b5ea",
-      "value": "8900000",
-      "index": 1,
-      "globalIndex": 6029518,
-      "creationHeight": 1277184,
-      "settlementHeight": 1277196,
-      "ergoTree": "0008cd02eb083423041003740c9e791b2fea5ecf6e273669630a25b7ecabf9145395e447",
-      "ergoTreeConstants": "",
-      "ergoTreeScript": "{SigmaProp(ProveDlog(ECPoint(eb0834,848edd,...)))}",
-      "address": "9gJa6Mict6TVu9yipUX5aRUW87Yv8J62bbPEtkTje28sh5i3Lz8",
-      "assets": [
-        {
-          "tokenId": "03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04",
-          "index": 0,
-          "amount": "100",
+          "amount": "50000000000",
           "name": "SigUSD",
           "decimals": 2,
           "type": "EIP-004"
@@ -119,9 +107,7 @@ export const utxos =
       "additionalRegisters": {},
       "spentTransactionId": null,
       "mainChain": true
-    }
-  ],
-  "9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU": [
+    },
     {
       "boxId": "905be31c7fb4eca489f9990e22d26ecbd6997d42425b6b628be013f44fe37998",
       "transactionId": "0e86bf4c37ec17e4de7ce67e00eeee16e6e42a43ddf023a7066447c9acd48468",
