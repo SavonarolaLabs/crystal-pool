@@ -3,19 +3,13 @@
 	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
 	import { TOKEN } from '$lib/constants/tokens';
 	import { b } from '$lib/wallet/multisig-client';
-	import {
-		createSwapTx,
-		signSwapTx
-	} from '$lib/ui/service/crystalPoolService';
+	import { createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
 	import { user_address, user_mnemonic } from '../ui_state';
-	import {
-		createAndMultisigSwapTx,
-		type SwapRequest
-	} from '../service/tradingService';
+	import { createAndMultisigSwapTx, type SwapRequest } from '../service/tradingService';
 
-	let buyPriceInput: string;
-	let buyAmountInput: string;
+	let buyPriceInput: string = '20000';
+	let buyAmountInput: string = '0.00001';
 	let buyTotalInput: string;
 
 	let sellPriceInput: string = '20000';
@@ -46,7 +40,45 @@
 	}
 
 	async function swapActionBuy() {
-		const swapParams = dummySwapParams(); //TODO: Take Real Inputs\
+		//const swapParams = dummySwapParams(); //TODO: Take Real Inputs\
+
+		const sellingToken = TOKEN.sigUSD;
+		const buyingToken = TOKEN.rsBTC;
+
+		// take user inputs
+		const amountInput = new BigNumber(buyAmountInput);
+		const priceInput = new BigNumber(buyPriceInput);
+
+		// load and calculate decimals
+		const decimalsToken = TOKEN.rsBTC.decimals;
+		const decimalsCurrency = TOKEN.sigUSD.decimals;
+		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
+		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
+		const bigDecimalsDelta = bigDecimalsToken.dividedBy(bigDecimalsCurrency);
+
+		// apply decimals to contract
+		const real_price = BigNumber(1)
+			.dividedBy(priceInput.dividedBy(bigDecimalsDelta))
+			.toString(10); // 1 sats =
+		const real_amount = amountInput
+			.multipliedBy(priceInput)
+			.multipliedBy(bigDecimalsCurrency)
+			.toString(10);
+		const total = amountInput.multipliedBy(bigDecimalsToken).toString(10);
+		console.log('real_price 1 cent in sats = ', real_price);
+		console.log('real_amount in cents', real_amount);
+		console.log('total in sats', total);
+
+		//real_price.multipliedBy(real_amount);
+		const swapParams: SwapRequest = {
+			address: $user_address,
+			price: real_price.toString(),
+			amount: real_amount.toString(),
+			sellingTokenId: sellingToken.tokenId,
+			buyingTokenId: buyingToken.tokenId
+		};
+
+		console.log('swap params for selling:', swapParams);
 		//----------------------------
 		let signedTx = await createAndMultisigSwapTx(swapParams);
 		console.log(signedTx);
@@ -66,9 +98,7 @@
 		const decimalsCurrency = TOKEN.sigUSD.decimals;
 		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
 		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
-
-		const bigDecimalsDelta =
-			bigDecimalsToken.dividedBy(bigDecimalsCurrency);
+		const bigDecimalsDelta = bigDecimalsToken.dividedBy(bigDecimalsCurrency);
 
 		// apply decimals
 		const real_price = priceInput.dividedBy(bigDecimalsDelta);
@@ -105,9 +135,7 @@
 	<div class="actions_header">
 		<div class="actions_headerTabActive">Spot</div>
 		<div class="fee">
-			Maker <span style="display: inline-block; direction: ltr;"
-				>0.000%</span
-			>
+			Maker <span style="display: inline-block; direction: ltr;">0.000%</span>
 			/ Taker
 			<span style="display: inline-block; direction: ltr;">0.000%</span>
 		</div>
@@ -125,9 +153,7 @@
 			<div class="actions_buyWrapper actions_doWrapper">
 				<div class="actions_balance">
 					<div>
-						<span
-							class="actions_primaryText"
-							style="margin-inline-end: 8px;"
+						<span class="actions_primaryText" style="margin-inline-end: 8px;"
 							>Available
 						</span><span><span>--</span><span> sigUSD</span></span>
 					</div>
@@ -153,18 +179,14 @@
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
 							><span class="ant-input-prefix"
-								><span class="plus-minus_prefix__IJXO_"
-									>Price</span
-								></span
+								><span class="plus-minus_prefix__IJXO_">Price</span></span
 							><input
 								placeholder=""
 								data-testid="spot-trade-buyPrice"
 								class="ant-input ant-input-sm"
 								type="text"
 								bind:value={buyPriceInput}
-							/><span class="ant-input-suffix"
-								><span>sigUSD</span>
-							</span></span
+							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
 					</div>
 				</div>
@@ -173,18 +195,14 @@
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
 							><span class="ant-input-prefix"
-								><span class="plus-minus_prefix__IJXO_"
-									>Amount</span
-								></span
+								><span class="plus-minus_prefix__IJXO_">Amount</span></span
 							><input
 								placeholder=""
 								data-testid="spot-trade-buyQuantity"
 								class="ant-input ant-input-sm"
 								type="text"
 								bind:value={buyAmountInput}
-							/><span class="ant-input-suffix"
-								><span>rsBTC</span>
-							</span></span
+							/><span class="ant-input-suffix"><span>rsBTC</span> </span></span
 						>
 					</div>
 				</div>
@@ -193,10 +211,7 @@
 						class="ant-slider slider-buy ant-slider-disabled ant-slider-horizontal ant-slider-with-marks"
 					>
 						<div class="ant-slider-rail"></div>
-						<div
-							class="ant-slider-track"
-							style="left: 0%; width: 0%;"
-						></div>
+						<div class="ant-slider-track" style="left: 0%; width: 0%;"></div>
 						<div class="ant-slider-step">
 							<span
 								class="ant-slider-dot ant-slider-dot-active"
@@ -254,32 +269,24 @@
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
 							><span class="ant-input-prefix"
-								><span class="plus-minus_prefix__IJXO_"
-									>Total</span
-								></span
+								><span class="plus-minus_prefix__IJXO_">Total</span></span
 							><input
 								placeholder=""
 								data-testid="spot-trade-buyTotal"
 								class="ant-input ant-input-sm"
 								type="text"
 								bind:value={buyTotalInput}
-							/><span class="ant-input-suffix"
-								><span>sigUSD</span>
-							</span></span
+							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
 					</div>
 				</div>
 
-				<button class="buySellButton buyButton" on:click={swapActionBuy}
-					>Buy</button
-				>
+				<button class="buySellButton buyButton" on:click={swapActionBuy}>Buy</button>
 			</div>
 			<div class="actions_doWrapper">
 				<div class="actions_balance">
 					<div>
-						<span
-							class="actions_primaryText"
-							style="margin-inline-end: 8px;"
+						<span class="actions_primaryText" style="margin-inline-end: 8px;"
 							>Available
 						</span><span><span>--</span><span> rsBTC</span></span>
 					</div>
@@ -305,18 +312,14 @@
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
 							><span class="ant-input-prefix"
-								><span class="plus-minus_prefix__IJXO_"
-									>Price</span
-								></span
+								><span class="plus-minus_prefix__IJXO_">Price</span></span
 							><input
 								placeholder=""
 								data-testid="spot-trade-sellPrice"
 								class="ant-input ant-input-sm"
 								type="text"
 								bind:value={sellPriceInput}
-							/><span class="ant-input-suffix"
-								><span>sigUSD</span>
-							</span></span
+							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
 					</div>
 				</div>
@@ -325,18 +328,14 @@
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
 							><span class="ant-input-prefix"
-								><span class="plus-minus_prefix__IJXO_"
-									>Amount</span
-								></span
+								><span class="plus-minus_prefix__IJXO_">Amount</span></span
 							><input
 								placeholder=""
 								data-testid="spot-trade-sellQuantity"
 								class="ant-input ant-input-sm"
 								type="text"
 								bind:value={sellAmountInput}
-							/><span class="ant-input-suffix"
-								><span>rsBTC</span>
-							</span></span
+							/><span class="ant-input-suffix"><span>rsBTC</span> </span></span
 						>
 					</div>
 				</div>
@@ -345,10 +344,7 @@
 						class="ant-slider slider-sell ant-slider-disabled ant-slider-horizontal ant-slider-with-marks"
 					>
 						<div class="ant-slider-rail"></div>
-						<div
-							class="ant-slider-track"
-							style="left: 0%; width: 0%;"
-						></div>
+						<div class="ant-slider-track" style="left: 0%; width: 0%;"></div>
 						<div class="ant-slider-step">
 							<span
 								class="ant-slider-dot ant-slider-dot-active"
@@ -406,25 +402,18 @@
 						<span
 							class="ant-input-affix-wrapper input-plus-minus ant-input-affix-wrapper-sm"
 							><span class="ant-input-prefix"
-								><span class="plus-minus_prefix__IJXO_"
-									>Total</span
-								></span
+								><span class="plus-minus_prefix__IJXO_">Total</span></span
 							><input
 								placeholder=""
 								data-testid="spot-trade-sellTotal"
 								class="ant-input ant-input-sm"
 								type="text"
 								bind:value={sellTotalInput}
-							/><span class="ant-input-suffix"
-								><span>sigUSD</span>
-							</span></span
+							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
 					</div>
 				</div>
-				<button
-					class="buySellButton sellButton"
-					on:click={swapActionSell}>Sell</button
-				>
+				<button class="buySellButton sellButton" on:click={swapActionSell}>Sell</button>
 			</div>
 		</div>
 
