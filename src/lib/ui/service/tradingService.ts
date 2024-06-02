@@ -1,7 +1,10 @@
 import { get } from 'svelte/store';
 import { createSwapTx, executeSwapTx, signSwapTx } from './crystalPoolService';
 import { user_address, user_mnemonic } from '../ui_state';
-import { b } from '$lib/wallet/multisig-client';
+import type { Box } from '@fleet-sdk/common';
+import { b, signTxInput } from '$lib/wallet/multisig-client';
+import { parse } from '@fleet-sdk/serializer';
+import { ErgoAddress } from '@fleet-sdk/core';
 
 export type SwapRequest = {
 	address: string;
@@ -25,15 +28,26 @@ export async function createAndMultisigSwapTx(swapParams: SwapRequest) {
 	return signedTx;
 }
 
+export function decodeR4(box: Box): { userPk: string; poolPk: string } | undefined {
+	const r4 = box.additionalRegisters.R4;
+
+	if (r4) {
+		const parsed = parse<Uint8Array[]>(r4);
+		return {
+			userPk: ErgoAddress.fromPublicKey(parsed[0]).toString(),
+			poolPk: ErgoAddress.fromPublicKey(parsed[1]).toString()
+		};
+	}
+}
+
 export async function executeAndSignInputsSwapTx(swapParams: SwapRequest) {
 	const unsignedTx = await executeSwapTx(swapParams);
+		const inputIndex = unsignedTx.inputs
+		.findIndex((b: Box) => decodeR4(b)?.userPk == swapParams.address);
+	const signed = await signTxInput(get(user_mnemonic), unsignedTx, inputIndex);
+	const proof = JSON.parse(signed.spending_proof().to_json());
+	console.log({proof})
 
-	// const extractedHints = await b(
-	// 	unsignedTx,
-	// 	get(user_mnemonic),
-	// 	get(user_address),
-	// 	publicCommitsPool
-	// );
 
 	//let signedTx = await signSwapTx(extractedHints, unsignedTx);
 	return unsignedTx;

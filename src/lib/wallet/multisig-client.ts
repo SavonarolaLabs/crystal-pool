@@ -319,6 +319,7 @@ export async function signTxAllInputs(
 	return signedTx.to_js_eip12();
 }
 
+
 export async function signTxInput(
 	mnemonic: string,
 	tx: EIP12UnsignedTransaction,
