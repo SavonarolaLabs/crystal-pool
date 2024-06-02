@@ -12,7 +12,7 @@ import type { Server } from 'socket.io';
 import { createOrderBook } from '../orderBookUtils';
 import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 
-type SwapRequest = {
+export type SwapRequest = {
 	address: string;
 	price: string;
 	amount: string;
@@ -46,7 +46,7 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 		);
 
 		const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
-		res.json(unsignedTx);
+		res.json({unsignedTx, publicCommitsPool});
 	});
 }
 
@@ -54,7 +54,7 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/execute-swap', async (req: Request, res: Response) => {
 		const swapParams: SwapRequest = req.body; // Swap Params
 		const unsignedTx = createExecuteSwapOrderTx(swapParams, db);
-		res.json(unsignedTx);
+		res.json({});
 	});
 }
 
