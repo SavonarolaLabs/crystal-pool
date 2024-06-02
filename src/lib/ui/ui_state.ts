@@ -8,40 +8,43 @@ import { showToast } from './toaster';
 // market trades
 
 interface MarketTrade {
-    price: number,
-    amount: number,
-    time: string,
-    side: string,
+	price: number;
+	amount: number;
+	time: string;
+	side: string;
 }
 
 const dummy_trades = Array.from({ length: 50 }, () => ({
-    price: 69001.34,
-    amount: 1.302628,
-    time: '20:20:12',
-    side: Math.random() < 0.5 ? 'buy' : 'sell'
+	price: 69001.34,
+	amount: 1.302628,
+	time: '20:20:12',
+	side: Math.random() < 0.5 ? 'buy' : 'sell'
 }));
 
 export const market_trades: Writable<Array<MarketTrade>> = writable(dummy_trades);
 
 export function addRecentTrades(recentTrades: Array<MarketTrade>) {
-    market_trades.update(trades => {
-        const updatedTrades = [...recentTrades, ...trades];
-        if (updatedTrades.length > 50) {
-            updatedTrades.length = 50;
-        }
-        return updatedTrades;
-    });
-    recentTrades.forEach(trade => {
-        showToast(`SOLD: ${trade.amount}rsBTC for $${(trade.price*trade.amount).toFixed(2)}`, 'success');
-    });
+	market_trades.update((trades) => {
+		const updatedTrades = [...recentTrades, ...trades];
+		if (updatedTrades.length > 50) {
+			updatedTrades.length = 50;
+		}
+		return updatedTrades;
+	});
+	recentTrades.forEach((trade) => {
+		showToast(
+			`SOLD: ${trade.amount}rsBTC for $${(trade.price * trade.amount).toFixed(2)}`,
+			'success'
+		);
+	});
 }
 
 // orderbook
 
-interface Order {    
-    price: number;
-    amount: number;
-    value: number;
+interface Order {
+	price: number;
+	amount: number;
+	value: number;
 }
 
 export const orderbook_sell: Writable<Array<Order>> = writable([]);
@@ -53,48 +56,49 @@ export const orderbook_latest = writable({
 });
 
 function roundToStep(price: number, step: number): number {
-    return Math.floor(price / step) * step;
+	return Math.floor(price / step) * step;
 }
 
 function groupOrdersByPrice(orders: any[], step: number): Order[] {
-    const groupedOrders: { [key: number]: Order } = {};
-    
-    for (const order of orders) {
-        const roundedPrice = roundToStep(order.price, step);
-        
-        if (!groupedOrders[roundedPrice]) {
-            groupedOrders[roundedPrice] = {
-                price: roundedPrice,
-                amount: 0,
-                value: 0
-            };
-        }
-        
-        groupedOrders[roundedPrice].amount += order.amount;
-        groupedOrders[roundedPrice].value += parseFloat(order.value);
-    }
+	const groupedOrders: { [key: number]: Order } = {};
 
-    return Object.values(groupedOrders);
+	for (const order of orders) {
+		const roundedPrice = roundToStep(order.price, step);
+
+		if (!groupedOrders[roundedPrice]) {
+			groupedOrders[roundedPrice] = {
+				price: roundedPrice,
+				amount: 0,
+				value: 0
+			};
+		}
+
+		groupedOrders[roundedPrice].amount += order.amount;
+		groupedOrders[roundedPrice].value += parseFloat(order.value);
+	}
+
+	return Object.values(groupedOrders);
 }
 
 export async function setOrderBook(book: any) {
-    const step = 0.01;
-    
-    if (book?.buy) {
-        const groupedBuyOrders = groupOrdersByPrice(book.buy, step);
-        const groupedSellOrders = groupOrdersByPrice(book.sell, step);
-        
-        orderbook_buy.set(groupedBuyOrders);
-        orderbook_sell.set(groupedSellOrders);
-    }
-}
+	const step = 0.01;
 
+	if (book?.buy) {
+		const groupedBuyOrders = groupOrdersByPrice(book.buy, step).sort(
+			(a, b) => b.price - a.price
+		);
+		const groupedSellOrders = groupOrdersByPrice(book.sell, step);
+
+		orderbook_buy.set(groupedBuyOrders);
+		orderbook_sell.set(groupedSellOrders);
+	}
+}
 
 // wallet balance
 export const user_mnemonic = writable(BOB_MNEMONIC);
 export const user_address = writable(BOB_ADDRESS);
 
-export function setUserAlice(){
+export function setUserAlice() {
 	user_mnemonic.set(ALICE_MNEMONIC);
 	user_address.set(ALICE_ADDRESS);
 }
@@ -115,19 +119,21 @@ export const user_tokens = writable([
 ]);
 
 export async function fetchBalance() {
-    console.log("refetching balance")
+	console.log('refetching balance');
 	const address = get(user_address);
 	if (address) {
 		const boxes = await userBoxes(address);
 		const tokens = boxes
-			.flatMap((row: { box: { assets: any; }; }) => row.box.assets)
+			.flatMap((row: { box: { assets: any } }) => row.box.assets)
 			.reduce(sumAssets, []);
-        user_tokens.update(all =>{
-            all.forEach(t =>{
-                t.amount = Number(tokens.find((x: { tokenId: string; }) => x.tokenId == t.tokenId)?.amount??t.amount)
-            })
-            return all
-        })
+		user_tokens.update((all) => {
+			all.forEach((t) => {
+				t.amount = Number(
+					tokens.find((x: { tokenId: string }) => x.tokenId == t.tokenId)?.amount ??
+						t.amount
+				);
+			});
+			return all;
+		});
 	}
-
 }

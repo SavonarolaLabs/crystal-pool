@@ -50,7 +50,7 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 }
 
 export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
-	app.post('/swap-order/execute', async (req: Request, res: Response) => {
+	app.post('/execute-swap', async (req: Request, res: Response) => {
 		const swapParams: SwapRequest = req.body; // Swap Params
 		//-----------------------------------
 		const height = 1273521;
@@ -62,14 +62,12 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 		// sellingTokenId: string;
 		// buyingTokenId: string;
 
-		//1 - Invert Price
-		//2 - Find Contract Box
 		//3 - Add Inputs
 
 		const buyingAmount = 0n; //amount?
 		const paymentAmount = 0n; //calculate?
 
-		const swapOrderInputBoxes = []; //Take Swap Boxes
+		//2 - Find Contract Box
 		const paymentInputBoxes = []; //Take Deposits
 		const tokensFromSwapContract = { tokenId: swapParams.buyingTokenId, amount: buyingAmount };
 		const tokensAsPayment = { tokenId: swapParams.sellingTokenId, amount: paymentAmount };
@@ -82,9 +80,7 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 			tokensFromSwapContract,
 			tokensAsPayment
 		);
-
-		const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
-		res.json({ unsignedTx, publicCommitsPool });
+		res.json(unsignedTx);
 	});
 }
 

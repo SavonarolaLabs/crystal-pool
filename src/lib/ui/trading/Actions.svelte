@@ -6,7 +6,11 @@
 	import { createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
 	import { user_address, user_mnemonic } from '../ui_state';
-	import { createAndMultisigSwapTx, type SwapRequest } from '../service/tradingService';
+	import {
+		createAndMultisigSwapTx,
+		executeAndSignInputsSwapTx,
+		type SwapRequest
+	} from '../service/tradingService';
 
 	let buyPriceInput: string = '20000';
 	let buyAmountInput: string = '0.00001';
@@ -38,9 +42,45 @@
 
 		return swapParams;
 	}
+	async function swapExecuteBuy() {
+		const sellingToken = TOKEN.rsBTC;
+		const buyingToken = TOKEN.sigUSD;
+
+		// take user inputs
+		const amountInput = new BigNumber(buyAmountInput);
+		const priceInput = new BigNumber(buyPriceInput);
+
+		// load and calculate decimals
+		const decimalsToken = TOKEN.rsBTC.decimals;
+		const decimalsCurrency = TOKEN.sigUSD.decimals;
+		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
+		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
+		const bigDecimalsDelta = bigDecimalsToken.dividedBy(bigDecimalsCurrency);
+
+		// apply decimals
+		const real_price = priceInput.dividedBy(bigDecimalsDelta);
+		const real_amount = amountInput.multipliedBy(bigDecimalsToken);
+		const total = real_price.multipliedBy(real_amount);
+
+		console.log('real price: 1 sat in cents =', real_price.toString());
+		console.log('real amount: sats =', real_amount.toString());
+		console.log('total amount: cents =', total.toString());
+
+		const swapParams: SwapRequest = {
+			address: $user_address,
+			price: real_price.toString(),
+			amount: real_amount.toString(),
+			sellingTokenId: sellingToken.tokenId,
+			buyingTokenId: buyingToken.tokenId
+		};
+		console.log('swap params for selling:', swapParams);
+		//----------------------------
+		let signedTx = await executeAndSignInputsSwapTx(swapParams); // UNSIGNED TX
+		console.log(signedTx);
+	}
 
 	async function swapActionBuy() {
-		//const swapParams = dummySwapParams(); //TODO: Take Real Inputs\
+		//const swapParams = dummySwapParams();
 
 		const sellingToken = TOKEN.sigUSD;
 		const buyingToken = TOKEN.rsBTC;
@@ -77,6 +117,7 @@
 			sellingTokenId: sellingToken.tokenId,
 			buyingTokenId: buyingToken.tokenId
 		};
+		//
 
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
