@@ -28,6 +28,7 @@ export type SwapParams = DepositParams & {
 	sellingTokenId: string;
 	buyingTokenId: string;
 	rate: bigint;
+	denom: bigint;
 	sellerMultisigAddress: string;
 	pair: string;
 	side: string;
