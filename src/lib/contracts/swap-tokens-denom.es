@@ -55,7 +55,7 @@
 		.filter(isLegitInput)
 		.fold(0L, {(r:Long, box:Box) => {
 			if(r > getDenom(box)) r else getDenom(box)
-		}}) // TAKE MAX DENOM
+		}})
   
     def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) 
 
@@ -69,8 +69,8 @@
       }})
 
       def hasMaxSellRate(box: Box) =
-    getRate(box)*maxDenom==getDenom(box)*maxSellRate //include denom
-
+    getRate(box)*maxDenom==getDenom(box)*maxSellRate 
+	
   	def isLegitSellOrderOutput(box: Box) =
 	  	isLegitInput(box)&&
 	  	hasMaxSellRate(box)

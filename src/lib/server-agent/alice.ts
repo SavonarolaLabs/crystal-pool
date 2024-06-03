@@ -4,7 +4,13 @@ import { utxos } from '$lib/data/utxos';
 import { boxesAtAddress } from '$lib/utils/test-helper';
 import { deposit } from '$lib/wallet/deposit';
 import { signTx } from '$lib/wallet/multisig-server';
-import type { Amount, EIP12UnsignedTransaction, OneOrMore, SignedTransaction, TokenAmount } from '@fleet-sdk/common';
+import type {
+	Amount,
+	EIP12UnsignedTransaction,
+	OneOrMore,
+	SignedTransaction,
+	TokenAmount
+} from '@fleet-sdk/common';
 
 export function depositAgentAlice(
 	tokens: OneOrMore<TokenAmount<Amount>>,
@@ -12,9 +18,9 @@ export function depositAgentAlice(
 ): EIP12UnsignedTransaction {
 	const depositUTx = deposit(
 		1277300,
-		utxos[ALICE_ADDRESS], // FROM
-		ALICE_ADDRESS, // ChangeAddress
-		ALICE_ADDRESS, // Deposit Receiver Address
+		utxos[ALICE_ADDRESS],
+		ALICE_ADDRESS,
+		ALICE_ADDRESS,
 		1300000,
 		tokens,
 		value
@@ -26,11 +32,8 @@ export async function signTxAgentAlice(tx: EIP12UnsignedTransaction): Promise<Si
 	return await signTx(tx, ALICE_MNEMONIC);
 }
 
-export async function depositAlice(token: OneOrMore<TokenAmount<Amount>>, value:bigint){
+export async function depositAlice(token: OneOrMore<TokenAmount<Amount>>, value: bigint) {
 	const depositUTxAlice = depositAgentAlice(token, value);
 	const depositTxAlice = await signTxAgentAlice(depositUTxAlice);
-	return boxesAtAddress(depositTxAlice, DEPOSIT_ADDRESS)
+	return boxesAtAddress(depositTxAlice, DEPOSIT_ADDRESS);
 }
-
-
-
