@@ -15,11 +15,10 @@ import {
 	type OneOrMore
 } from '@fleet-sdk/common';
 import { returnToR4Address } from './contract-address-return-to-r4';
-import { depositAddress } from '$lib/constants/depositAddress';
-import { signTxAllInputs } from '$lib/wallet/multisig';
 import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { utxos } from '$lib/data/utxos';
-import { BOB_ADDRESS } from '$lib/constants/addresses';
+import { BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addresses';
+import { signTxAllInputs } from '$lib/wallet/multisig-server';
 
 let contractBoxesForMultisig: OneOrMore<Box<Amount>> = [];
 let contractBoxesForBob: OneOrMore<Box<Amount>> = [];
@@ -34,7 +33,7 @@ describe('contract box R4: multisig', () => {
 		).setAdditionalRegisters({
 			R4: SColl(
 				SByte,
-				ErgoAddress.fromBase58(depositAddress).ergoTree
+				ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree
 			).toHex()
 		});
 
@@ -72,7 +71,7 @@ describe('contract box R4: multisig', () => {
 	});
 
 	it('Bob can return to Multisig', async () => {
-		const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, depositAddress);
+		const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, DEPOSIT_ADDRESS);
 
 		const unsigned = new TransactionBuilder(currentHeight)
 			.from(contractBoxesForMultisig)
@@ -128,7 +127,7 @@ describe('contract box R4: BOB_ADDRESS', () => {
 	});
 
 	it('Bob CANT return to Multisig', async () => {
-		const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, depositAddress);
+		const output = new OutputBuilder(SAFE_MIN_BOX_VALUE, DEPOSIT_ADDRESS);
 
 		const unsigned = new TransactionBuilder(currentHeight)
 			.from(contractBoxesForBob)

@@ -1,38 +1,24 @@
 import {
 	ALICE_ADDRESS,
 	BOB_ADDRESS,
-	DEPOSIT_ADDRESS,
-	SHADOWPOOL_ADDRESS,
-	SWAP_ORDER_ADDRESS
+	DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
-import { ALICE_MNEMONIC, BOB_MNEMONIC, SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
+import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { createWithdrawTx, deposit } from '$lib/wallet/deposit';
 import {
 	signMultisig,
-	signTx,
-	signTxInput,
-	submitTx,
-	txHasErrors
+	signTx
 } from '$lib/wallet/multisig-server';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { utxos } from '$lib/data/utxos';
 import {
-	ErgoAddress,
-	OutputBuilder,
-	RECOMMENDED_MIN_FEE_VALUE,
-	SAFE_MIN_BOX_VALUE,
-	SInt,
-	TransactionBuilder
+	SAFE_MIN_BOX_VALUE
 } from '@fleet-sdk/core';
 import {
-	boxAtAddress,
-	boxesAtAddress,
-	boxesFromAddress,
 	getDepositsBoxesByAddress,
 	updateContractBoxes
 } from '$lib/utils/test-helper';
 import {
-	first,
 	type Amount,
 	type Box,
 	type EIP12UnsignedTransaction,
@@ -41,12 +27,8 @@ import {
 	type TokenAmount
 } from '@fleet-sdk/common';
 import { TOKEN } from '$lib/constants/tokens';
-import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swap';
+import { createSwapOrderTxR9 } from '$lib/wallet/swap';
 import BigNumber from 'bignumber.js';
-import { decodeR4, parseBox } from '$lib/db/db';
-import { UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
-import { SByte, SColl, SGroupElement, SLong, SPair, SSigmaProp } from '@fleet-sdk/serializer';
-import { asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
 
 //REAL_BOX_DATA
 const CHAIN_HEIGHT = 1277300;

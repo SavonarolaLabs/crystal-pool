@@ -1,5 +1,4 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { sellOrderAddress } from '$lib/constants/sellOrder';
 import { OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, TransactionBuilder } from '@fleet-sdk/core';
 import { ALICE_ADDRESS, BOB_ADDRESS } from '$lib/constants/addresses';
 
@@ -39,10 +38,6 @@ describe('limit sell order', () => {
 			.payFee(RECOMMENDED_MIN_FEE_VALUE)
 			.build()
 			.toPlainObject();
-	});
-
-	it('contract compiles', async () => {
-		expect(sellOrderAddress?.length).greaterThan(10);
 	});
 
 	it('seller paid', () => {

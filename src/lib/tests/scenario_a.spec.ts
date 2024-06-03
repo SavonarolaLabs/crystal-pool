@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { db_addBoxes, initDb, type BoxDB } from '$lib/db/db';
+import { db_addBoxes, initDb, type BoxDB } from '../../server/db/db';
 import {
 	PRINTER_ADDRESS,
 	PRINTER_MNEMONIC,
 	PRINTER_UTXO
 } from '$lib/constants/fakeUtxos';
-import { signTx } from '$lib/wallet/multisig';
+import { signTx } from '$lib/wallet/multisig-server';
 import { boxesAtAddress } from '$lib/utils/test-helper';
 import { DEPOSIT_ADDRESS } from '$lib/constants/addresses';
 import type { Box } from '@fleet-sdk/common';

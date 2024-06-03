@@ -158,10 +158,12 @@ describe('Deposit/Withdraw AGENTS', () => {
 
 		executeSwapUTx.inputs[shadowIndex] = {
 			boxId: executeSwapUTx.inputs[shadowIndex].boxId,
+			// @ts-ignore
 			spendingProof: shadowProof
 		};
 		executeSwapUTx.inputs[aliceIndex] = {
 			boxId: executeSwapUTx.inputs[aliceIndex].boxId,
+			// @ts-ignore
 			spendingProof: aliceProof
 		};
 
@@ -280,10 +282,12 @@ describe('Separate Swap Execution', () => {
 
 		executeSwapUTx.inputs[shadowIndex] = {
 			boxId: executeSwapUTx.inputs[shadowIndex].boxId,
+			// @ts-ignore
 			spendingProof: shadowProof
 		};
 		executeSwapUTx.inputs[aliceIndex] = {
 			boxId: executeSwapUTx.inputs[aliceIndex].boxId,
+			// @ts-ignore
 			spendingProof: aliceProof
 		};
 

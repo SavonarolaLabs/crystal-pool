@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
-import type { ErgoBox, UnsignedTx } from '../garbage/connector';
 import { LedgerDeviceModelId } from './ledger';
+import type { ErgoBox } from '@fleet-sdk/core';
 
 export enum AddressState {
 	Used,
@@ -94,13 +94,6 @@ export type FeeSettings = {
 	box?: ErgoBox;
 };
 
-export type SignTxCommand = {
-	tx: UnsignedTx;
-	inputsToSign?: number[];
-	walletId: number;
-	password: string;
-	callback?: (newState: Partial<SigningState>) => void;
-};
 
 export type SignEip28MessageCommand = {
 	message: string;
@@ -147,8 +140,6 @@ export type SigningState = {
 	type?: ProverStateType;
 	device?: ProverDeviceState;
 };
-
-export type TransactionBuilderFunction = () => Promise<UnsignedTx>;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};

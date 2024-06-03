@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import type { BoxDB } from '$lib/db/db';
+import type { BoxDB } from '../db/db';
 import { createOrderBook } from '../orderBookUtils';
 
 interface OrderBooksParams {

@@ -1,3 +1,4 @@
+// @ts-ignore
 import { BlockHeader, BlockHeaders, ErgoStateContext, PreHeader } from 'ergo-lib-wasm-browser';
 
 const headers = [

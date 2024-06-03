@@ -15,7 +15,6 @@ import {
 	signMultisigEIP12,
 	signTxInput,
 	signTxMulti,
-	signTxMultiPartial
 } from '$lib/wallet/multisig-server';
 import { ErgoAddress, ErgoTree, SAFE_MIN_BOX_VALUE, type Box } from '@fleet-sdk/core';
 import * as wasm from 'ergo-lib-wasm-nodejs';
@@ -23,7 +22,7 @@ import { describe, expect, it } from 'vitest';
 import { createSwapOrderTxR9, executeSwap, createSwapOrderTx } from '../wallet/swap';
 import { TOKEN } from '$lib/constants/tokens';
 import { sumAssetsFromBoxes } from '$lib/utils/helper';
-import { parseBox } from '$lib/db/db';
+import { parseBox } from '../../server/db/db';
 import type { BoxParameters, ContractType } from '$lib/types/boxRow';
 
 const CONTRACT_FOR_TEST = `{	
@@ -248,61 +247,6 @@ describe('New Swap order with R9', async () => {
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.parameters.unlockHeight).toBe(1300000);
 
 		console.log(executeSwapOrderTx.inputs);
-		const signed = signTxMultiPartial(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
-
-		//const signed = signMultisigEIP12(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
-		//expect(signed).toBeDefined();
-
-		return;
-
-		const unsignedTx = unsignedTransaction; // <---
-		let swapContractUtxo = swapOrderBoxes;
-
-		const shadowIndex = unsignedTx.inputs.findIndex((b) =>
-			swapContractUtxo.map((b) => b.boxId).includes(b.boxId)
-		);
-		expect(shadowIndex).toBe(0);
-
-		const signedShadowInput = await signTxInput(SHADOW_MNEMONIC, unsignedTx, shadowIndex);
-
-		const shadowInputProof = JSON.parse(signedShadowInput.spending_proof().to_json());
-
-		expect(shadowInputProof.proofBytes.length).greaterThan(10);
-
-		//---------------------- CHANGE FOR MULTISIG ALICE + POOL -------------
-		const aliceIndex = unsignedTx.inputs.findIndex(
-			(b) => utxos[DEPOSIT_ADDRESS].map((b) => b.boxId).includes(b.boxId) //DEPOSIT
-		);
-		expect(aliceIndex).toBe(1);
-		expect(unsignedTx.inputs[aliceIndex].ergoTree).toBe(
-			ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree
-		);
-
-		// --------------
-		// const commits = await a(unsignedTx);
-		// console.dir(commits, { depth: null });
-		// --------------
-
-		// MULTISIG INPUTS
-		const signedAliceInput = await signTxInput(ALICE_MNEMONIC, unsignedTx, aliceIndex);
-
-		// ---------------
-
-		const aliceInputProof = JSON.parse(signedAliceInput.spending_proof().to_json());
-		expect(aliceInputProof.proofBytes.length).greaterThan(10);
-
-		const txId = wasm.UnsignedTransaction.from_json(JSON.stringify(unsignedTx)).id().to_str();
-
-		unsignedTx.inputs[shadowIndex] = {
-			boxId: unsignedTx.inputs[shadowIndex].boxId,
-			spendingProof: shadowInputProof
-		};
-		unsignedTx.inputs[aliceIndex] = {
-			boxId: unsignedTx.inputs[aliceIndex].boxId,
-			spendingProof: aliceInputProof
-		};
-
-		unsignedTx.id = txId;
-		console.log(unsignedTx.id);
+		//const signed = signTxMultiPartial(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
 	});
 });

@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import type { BoxRow, SerializedBoxRow } from '$lib/types/boxRow';
+import type { BoxRow, SerializedBoxRow } from '../../lib/types/boxRow';
 import { serializeBigInt } from '../../server/serializeBigInt';
 
 export const sqlDb = await open({

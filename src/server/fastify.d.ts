@@ -1,5 +1,5 @@
 import 'fastify';
-import type { BoxDB } from '$lib/db/db';
+import type { BoxDB } from './db';
 import type { Server as SocketIOServer } from 'socket.io';
 
 declare module 'fastify' {

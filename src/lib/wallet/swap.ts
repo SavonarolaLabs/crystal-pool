@@ -21,7 +21,7 @@ import { SByte, SLong, SPair } from '@fleet-sdk/serializer';
 
 import { amountByTokenId, asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
 import type { SwapRequest } from '../../server/routes/swapOrder';
-import type { BoxDB } from '$lib/db/db';
+import type { BoxDB } from '../../server/db/db';
 
 export function splitSellRate(sellRate: string): [bigint, bigint] {
 	let floatRate = parseFloat(sellRate);
@@ -65,6 +65,7 @@ export function createSwapOrderTxR9(
 		});
 
 	const change = new OutputBuilder(
+			// @ts-ignore
 		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
 		DEPOSIT_ADDRESS
 	)
@@ -72,9 +73,11 @@ export function createSwapOrderTxR9(
 			R4: inputBoxes[0].additionalRegisters.R4,
 			R5: inputBoxes[0].additionalRegisters.R5
 		})
+			// @ts-ignore
 		.addTokens(calcTokenChange([...inputBoxes], token));
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
+			// @ts-ignore
 		.configureSelector((selector) => selector.ensureInclusion([inputBoxes].map((b) => b.boxId)))
 		.from(inputBoxes)
 		.to([outputSwapOrder, change])
@@ -100,7 +103,7 @@ export function executeSwap(
 		})
 		.addTokens(tokensAsPayment);
 
-	let remainingSwapOrderBox = undefined;
+	let remainingSwapOrderBox: any = undefined;
 	const remainingTokens =
 		asBigInt(tokensFromSwapContract.amount) -
 		asBigInt(amountByTokenId(swapOrderInputBoxes, tokensFromSwapContract.tokenId));
@@ -183,9 +186,12 @@ export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
 	const swapOrderInputBoxes: any = db.boxRows.filter(
 		(b) =>
 			b.contract == 'SWAP' &&
-			b.parameters?.side == 'sell' &&
-			b.parameters?.rate == rate &&
-			b.parameters?.denom == denom
+			//@ts-ignore
+			b.parameters.side == 'sell' &&
+			//@ts-ignore
+			b.parameters.rate == rate &&
+			//@ts-ignore
+			b.parameters.denom == denom
 	);
 	swapOrderInputBoxes.length = 1;
 

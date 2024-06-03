@@ -27,7 +27,7 @@ import {
 	signTxAllInputs,
 	signTxInput,
 	submitTx
-} from '$lib/wallet/multisig';
+} from '$lib/wallet/multisig-server';
 import {
 	ALICE_MNEMONIC,
 	BOB_MNEMONIC,
@@ -167,15 +167,15 @@ describe(`Bob sellOrder: height:${height}, unlock +10`, () => {
 			.id()
 			.to_str();
 
-		unsignedTx.inputs[shadowIndex] = {
-			boxId: unsignedTx.inputs[shadowIndex].boxId,
-			spendingProof: shadowInputProof
-		};
-		unsignedTx.inputs[aliceIndex] = {
-			boxId: unsignedTx.inputs[aliceIndex].boxId,
-			spendingProof: aliceInputProof
-		};
-		unsignedTx.id = txId;
+		//unsignedTx.inputs[shadowIndex] = {
+		//	boxId: unsignedTx.inputs[shadowIndex].boxId,
+		//	spendingProof: shadowInputProof
+		//};
+		//unsignedTx.inputs[aliceIndex] = {
+		//	boxId: unsignedTx.inputs[aliceIndex].boxId,
+		//	spendingProof: aliceInputProof
+		//};
+		//unsignedTx.id = txId;
 	});
 
 	it.skip('50/100 sigmaProp(orderFilled) && getPoolPk(SELF)', async () => {
@@ -267,7 +267,6 @@ describe(`Bob sellOrder: height:${height}, unlock +10`, () => {
 		);
 		expect(aliceInputProof.proofBytes.length).greaterThan(10);
 
-		console.dir(unsignedTx, { depth: null });
 
 		const txId = wasm.UnsignedTransaction.from_json(
 			JSON.stringify(unsignedTx)
@@ -275,16 +274,16 @@ describe(`Bob sellOrder: height:${height}, unlock +10`, () => {
 			.id()
 			.to_str();
 
-		unsignedTx.inputs[shadowIndex] = {
-			boxId: unsignedTx.inputs[shadowIndex].boxId,
-			spendingProof: shadowInputProof
-		};
-		unsignedTx.inputs[aliceIndex] = {
-			boxId: unsignedTx.inputs[aliceIndex].boxId,
-			spendingProof: aliceInputProof
-		};
-
-		unsignedTx.id = txId;
+		//unsignedTx.inputs[shadowIndex] = {
+		//	boxId: unsignedTx.inputs[shadowIndex].boxId,
+		//	spendingProof: shadowInputProof
+		//};
+		//unsignedTx.inputs[aliceIndex] = {
+		//	boxId: unsignedTx.inputs[aliceIndex].boxId,
+		//	spendingProof: aliceInputProof
+		//};
+//
+		//unsignedTx.id = txId;
 	});
 
 	it.skip('NEW CONTRACT 100 000 sigmaProp(orderFilled) && getPoolPk(SELF)', async () => {
@@ -332,7 +331,8 @@ describe(`Bob sellOrder: height:${height}, unlock +10`, () => {
 					)
 				)
 			]).toHex(),
-			R5: sellContractUtxo[0].additionalRegisters.R5, //<----
+			// @ts-ignore
+			R5: sellContractUtxo[0].additionalRegisters.R5,
 			R6: SColl(SByte, tokenForSale.tokenId).toHex()
 		});
 		//console.log(output.additionalRegisters.R6)
@@ -411,16 +411,16 @@ describe(`Bob sellOrder: height:${height}, unlock +10`, () => {
 			.id()
 			.to_str();
 
-		unsignedTx.inputs[shadowIndex] = {
-			boxId: unsignedTx.inputs[shadowIndex].boxId,
-			spendingProof: shadowInputProof
-		};
-		unsignedTx.inputs[aliceIndex] = {
-			boxId: unsignedTx.inputs[aliceIndex].boxId,
-			spendingProof: aliceInputProof
-		};
+		// unsignedTx.inputs[shadowIndex] = {
+		// 	boxId: unsignedTx.inputs[shadowIndex].boxId,
+		// 	spendingProof: shadowInputProof
+		// };
+		// unsignedTx.inputs[aliceIndex] = {
+		// 	boxId: unsignedTx.inputs[aliceIndex].boxId,
+		// 	spendingProof: aliceInputProof
+		// };
 
-		unsignedTx.id = txId;
+		// unsignedTx.id = txId;
 	});
 
 	it.skip('alice can buy with Shadow Signed - 100/100 tokens', async () => {
@@ -527,6 +527,7 @@ describe(`Bob sellOrder: height:${height}, unlock +10`, () => {
 			BOB_ADDRESS,
 			unsignedTx
 		);
+		//@ts-ignore
 		sellContractUtxo = [signedTx.outputs[0]];
 		const txId = await submitTx(signedTx);
 		expect(txId).toBeTruthy();

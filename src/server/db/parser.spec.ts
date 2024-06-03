@@ -10,21 +10,21 @@ import {
 	parseBox
 } from './db';
 import { SAFE_MIN_BOX_VALUE, type Box } from '@fleet-sdk/core';
-import { PRINTER_ADDRESS, PRINTER_MNEMONIC, PRINTER_UTXO } from '$lib/constants/fakeUtxos';
+import { PRINTER_ADDRESS, PRINTER_MNEMONIC, PRINTER_UTXO } from '../../lib/constants/fakeUtxos';
 import {
 	BOB_ADDRESS,
 	BUY_ORDER_ADDRESS,
 	DEPOSIT_ADDRESS,
 	SELL_ORDER_ADDRESS,
 	SWAP_ORDER_ADDRESS
-} from '$lib/constants/addresses';
-import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
-import { deposit } from '$lib/wallet/deposit';
-import { signTx, signTxMulti } from '$lib/wallet/multisig-server';
-import { boxAtAddress } from '$lib/utils/test-helper';
-import { createSellOrderTx } from '$lib/wallet/sell';
-import { createSwapOrderTx } from '$lib/wallet/swap';
-import { buy } from '$lib/wallet/buy';
+} from '../../lib/constants/addresses';
+import { BOB_MNEMONIC } from '../../lib/constants/mnemonics';
+import { deposit } from '../../lib/wallet/deposit';
+import { signTx, signTxMulti } from '../../lib/wallet/multisig-server';
+import { boxAtAddress } from '../../lib/utils/test-helper';
+import { createSellOrderTx } from '../../lib/wallet/sell';
+import { createSwapOrderTx } from '../../lib/wallet/swap';
+import { buy } from '../../lib/wallet/buy';
 
 const depositBox = {
 	boxId: '9721de0f8ec7da47b2b31083856bf24819a1d7d755e0e0e57c42fb6ff7a8eff8',
@@ -330,7 +330,7 @@ describe('swap order box parser', async () => {
 	});
 	it('box recognized and parsed', () => {
 		const expected = {
-			contract: ContractType.SWAP,
+			contract: 'SWAP',
 			parameters: {
 				userPk: '9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU',
 				poolPk: '9fE4Hk2QXzij6eKt73ki93iWVKboZgRPgV95VZYmazdzqdjPEW8',

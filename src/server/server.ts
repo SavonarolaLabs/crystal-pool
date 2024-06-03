@@ -12,7 +12,7 @@ import {
 	signExecuteSwapOrder,
 	signSwapOrder
 } from './routes/swapOrder';
-import { initDb, initDepositUtxo } from '$lib/db/db';
+import { initDb, initDepositUtxo } from './db/db';
 import { createOrderBook } from './orderBookUtils';
 
 const app = express();

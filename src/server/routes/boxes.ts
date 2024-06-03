@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { BoxDB } from '$lib/db/db';
+import type { BoxDB } from '../db/db';
 import { serializeBigInt } from '../serializeBigInt';
 
 // Make sure to pass `io` from your main server file

@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import type { BoxDB } from '$lib/db/db';
+import type { BoxDB } from '../db/db';
 import { serializeBigInt } from '../serializeBigInt';
 
 export function userBoxes(app: Express, db: BoxDB) {

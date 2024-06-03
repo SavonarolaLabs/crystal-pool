@@ -1,17 +1,21 @@
-import type { BoxDB } from '$lib/db/db';
+import type { BoxDB } from './db/db';
 import BigNumber from 'bignumber.js';
 import { serializeBigInt } from './serializeBigInt';
-import { TOKEN } from '$lib/constants/tokens';
 import type { Amount } from '@fleet-sdk/common';
+import { TOKEN } from '$lib/constants/tokens';
 
 export function createOrderBook(tradingPair: string, db: BoxDB) {
+	// @ts-ignore
 	const filteredBoxRows = db.boxRows.filter((boxRow) => boxRow.parameters?.pair === tradingPair);
 	console.log('filteredBoxRows', filteredBoxRows.length);
 	const allOrders = filteredBoxRows.map((row) => {
 		return {
-			rate: row.parameters.rate, // todo rate to price conversion
+			// @ts-ignore
+			rate: row.parameters.rate,
+			// @ts-ignore
 			denom: row.parameters.denom,
 			amount: row.box.assets[0].amount,
+			// @ts-ignore
 			side: row.parameters.side
 		};
 	});

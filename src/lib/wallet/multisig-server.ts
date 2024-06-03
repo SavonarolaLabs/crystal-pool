@@ -30,14 +30,6 @@ export async function signTxMulti(
 	return (await signMultisig(unsignedTx, userMnemonic, userAddress)).to_js_eip12();
 }
 
-export async function signTxMultiPartial(
-	unsignedTx: EIP12UnsignedTransaction,
-	userMnemonic: string,
-	userAddress: string
-): Promise<SignedTransaction> {
-	return (await signMultisigPartial(unsignedTx, userMnemonic, userAddress)).to_js_eip12();
-}
-
 type JSONTransactionHintsBag = any;
 
 function _removeSecrets(privateCommitments: JSONTransactionHintsBag, address: string) {
@@ -154,112 +146,6 @@ export async function signMultisig(
 	);
 
 	const signedTx = await c(unsignedMultisigCopy2, privateCommitsPool, extractedHints);
-
-	return signedTx;
-}
-
-export async function signMultisigPartial(
-	unsignedTx: EIP12UnsignedTransaction,
-	userMnemonic: string,
-	userAddress: string
-) {
-	const unsignedMultisigCopy = JSON.parse(JSON.stringify(unsignedTx));
-	const unsignedMultisigCopy2 = JSON.parse(JSON.stringify(unsignedTx));
-	const { privateCommitsPool, publicCommitsPool } = await aPartial(unsignedTx);
-
-	const extractedHints = await bPartial(
-		unsignedMultisigCopy,
-		userMnemonic,
-		userAddress,
-		publicCommitsPool
-	);
-
-	const signedTx = await cPartial(unsignedMultisigCopy2, privateCommitsPool, extractedHints);
-
-	return signedTx;
-}
-
-export async function aPartial(unsignedTx: EIP12UnsignedTransaction): Promise<any> {
-	const proverBob = await getProver(SHADOW_MNEMONIC);
-	let reducedTx = reducedFromUnsignedTx(unsignedTx);
-	const privateCommitsPool = proverBob
-		.generate_commitments_for_reduced_transaction(reducedTx)
-		.to_json();
-
-	let publicCommitsPool = _removeSecrets(privateCommitsPool, SHADOWPOOL_ADDRESS);
-
-	return { privateCommitsPool, publicCommitsPool };
-}
-
-export async function bPartial(
-	unsignedTx: EIP12UnsignedTransaction,
-	userMnemonic: string,
-	userAddress: string,
-	publicCommits: JSONTransactionHintsBag
-) {
-	const publicBag = TransactionHintsBag.from_json(JSON.stringify(publicCommits));
-	const proverAlice = await getProver(userMnemonic);
-	const reducedTx = reducedFromUnsignedTx(unsignedTx);
-	const initialCommitsAlice = proverAlice.generate_commitments_for_reduced_transaction(reducedTx);
-
-	publicCommits.publicHints[0] = [];
-	const combinedHints = TransactionHintsBag.empty();
-
-
-	for (let i = 0; i < unsignedTx.inputs.length; i++) {
-		combinedHints.add_hints_for_input(i, initialCommitsAlice.all_hints_for_input(i));
-		combinedHints.add_hints_for_input(i, publicBag.all_hints_for_input(i));
-	}
-	const unsigned = UnsignedTransaction.from_json(JSON.stringify(unsignedTx));
-	const signedByAlice = proverAlice.sign_transaction_multi(
-		fakeContext(wasm),
-		unsigned,
-		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
-		ErgoBoxes.empty(),
-		combinedHints
-	);
-	const partialSignedTx = proverAlice.sign_tx_input(
-		1,
-		fakeContext(wasm),
-		unsigned,
-		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
-		ErgoBoxes.empty()
-	);
-
-	const hAlice = ErgoAddress.fromBase58(userAddress).ergoTree.slice(6);
-	let extractedHints = extract_hints(
-		partialSignedTx,
-		fakeContext(wasm),
-		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
-		ErgoBoxes.empty(),
-		arrayToProposition([hAlice]),
-		arrayToProposition([])
-	).to_json();
-	return extractedHints;
-}
-
-export async function cPartial(
-	unsignedTx: EIP12UnsignedTransaction,
-	privateCommitsPool: JSONTransactionHintsBag,
-	hints: JSONTransactionHintsBag
-) {
-	const hintsForBobSign = privateCommitsPool;
-
-	for (var row in hintsForBobSign.publicHints) {
-		for (var i = 0; i < hints.publicHints[row].length; i++) {
-			hintsForBobSign.publicHints[row].push(hints.publicHints[row][i]);
-		}
-		for (var i = 0; i < hints.secretHints[row].length; i++) {
-			hintsForBobSign.secretHints[row].push(hints.secretHints[row][i]);
-		}
-	}
-	const convertedHintsForBobSign = TransactionHintsBag.from_json(JSON.stringify(hintsForBobSign));
-
-	const proverBob = await getProver(SHADOW_MNEMONIC);
-	let signedTx = proverBob.sign_reduced_transaction_multi(
-		reducedFromUnsignedTx(unsignedTx),
-		convertedHintsForBobSign
-	);
 
 	return signedTx;
 }

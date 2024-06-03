@@ -1,5 +1,4 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { signTxAllInputs } from '$lib/wallet/multisig';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { ALICE_ADDRESS, BOB_ADDRESS } from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
@@ -20,6 +19,7 @@ import {
 	type Box,
 	type OneOrMore
 } from '@fleet-sdk/common';
+import { signTxAllInputs } from '$lib/wallet/multisig-server';
 
 const contract = '21Ria9WjLZHMjVqHRCJdXd5w77sWf1QD8gEgNAxvmsUGVdY6QfWDeqCMnVX8';
 /*

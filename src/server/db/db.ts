@@ -1,17 +1,17 @@
 import { type Box, type EIP12UnsignedTransaction } from '@fleet-sdk/common';
-import type { ContractType, BoxParameters, BoxRow } from '$lib/types/boxRow';
-import type { TxRow } from '$lib/types/txRow';
+import type { ContractType, BoxParameters, BoxRow } from '../../lib/types/boxRow';
+import type { TxRow } from '../../lib/types/txRow';
 import { ErgoAddress, ErgoTree } from '@fleet-sdk/core';
 import {
 	BUY_ORDER_ADDRESS,
 	DEPOSIT_ADDRESS,
 	SELL_ORDER_ADDRESS,
 	SWAP_ORDER_ADDRESS
-} from '$lib/constants/addresses';
+} from '../../lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
-import { tradingPairs } from '$lib/constants/tokens';
-import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes } from '$lib/db/sqlDb';
-import { initDeposits } from '$lib/server-agent/simulator';
+import { tradingPairs } from '../../lib/constants/tokens';
+import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes } from './sqlDb';
+import { initDeposits } from '../../lib/server-agent/simulator';
 
 interface HasId {
 	id: number;

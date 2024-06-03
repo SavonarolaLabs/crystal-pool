@@ -68,7 +68,7 @@ describe.skip('Printer BOX buy()', () => {
 			PRINTER_ADDRESS,
 			BUYER_PK,
 			BUYER_UNLOCK_HEIGHT,
-			DEPOSIT_TOKEN,
+			DEPOSIT_TOKEN_BTC,
 			10n * SAFE_MIN_BOX_VALUE
 		);
 

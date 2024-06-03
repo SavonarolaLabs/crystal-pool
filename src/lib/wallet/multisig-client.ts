@@ -8,8 +8,9 @@ import {
 	extract_hints,
 	Input,
 	Wallet,
-	SecretKey, 
+	SecretKey,
 	SecretKeys
+	// @ts-ignore
 } from 'ergo-lib-wasm-browser';
 import { ErgoAddress } from '@fleet-sdk/core';
 import { mnemonicToSeedSync } from 'bip39';
@@ -22,16 +23,6 @@ import BIP32Factory from 'bip32';
 import * as ecc from 'tiny-secp256k1';
 import { fakeContextBrowser } from './fakeContextBrowser';
 
-export async function signTxMulti(
-	unsignedTx: EIP12UnsignedTransaction,
-	userMnemonic: string,
-	userAddress: string
-): Promise<SignedTransaction> {
-	return (
-		await signMultisig(unsignedTx, userMnemonic, userAddress)
-	).to_js_eip12();
-}
-
 type JSONTransactionHintsBag = any;
 
 export async function b(
@@ -40,29 +31,19 @@ export async function b(
 	userAddress: string,
 	publicCommits: JSONTransactionHintsBag
 ) {
-	
-	const publicBag = TransactionHintsBag.from_json(
-		JSON.stringify(publicCommits)
-	);
+	const publicBag = TransactionHintsBag.from_json(JSON.stringify(publicCommits));
 	const proverAlice = await getProver(userMnemonic);
 	const reducedTx = reducedFromUnsignedTx(unsignedTx);
-	const initialCommitsAlice =
-		proverAlice.generate_commitments_for_reduced_transaction(reducedTx);
+	const initialCommitsAlice = proverAlice.generate_commitments_for_reduced_transaction(reducedTx);
 
 	const combinedHints = TransactionHintsBag.empty();
 
 	for (let i = 0; i < unsignedTx.inputs.length; i++) {
-		combinedHints.add_hints_for_input(
-			i,
-			initialCommitsAlice.all_hints_for_input(i)
-		);
+		combinedHints.add_hints_for_input(i, initialCommitsAlice.all_hints_for_input(i));
 		combinedHints.add_hints_for_input(i, publicBag.all_hints_for_input(i));
 	}
 
-	const partialSignedTx = proverAlice.sign_reduced_transaction_multi(
-		reducedTx,
-		combinedHints
-	);
+	const partialSignedTx = proverAlice.sign_reduced_transaction_multi(reducedTx, combinedHints);
 
 	const hAlice = ErgoAddress.fromBase58(userAddress).ergoTree.slice(6);
 	let extractedHints = extract_hints(
@@ -78,9 +59,7 @@ export async function b(
 
 function reducedFromUnsignedTx(unsignedTx: EIP12UnsignedTransaction) {
 	const inputBoxes = ErgoBoxes.from_boxes_json(unsignedTx.inputs);
-	const wasmUnsignedTx = UnsignedTransaction.from_json(
-		JSON.stringify(unsignedTx)
-	);
+	const wasmUnsignedTx = UnsignedTransaction.from_json(JSON.stringify(unsignedTx));
 	let context = fakeContextBrowser();
 	let reducedTx = ReducedTransaction.from_unsigned_tx(
 		wasmUnsignedTx,
@@ -91,28 +70,7 @@ function reducedFromUnsignedTx(unsignedTx: EIP12UnsignedTransaction) {
 	return reducedTx;
 }
 
-export async function signMultisig(
-	unsignedTx: EIP12UnsignedTransaction,
-	userMnemonic: string,
-	userAddress: string
-) {
-	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
-
-	const extractedHints = await b(
-		unsignedTx,
-		userMnemonic,
-		userAddress,
-		publicCommitsPool
-	);
-
-	const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
-
-	return signedTx;
-}
-
-export async function txHasErrors(
-	signedTransaction: SignedTransaction
-): Promise<false | string> {
+export async function txHasErrors(signedTransaction: SignedTransaction): Promise<false | string> {
 	const endpoint = 'https://gql.ergoplatform.com/';
 	const query = `
       mutation CheckTransaction($signedTransaction: SignedTransaction!) {
@@ -147,9 +105,7 @@ export async function txHasErrors(
 	}
 }
 
-export async function submitTx(
-	signedTransaction: SignedTransaction
-): Promise<false | string> {
+export async function submitTx(signedTransaction: SignedTransaction): Promise<false | string> {
 	const endpoint = 'https://gql.ergoplatform.com/';
 	const query = `
       mutation SubmitTransaction($signedTransaction: SignedTransaction!) {
@@ -323,7 +279,6 @@ export async function signTxAllInputs(
 	return signedTx.to_js_eip12();
 }
 
-
 export async function signTxInput(
 	mnemonic: string,
 	tx: EIP12UnsignedTransaction,
@@ -352,9 +307,7 @@ const getWalletAddressSecret = (mnemonic: string, idx: number = 0) => {
 	const path = calcPathFromIndex(idx);
 	const bip32 = BIP32Factory(ecc);
 	const extended = bip32.fromSeed(seed).derivePath(path);
-	return SecretKey.dlog_from_bytes(
-		Uint8Array.from(extended.privateKey ?? Buffer.from(''))
-	);
+	return SecretKey.dlog_from_bytes(Uint8Array.from(extended.privateKey ?? Buffer.from('')));
 };
 
 const RootPathWithoutIndex = "m/44'/429'/0'/0";
