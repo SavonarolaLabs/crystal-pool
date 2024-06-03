@@ -8,13 +8,9 @@
 	def getSellerMultisigAddress(box: Box)  = box.R8[Coll[Byte]].get
   def getDenom(box: Box)                  = box.R9[Long].get
 
-
-
 	def tokenId(box: Box) = box.tokens(0)._1
 	def tokenAmount(box: Box) = box.tokens(0)._2
 
-
-//------------------------
 	def isSameContract(box: Box) = 
 		box.propositionBytes == SELF.propositionBytes
 
@@ -54,17 +50,17 @@
 		hasSellingToken(box) &&
 		isGreaterZeroRate(box) &&
 		isSameMultisig(box)
-//-------------------------
+
   val maxDenom: Long = INPUTS
 		.filter(isLegitInput)
 		.fold(0L, {(r:Long, box:Box) => {
 			if(r > getDenom(box)) r else getDenom(box)
 		}}) // TAKE MAX DENOM
   
-    def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) //1>
+    def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) 
 
   	def sumTokenAmount(a:Long, b: Box) = a + tokenAmount(b)
-  	def sumTokenAmountXRate(a:Long, b: Box) = a + tokenAmount(b) * getRateInMaxDenom(b)   // <---------------- REWORK WITH MAX DENOM
+  	def sumTokenAmountXRate(a:Long, b: Box) = a + tokenAmount(b) * getRateInMaxDenom(b)   
 
     val maxSellRate: Long = INPUTS
       .filter(isLegitInput)
@@ -79,7 +75,6 @@
 	  	isLegitInput(box)&&
 	  	hasMaxSellRate(box)
 
-  //-------------------------
 	def isPaymentBox(box:Box) =
 		isSameSeller(box) &&
 		isSameUnlockHeight(box) &&
@@ -97,30 +92,23 @@
 	def sumBuyTokensPaid(boxes: Coll[Box]): Long = boxes
 		.filter(isPaymentBox) 
 		.fold(0L, sumTokenAmount)
-//-------------------------
 
-//-----------------
-  	val tokensSold = sumSellTokensIn(INPUTS) - sumSellTokensOut(OUTPUTS) //rsBTC on contract (delta) (10000)
+  	val tokensSold = sumSellTokensIn(INPUTS) - sumSellTokensOut(OUTPUTS) 
 
-  	val tokensPaid = sumBuyTokensPaid(OUTPUTS) //sigUSD PAID (20) + ADD DENOM (1000) = > 20_000 
+  	val tokensPaid = sumBuyTokensPaid(OUTPUTS) 
 
-    	val inSellTokensXRate = INPUTS  //VOLUME INPUT ON CONTRACT
+    	val inSellTokensXRate = INPUTS  
 		.filter(isLegitInput) 
-		.fold(0L, sumTokenAmountXRate)   // 2*10000
+		.fold(0L, sumTokenAmountXRate)   
 
-     	val outSellTokensXRate = OUTPUTS //VOLUME OUTPUT ON CONTRACT 
+     	val outSellTokensXRate = OUTPUTS 
 		.filter(isLegitSellOrderOutput)
-		.fold(0L, sumTokenAmountXRate)  // Учитывает макс деном  
+		.fold(0L, sumTokenAmountXRate)    
 
-    val sellTokensXRate = inSellTokensXRate - outSellTokensXRate  // DELTA VOLUME в Макс деноме
-    val expectedRate = sellTokensXRate / tokensSold   // 23125124 in DENOM MAX
+    val sellTokensXRate = inSellTokensXRate - outSellTokensXRate  
+    val expectedRate = sellTokensXRate / tokensSold   
 
-    val isPaidAtFairRate = maxDenom*tokensPaid/tokensSold >= expectedRate  //sigUSD PAID (20) + ADD DENOM (1000) = > 20_000. * MAX_DENOM
-    //1000
-    //20
-    //10000
-    //>=
-    //2
+    val isPaidAtFairRate = maxDenom*tokensPaid/tokensSold >= expectedRate  
 	
   if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)

@@ -7,8 +7,8 @@ export const TOKEN = {
 	},
 	sigUSD: {
 		tokenId: 'f60bff91f7ae3f3a5f0c2d35b46ef8991f213a61d7f7e453d344fa52a42d9f9a',
-		name: 'sigUSD', //?
-		decimals: 2, //?
+		name: 'sigUSD',
+		decimals: 2,
 		type: 'EIP-004'
 	}
 };
