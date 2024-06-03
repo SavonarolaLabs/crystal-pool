@@ -1,4 +1,3 @@
-import { fakeContext } from '../constants/fakeContext';
 import {
 	ErgoBox,
 	ErgoBoxes,
@@ -7,10 +6,13 @@ import {
 	TransactionHintsBag,
 	UnsignedTransaction,
 	extract_hints,
+	Input,
+	Wallet,
+	SecretKey, 
+	SecretKeys
 } from 'ergo-lib-wasm-browser';
 import { ErgoAddress } from '@fleet-sdk/core';
 import { mnemonicToSeedSync } from 'bip39';
-const wasm = await import("ergo-lib-wasm-browser");
 import type {
 	EIP12UnsignedInput,
 	EIP12UnsignedTransaction,
@@ -18,6 +20,7 @@ import type {
 } from '@fleet-sdk/common';
 import BIP32Factory from 'bip32';
 import * as ecc from 'tiny-secp256k1';
+import { fakeContextBrowser } from './fakeContextBrowser';
 
 export async function signTxMulti(
 	unsignedTx: EIP12UnsignedTransaction,
@@ -37,6 +40,7 @@ export async function b(
 	userAddress: string,
 	publicCommits: JSONTransactionHintsBag
 ) {
+	
 	const publicBag = TransactionHintsBag.from_json(
 		JSON.stringify(publicCommits)
 	);
@@ -63,7 +67,7 @@ export async function b(
 	const hAlice = ErgoAddress.fromBase58(userAddress).ergoTree.slice(6);
 	let extractedHints = extract_hints(
 		partialSignedTx,
-		fakeContext(wasm),
+		fakeContextBrowser(),
 		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
 		ErgoBoxes.empty(),
 		arrayToProposition([hAlice]),
@@ -77,7 +81,7 @@ function reducedFromUnsignedTx(unsignedTx: EIP12UnsignedTransaction) {
 	const wasmUnsignedTx = UnsignedTransaction.from_json(
 		JSON.stringify(unsignedTx)
 	);
-	let context = fakeContext(wasm);
+	let context = fakeContextBrowser();
 	let reducedTx = ReducedTransaction.from_unsigned_tx(
 		wasmUnsignedTx,
 		inputBoxes,
@@ -217,7 +221,7 @@ export interface StateAddress {
 	tokens: Array<TokenInfo>;
 }
 
-export function arrayToProposition(input: Array<string>): wasm.Propositions {
+export function arrayToProposition(input: Array<string>): Propositions {
 	const output = new Propositions();
 	input.forEach((pk) => {
 		const proposition = Uint8Array.from(Buffer.from('cd' + pk, 'hex'));
@@ -226,10 +230,10 @@ export function arrayToProposition(input: Array<string>): wasm.Propositions {
 	return output;
 }
 
-export async function getProver(mnemonic: string): Promise<wasm.Wallet> {
-	const secretKeys = new wasm.SecretKeys();
+export async function getProver(mnemonic: string): Promise<Wallet> {
+	const secretKeys = new SecretKeys();
 	secretKeys.add(getWalletAddressSecret(mnemonic));
-	return wasm.Wallet.from_secrets(secretKeys);
+	return Wallet.from_secrets(secretKeys);
 }
 
 export async function signTxByAddress(
@@ -248,8 +252,8 @@ export async function signTxByAddress(
 	});
 
 	const signedTx = prover.sign_transaction(
-		fakeContext(wasm),
-		wasm.UnsignedTransaction.from_json(JSON.stringify(tx)),
+		fakeContextBrowser(),
+		UnsignedTransaction.from_json(JSON.stringify(tx)),
 		boxes_to_spend,
 		ErgoBoxes.empty()
 	);
@@ -269,8 +273,8 @@ export async function signTxByInputs(
 	});
 
 	const signedTx = prover.sign_transaction(
-		fakeContext(wasm),
-		wasm.UnsignedTransaction.from_json(JSON.stringify(tx)),
+		fakeContextBrowser(),
+		UnsignedTransaction.from_json(JSON.stringify(tx)),
 		boxes_to_spend,
 		ErgoBoxes.empty()
 	);
@@ -290,8 +294,8 @@ export async function signTx(
 	});
 
 	const signedTx = prover.sign_transaction(
-		fakeContext(wasm),
-		wasm.UnsignedTransaction.from_json(JSON.stringify(tx)),
+		fakeContextBrowser(),
+		UnsignedTransaction.from_json(JSON.stringify(tx)),
 		boxes_to_spend,
 		ErgoBoxes.empty()
 	);
@@ -311,8 +315,8 @@ export async function signTxAllInputs(
 	});
 
 	const signedTx = prover.sign_transaction(
-		fakeContext(wasm),
-		wasm.UnsignedTransaction.from_json(JSON.stringify(tx)),
+		fakeContextBrowser(),
+		UnsignedTransaction.from_json(JSON.stringify(tx)),
 		boxes_to_spend,
 		ErgoBoxes.empty()
 	);
@@ -324,7 +328,7 @@ export async function signTxInput(
 	mnemonic: string,
 	tx: EIP12UnsignedTransaction,
 	index: number
-): Promise<wasm.Input> {
+): Promise<Input> {
 	const prover = await getProver(mnemonic);
 
 	const boxesToSign = tx.inputs;
@@ -335,8 +339,8 @@ export async function signTxInput(
 
 	const signedInput = prover.sign_tx_input(
 		index,
-		fakeContext(wasm),
-		wasm.UnsignedTransaction.from_json(JSON.stringify(tx)),
+		fakeContextBrowser(),
+		UnsignedTransaction.from_json(JSON.stringify(tx)),
 		boxes_to_spend,
 		ErgoBoxes.empty()
 	);
@@ -348,7 +352,7 @@ const getWalletAddressSecret = (mnemonic: string, idx: number = 0) => {
 	const path = calcPathFromIndex(idx);
 	const bip32 = BIP32Factory(ecc);
 	const extended = bip32.fromSeed(seed).derivePath(path);
-	return wasm.SecretKey.dlog_from_bytes(
+	return SecretKey.dlog_from_bytes(
 		Uint8Array.from(extended.privateKey ?? Buffer.from(''))
 	);
 };
