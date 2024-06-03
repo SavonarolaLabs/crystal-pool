@@ -92,7 +92,6 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 
 export function signExecuteSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/execute-swap/sign', async (req: Request, res: Response) => {
-		console.trace('export function signExecuteSwapOrder')
 		const { proof, unsignedTx } = req.body; // TODO: unsignedTx not from USER
 
 
@@ -112,11 +111,24 @@ export function signExecuteSwapOrder(app: Express, io: Server, db: BoxDB) {
 		unsignedTx.txId = txId;
 
 		// TODO: Add signedToStash -> to DB -> To orderbook ...
-		storeSignedSwapTx(db, unsignedTx, SWAP_ORDER_ADDRESS);
+		storeSignedSwapTx(db, unsignedTx);
 
 		// Create the order book
 		const orderbook = createOrderBook('rsBTC_sigUSD', db);
 		io.emit('update', orderbook);
+		function getCurrentTime() {
+			const now = new Date();
+			const hours = String(now.getHours()).padStart(2, '0');
+			const minutes = String(now.getMinutes()).padStart(2, '0');
+			const seconds = String(now.getSeconds()).padStart(2, '0');
+			return `${hours}:${minutes}:${seconds}`;
+		}
+		io.emit('trades', JSON.stringify([{
+			price: 20000,
+			amount: 0.00001,
+			time: getCurrentTime(),
+			side: 'buy'
+		}]))
 
 		res.json(unsignedTx);
 	});
