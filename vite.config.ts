@@ -13,7 +13,7 @@ export default defineConfig({
 		include: ['ergo-lib-wasm-browser', 'buffer'],
 	},
 	build: {
-		target: 'esnext' // Ensure modern JavaScript features are supported
+		target: 'esnext' // without this wasm doesn't work
 	},
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
