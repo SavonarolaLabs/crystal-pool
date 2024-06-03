@@ -22,12 +22,11 @@ export type SwapRequest = {
 
 export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/swap-order', async (req: Request, res: Response) => {
-		const swapParams: SwapRequest = req.body; // Swap Params
-		//-----------------------------------
+		const swapParams: SwapRequest = req.body;
+
 		const height = 1273521;
 		const unlockHeight = height + 200000;
-		//------------------------------------
-		// CreateTx unsignedTx
+
 		const unsignedTx = createSwapOrderTxR9(
 			swapParams.address,
 			DEPOSIT_ADDRESS,
@@ -52,16 +51,13 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 
 export function signSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/swap-order/sign', async (req: Request, res: Response) => {
-		const { extractedHints, unsignedTx } = req.body; // TODO: unsignedTx not from USER
+		const { extractedHints, unsignedTx } = req.body;
 
 		const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
 		const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
 		const signedTxToStash = signedTx.to_js_eip12();
 
-		// TODO: Add signedToStash -> to DB -> To orderbook ...
 		storeSignedTx(db, signedTxToStash, SWAP_ORDER_ADDRESS);
-
-		// Create the order book
 		const orderbook = createOrderBook('rsBTC_sigUSD', db);
 		io.emit('update', orderbook);
 
@@ -70,13 +66,19 @@ export function signSwapOrder(app: Express, io: Server, db: BoxDB) {
 }
 
 export function storeSignedTx(db: BoxDB, signedTx: SignedTransaction, address: string) {
-	db_removeBoxesByBoxIds(db, signedTx.inputs.map(box => box.boxId));
+	db_removeBoxesByBoxIds(
+		db,
+		signedTx.inputs.map((box) => box.boxId)
+	);
 	const boxes = boxesAtAddress(signedTx, address);
 	db_addBoxes(db, boxes);
 }
 
 export function storeSignedSwapTx(db: BoxDB, signedTx: SignedTransaction) {
-	db_removeBoxesByBoxIds(db, signedTx.inputs.map(box => box.boxId));
+	db_removeBoxesByBoxIds(
+		db,
+		signedTx.inputs.map((box) => box.boxId)
+	);
 	const boxes1 = boxesAtAddress(signedTx, SWAP_ORDER_ADDRESS);
 	const boxes2 = boxesAtAddress(signedTx, DEPOSIT_ADDRESS);
 	db_addBoxes(db, [...boxes1, ...boxes2]);
@@ -84,7 +86,7 @@ export function storeSignedSwapTx(db: BoxDB, signedTx: SignedTransaction) {
 
 export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/execute-swap', async (req: Request, res: Response) => {
-		const swapParams: SwapRequest = req.body; // Swap Params
+		const swapParams: SwapRequest = req.body;
 		const unsignedTx = createExecuteSwapOrderTx(swapParams, db);
 		res.json(unsignedTx);
 	});
@@ -92,8 +94,7 @@ export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
 
 export function signExecuteSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/execute-swap/sign', async (req: Request, res: Response) => {
-		const { proof, unsignedTx } = req.body; // TODO: unsignedTx not from USER
-
+		const { proof, unsignedTx } = req.body;
 
 		const inputIndexDeposit = unsignedTx.inputs.findIndex(
 			(box: Box) => box.ergoTree == ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree
@@ -103,17 +104,15 @@ export function signExecuteSwapOrder(app: Express, io: Server, db: BoxDB) {
 		);
 		const signed = await signTxInput(SHADOW_MNEMONIC, unsignedTx, inputIndexSwap);
 		const proofSwap = JSON.parse(signed.spending_proof().to_json());
-		
+
 		const txId = UnsignedTransaction.from_json(JSON.stringify(unsignedTx)).id().to_str();
 
 		unsignedTx.inputs[inputIndexDeposit].spendingProof = proof;
 		unsignedTx.inputs[inputIndexSwap].spendingProof = proofSwap;
 		unsignedTx.txId = txId;
 
-		// TODO: Add signedToStash -> to DB -> To orderbook ...
 		storeSignedSwapTx(db, unsignedTx);
 
-		// Create the order book
 		const orderbook = createOrderBook('rsBTC_sigUSD', db);
 		io.emit('update', orderbook);
 		function getCurrentTime() {
@@ -123,12 +122,17 @@ export function signExecuteSwapOrder(app: Express, io: Server, db: BoxDB) {
 			const seconds = String(now.getSeconds()).padStart(2, '0');
 			return `${hours}:${minutes}:${seconds}`;
 		}
-		io.emit('trades', JSON.stringify([{
-			price: 20000,
-			amount: 0.00001,
-			time: getCurrentTime(),
-			side: 'buy'
-		}]))
+		io.emit(
+			'trades',
+			JSON.stringify([
+				{
+					price: 20000,
+					amount: 0.00001,
+					time: getCurrentTime(),
+					side: 'buy'
+				}
+			])
+		);
 
 		res.json(unsignedTx);
 	});

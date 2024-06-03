@@ -1,11 +1,10 @@
 <script lang="ts">
-	import WalletBalanceBar from "./WalletBalanceBar.svelte";
-	import { setUserAlice, setUserBob, toggleWallet, user_name } from "./ui_state";
+	import WalletBalanceBar from './WalletBalanceBar.svelte';
+	import { setUserAlice, setUserBob, toggleWallet, user_name } from './ui_state';
 
 	function toggleTheme() {
 		if (typeof document !== 'undefined') {
-			const currentTheme =
-				document.documentElement.getAttribute('data-theme');
+			const currentTheme = document.documentElement.getAttribute('data-theme');
 			const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 			document.documentElement.setAttribute('data-theme', newTheme);
 		}
@@ -43,10 +42,18 @@
 				>
 			</a>
 			<div class="header_leftMenu">
-				<a class="header_navItem" target="_blank" href="https://explorer.ergoplatform.com/en/mempool">
+				<a
+					class="header_navItem"
+					target="_blank"
+					href="https://explorer.ergoplatform.com/en/mempool"
+				>
 					Mempool
 				</a>
-				<a class="header_navItem" target="_blank" href="https://explorer.ergoplatform.com/en/addresses/t5UVmPtqprz5zN2M2X5fRTajpYD2CYuamxePkcwNFc2t9Yc3DhNMyB81fLAqoL7t91hzyYacMA8uVzkpTYTRdg4A6gZHFZxVsvLo">
+				<a
+					class="header_navItem"
+					target="_blank"
+					href="https://explorer.ergoplatform.com/en/addresses/t5UVmPtqprz5zN2M2X5fRTajpYD2CYuamxePkcwNFc2t9Yc3DhNMyB81fLAqoL7t91hzyYacMA8uVzkpTYTRdg4A6gZHFZxVsvLo"
+				>
 					Deposits
 				</a>
 			</div>
@@ -69,13 +76,7 @@
 						>
 							<defs>
 								<mask id="moon-mask">
-									<rect
-										x="0"
-										y="0"
-										width="100%"
-										height="100%"
-										fill="white"
-									/>
+									<rect x="0" y="0" width="100%" height="100%" fill="white" />
 									<circle cx="16" cy="8" r="8" fill="black" />
 								</mask>
 							</defs>
@@ -90,26 +91,11 @@
 								<line x1="12" y1="1" x2="12" y2="3" />
 								<line x1="12" y1="21" x2="12" y2="23" />
 								<line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-								<line
-									x1="18.36"
-									y1="18.36"
-									x2="19.78"
-									y2="19.78"
-								/>
+								<line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
 								<line x1="1" y1="12" x2="3" y2="12" />
 								<line x1="21" y1="12" x2="23" y2="12" />
-								<line
-									x1="4.22"
-									y1="19.78"
-									x2="5.64"
-									y2="18.36"
-								/>
-								<line
-									x1="18.36"
-									y1="5.64"
-									x2="19.78"
-									y2="4.22"
-								/>
+								<line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+								<line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
 							</g>
 						</svg>
 					</button>
@@ -177,7 +163,7 @@
 		display: flex;
 		align-items: center;
 	}
-	.balance{
+	.balance {
 		margin-inline-end: 20px;
 	}
 	.responsive-item-content {
@@ -192,10 +178,10 @@
 		align-items: center;
 		position: relative;
 		color: inherit;
-    	text-decoration: none;
+		text-decoration: none;
 	}
-	.header_navItem:hover{
-		color: var(--text-primary)
+	.header_navItem:hover {
+		color: var(--text-primary);
 	}
 
 	.header_rightWrapper {

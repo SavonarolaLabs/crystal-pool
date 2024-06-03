@@ -6,7 +6,12 @@ import cors from 'cors';
 import { boxes } from './routes/boxes';
 import { userBoxes } from './routes/userBoxes';
 import { orderBooks } from './routes/orderBooks';
-import { createSwapOrder, executeSwapOrder, signExecuteSwapOrder, signSwapOrder } from './routes/swapOrder';
+import {
+	createSwapOrder,
+	executeSwapOrder,
+	signExecuteSwapOrder,
+	signSwapOrder
+} from './routes/swapOrder';
 import { initDb, initDepositUtxo } from '$lib/db/db';
 import { createOrderBook } from './orderBookUtils';
 
@@ -19,7 +24,6 @@ const io = new Server(server, {
 	}
 });
 
-// Apply CORS middleware to Express
 app.use(
 	cors({
 		origin: '*',
