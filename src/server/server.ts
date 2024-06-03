@@ -6,7 +6,7 @@ import cors from 'cors';
 import { boxes } from './routes/boxes';
 import { userBoxes } from './routes/userBoxes';
 import { orderBooks } from './routes/orderBooks';
-import { createSwapOrder, executeSwapOrder, signSwapOrder } from './routes/swapOrder';
+import { createSwapOrder, executeSwapOrder, signExecuteSwapOrder, signSwapOrder } from './routes/swapOrder';
 import { initDb, initDepositUtxo } from '$lib/db/db';
 import { createOrderBook } from './orderBookUtils';
 
@@ -46,6 +46,7 @@ createSwapOrder(app, io, db);
 executeSwapOrder(app, io, db);
 signSwapOrder(app, io, db);
 userBoxes(app, db);
+signExecuteSwapOrder(app, io, db);
 
 // Basic test route
 app.get('/test', (req, res) => {

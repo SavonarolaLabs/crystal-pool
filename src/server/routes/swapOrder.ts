@@ -1,16 +1,16 @@
 import { BOB_ADDRESS, DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
-import { db_addBoxes, type BoxDB } from '$lib/db/db';
+import { db_addBoxes, db_removeBoxesByBoxIds, type BoxDB } from '$lib/db/db';
 import { boxesAtAddress } from '$lib/utils/test-helper';
-import { a, c } from '$lib/wallet/multisig-server';
-import {
-	createExecuteSwapOrderTx, createSwapOrderTxR9
-} from '$lib/wallet/swap';
-import type { SignedTransaction } from '@fleet-sdk/common';
+import { a, c, signTxInput } from '$lib/wallet/multisig-server';
+import { createExecuteSwapOrderTx, createSwapOrderTxR9 } from '$lib/wallet/swap';
+import type { Box, SignedTransaction } from '@fleet-sdk/common';
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
 import { createOrderBook } from '../orderBookUtils';
-import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
+import { ErgoAddress, ErgoTree, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
+import { SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
+import { UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
 
 export type SwapRequest = {
 	address: string;
@@ -46,15 +46,7 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 		);
 
 		const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
-		res.json({unsignedTx, publicCommitsPool});
-	});
-}
-
-export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
-	app.post('/execute-swap', async (req: Request, res: Response) => {
-		const swapParams: SwapRequest = req.body; // Swap Params
-		const unsignedTx = createExecuteSwapOrderTx(swapParams, db);
-		res.json(unsignedTx);
+		res.json({ unsignedTx, publicCommitsPool });
 	});
 }
 
@@ -78,9 +70,54 @@ export function signSwapOrder(app: Express, io: Server, db: BoxDB) {
 }
 
 export function storeSignedTx(db: BoxDB, signedTx: SignedTransaction, address: string) {
+	db_removeBoxesByBoxIds(db, signedTx.inputs.map(box => box.boxId));
 	const boxes = boxesAtAddress(signedTx, address);
 	db_addBoxes(db, boxes);
-	// BoxRow.parameters.pair
+}
 
-	// console.log(signedTx);
+export function storeSignedSwapTx(db: BoxDB, signedTx: SignedTransaction) {
+	db_removeBoxesByBoxIds(db, signedTx.inputs.map(box => box.boxId));
+	const boxes1 = boxesAtAddress(signedTx, SWAP_ORDER_ADDRESS);
+	const boxes2 = boxesAtAddress(signedTx, DEPOSIT_ADDRESS);
+	db_addBoxes(db, [...boxes1, ...boxes2]);
+}
+
+export function executeSwapOrder(app: Express, io: Server, db: BoxDB) {
+	app.post('/execute-swap', async (req: Request, res: Response) => {
+		const swapParams: SwapRequest = req.body; // Swap Params
+		const unsignedTx = createExecuteSwapOrderTx(swapParams, db);
+		res.json(unsignedTx);
+	});
+}
+
+export function signExecuteSwapOrder(app: Express, io: Server, db: BoxDB) {
+	app.post('/execute-swap/sign', async (req: Request, res: Response) => {
+		console.trace('export function signExecuteSwapOrder')
+		const { proof, unsignedTx } = req.body; // TODO: unsignedTx not from USER
+
+
+		const inputIndexDeposit = unsignedTx.inputs.findIndex(
+			(box: Box) => box.ergoTree == ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree
+		);
+		const inputIndexSwap = unsignedTx.inputs.findIndex(
+			(box: Box) => box.ergoTree == ErgoAddress.fromBase58(SWAP_ORDER_ADDRESS).ergoTree
+		);
+		const signed = await signTxInput(SHADOW_MNEMONIC, unsignedTx, inputIndexSwap);
+		const proofSwap = JSON.parse(signed.spending_proof().to_json());
+		
+		const txId = UnsignedTransaction.from_json(JSON.stringify(unsignedTx)).id().to_str();
+
+		unsignedTx.inputs[inputIndexDeposit].spendingProof = proof;
+		unsignedTx.inputs[inputIndexSwap].spendingProof = proofSwap;
+		unsignedTx.txId = txId;
+
+		// TODO: Add signedToStash -> to DB -> To orderbook ...
+		storeSignedSwapTx(db, unsignedTx, SWAP_ORDER_ADDRESS);
+
+		// Create the order book
+		const orderbook = createOrderBook('rsBTC_sigUSD', db);
+		io.emit('update', orderbook);
+
+		res.json(unsignedTx);
+	});
 }

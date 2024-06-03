@@ -10,7 +10,7 @@ import {
 } from '$lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
 import { TOKEN, tradingPairs } from '$lib/constants/tokens';
-import { persistBox, persistMultipleBoxes, loadBoxRows } from '$lib/db/sqlDb';
+import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes } from '$lib/db/sqlDb';
 import { depositAlice } from '$lib/server-agent/alice';
 import { depositBob } from '$lib/server-agent/bob';
 import { initDeposits } from '$lib/server-agent/simulator';
@@ -58,6 +58,14 @@ export function db_addBox(db: BoxDB, box: Box) {
 		persistBox(newRow); // Insert into database
 	} else {
 		console.error('db_addBox() invalid box: ', JSON.stringify(box));
+	}
+}
+
+export function db_removeBoxesByBoxIds(db: BoxDB, removeBoxIds: string[]) {
+	const deleteBoxIds = db.boxRows.filter(row => removeBoxIds.includes(row.box.boxId)).map(row => row.id);
+	if(deleteBoxIds.length > 0){
+		deleteMultipleBoxes(deleteBoxIds);
+		db.boxRows = db.boxRows.filter(row => !deleteBoxIds.includes(row.id));
 	}
 }
 

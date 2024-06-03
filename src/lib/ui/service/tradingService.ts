@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { createSwapTx, executeSwapTx, signSwapTx } from './crystalPoolService';
+import { createSwapTx, executeSwapTx, signExecuteSwapTx, signSwapTx } from './crystalPoolService';
 import { user_address, user_mnemonic } from '../ui_state';
 import type { Box } from '@fleet-sdk/common';
 import { b, signTxInput } from '$lib/wallet/multisig-client';
@@ -47,8 +47,8 @@ export async function executeAndSignInputsSwapTx(swapParams: SwapRequest) {
 	const signed = await signTxInput(get(user_mnemonic), unsignedTx, inputIndex);
 	const proof = JSON.parse(signed.spending_proof().to_json());
 	console.log({proof})
-
-
-	//let signedTx = await signSwapTx(extractedHints, unsignedTx);
-	return unsignedTx;
+	
+	const signedTx = await signExecuteSwapTx(proof, unsignedTx);
+	console.log({signedTx})
+	return signedTx;
 }

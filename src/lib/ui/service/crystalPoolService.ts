@@ -45,6 +45,13 @@ export async function signSwapTx(extractedHints: any, unsignedTx: any): Promise<
 	});
 }
 
+export async function signExecuteSwapTx(proof:any, unsignedTx: any):Promise<any>{
+	return await post(NEW_EXECUTE_SIGN, {
+		proof,
+		unsignedTx
+	});
+}
+
 export async function orderBook(pair: string): Promise<any> {
 	return await get(ORDER_BOOK + pair);
 }
