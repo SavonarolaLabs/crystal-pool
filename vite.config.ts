@@ -12,6 +12,9 @@ export default defineConfig({
 	optimizeDeps: {
 		include: ['ergo-lib-wasm-browser', 'buffer'],
 	},
+	build: {
+		target: 'esnext' // Ensure modern JavaScript features are supported
+	},
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
 		server: {

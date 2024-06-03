@@ -21126,7 +21126,7 @@ span.ant-radio+* {
     -webkit-margin-start: var(--margin-xss);
     margin-inline-start:var(--margin-xss)}
 
-.ant-form-item-label>label: after {
+.ant-form-item-label>label:after {
     position:relative;
     top: -.5px;
     margin: 0 var(--form-item-label-colon-margin-right) 0 var(--form-item-label-colon-margin-left);
@@ -21437,7 +21437,7 @@ span.ant-radio+* {
     -webkit-margin-end: var(--margin-xss);
     margin-inline-end:var(--margin-xss)}
 
-.ant-image-mask: hover {
+.ant-image-mask:hover {
     opacity:1
 }
 
@@ -21656,7 +21656,7 @@ span.ant-radio+* {
     -webkit-padding-start: var(--input-padding-horizontal-base);
     padding-inline-start:var(--input-padding-horizontal-base)}
 
-.ant-input-number-affix-wrapper: :placeholder {
+.ant-input-number-affix-wrapper::placeholder {
     color:var(--input-placeholder-color);
     -webkit-user-select: none;
     -moz-user-select: none;
