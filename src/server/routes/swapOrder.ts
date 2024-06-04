@@ -27,10 +27,16 @@ export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 		const height = 1273521;
 		const unlockHeight = height + 200000;
 
+		const depositInputBoxes: any = db.boxRows.filter(
+			(b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapParams.address
+		);
+		//
+		const depositInputs = depositInputBoxes.map((db) => db.box);
+
 		const unsignedTx = createSwapOrderTxR9(
 			swapParams.address,
 			DEPOSIT_ADDRESS,
-			utxos[BOB_ADDRESS], // need helper function and boxes for tests
+			depositInputs, // need helper function and boxes for tests
 			{
 				tokenId: swapParams.sellingTokenId,
 				amount: swapParams.amount
@@ -57,10 +63,9 @@ export function signSwapOrder(app: Express, io: Server, db: BoxDB) {
 		const signedTx = await c(unsignedTx, privateCommitsPool, extractedHints);
 		const signedTxToStash = signedTx.to_js_eip12();
 
-		storeSignedTx(db, signedTxToStash, SWAP_ORDER_ADDRESS);
+		storeSignedSwapTx(db, signedTxToStash);
 		const orderbook = createOrderBook('rsBTC_sigUSD', db);
 		io.emit('update', orderbook);
-
 		res.json(signedTxToStash);
 	});
 }
@@ -79,6 +84,7 @@ export function storeSignedSwapTx(db: BoxDB, signedTx: SignedTransaction) {
 		db,
 		signedTx.inputs.map((box) => box.boxId)
 	);
+
 	const boxes1 = boxesAtAddress(signedTx, SWAP_ORDER_ADDRESS);
 	const boxes2 = boxesAtAddress(signedTx, DEPOSIT_ADDRESS);
 	db_addBoxes(db, [...boxes1, ...boxes2]);

@@ -38,7 +38,7 @@ export async function initDepositUtxo(db: BoxDB) {
 }
 
 function nextId(table: HasId[]): number {
-	const maxId = Math.max(...table.map((row) => row.id), 0);
+	const maxId = Math.max(...table.map((row) => row.id), 0) + 1;
 	return maxId;
 }
 
@@ -63,33 +63,25 @@ export function db_removeBoxesByBoxIds(db: BoxDB, removeBoxIds: string[]) {
 	const deleteBoxIds = db.boxRows
 		.filter((row) => removeBoxIds.includes(row.box.boxId))
 		.map((row) => row.id);
+
+	// console.log('INSIDE REMOVE FUNCTION');
+	// console.log('deleteBoxIds', deleteBoxIds);
+	// console.log('deleteBoxIds.length', deleteBoxIds.length);
+	// console.log('xxxxxxxxxxxxxxx');
+
 	if (deleteBoxIds.length > 0) {
 		deleteMultipleBoxes(deleteBoxIds);
-		db.boxRows = db.boxRows.filter((row) => !deleteBoxIds.includes(row.id));
+		// console.log('DEEP INSIDE');
+		// console.log('db.boxRows', db.boxRows);
+		// console.log('deleteBoxIds', deleteBoxIds);
+		db.boxRows = db.boxRows.filter((row) => !deleteBoxIds.includes(row.id)); //
 	}
 }
 
 export function db_addBoxes(db: BoxDB, boxRows: Box[]) {
-	const newBoxRows = boxRows
-		.map((box) => {
-			const boxParams = parseBox(box);
-			if (boxParams) {
-				return {
-					id: nextId(db.boxRows),
-					contract: boxParams.contract,
-					parameters: boxParams.parameters,
-					box,
-					unspent: true
-				} as BoxRow;
-			} else {
-				console.error('db_addBoxes() invalid box: ', JSON.stringify(box));
-				return null;
-			}
-		})
-		.filter((row) => row !== null) as BoxRow[];
-
-	db.boxRows.push(...newBoxRows);
-	persistMultipleBoxes(newBoxRows); // Insert multiple rows into database
+	for (let i = 0; i < boxRows.length; i++) {
+		db_addBox(db, boxRows[i]);
+	}
 }
 
 export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {

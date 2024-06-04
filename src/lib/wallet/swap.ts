@@ -65,7 +65,7 @@ export function createSwapOrderTxR9(
 		});
 
 	const change = new OutputBuilder(
-			// @ts-ignore
+		// @ts-ignore
 		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
 		DEPOSIT_ADDRESS
 	)
@@ -73,11 +73,11 @@ export function createSwapOrderTxR9(
 			R4: inputBoxes[0].additionalRegisters.R4,
 			R5: inputBoxes[0].additionalRegisters.R5
 		})
-			// @ts-ignore
+		// @ts-ignore
 		.addTokens(calcTokenChange([...inputBoxes], token));
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
-			// @ts-ignore
+		// @ts-ignore
 		.configureSelector((selector) => selector.ensureInclusion([inputBoxes].map((b) => b.boxId)))
 		.from(inputBoxes)
 		.to([outputSwapOrder, change])
@@ -183,6 +183,11 @@ export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
 	const [rate, denom] = splitSellRate(swapParams.price);
 	const height = 1273521;
 
+	//console.log('ALL BOXES AT DEPOSIT');
+	const allDepositBoxes: any = db.boxRows.filter((b) => b.contract == 'DEPOSIT');
+
+	//console.log(allDepositBoxes.map((b) => b.box));
+
 	const swapOrderInputBoxes: any = db.boxRows.filter(
 		(b) =>
 			b.contract == 'SWAP' &&
@@ -198,6 +203,7 @@ export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
 	const paymentInputBoxes: any = db.boxRows.filter(
 		(b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapParams.address
 	);
+	console.log('userAddress', swapParams.address);
 	if (swapOrderInputBoxes.length < 1 || paymentInputBoxes.length < 1) {
 		console.dir({ swapOrderInputBoxes, paymentInputBoxes });
 		throw new Error(
