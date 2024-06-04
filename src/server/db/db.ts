@@ -288,7 +288,13 @@ export function decodeTokenIdPairFromR6(box: Box):
 
 
 // serialization functinos
-export function db_getBoxesString(db){
+export function db_getBoxesString(db: BoxDB){
 	const serializedData = serializeBigInt(db.boxRows);
+	return serializedData;
+}
+
+export function db_getBoxesByAddressString(db: BoxDB, address: string ){
+	const userBoxes = db.boxRows.filter(box => box.parameters.userPk == address);
+	const serializedData = serializeBigInt(userBoxes);
 	return serializedData;
 }
