@@ -4,16 +4,11 @@ import wasm from 'vite-plugin-wasm';
 
 export default defineConfig({
 	plugins: [sveltekit(), wasm()],
-	resolve: {
-		alias: {
-			'ergo-lib-wasm-browser': 'node_modules/ergo-lib-wasm-browser/ergo_lib_wasm.js',
-		}
-	},
 	optimizeDeps: {
 		include: ['ergo-lib-wasm-browser', 'buffer'],
 	},
 	build: {
-		target: 'esnext' // without this wasm doesn't work
+		target: 'esnext' // without this wasm build doesn't work
 	},
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
