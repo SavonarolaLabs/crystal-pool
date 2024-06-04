@@ -12,6 +12,7 @@ import { parse } from '@fleet-sdk/serializer';
 import { tradingPairs } from '../../lib/constants/tokens';
 import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes } from './sqlDb';
 import { initDeposits } from '../../lib/server-agent/simulator';
+import { serializeBigInt } from '../serializeBigInt';
 
 interface HasId {
 	id: number;
@@ -283,4 +284,11 @@ export function decodeTokenIdPairFromR6(box: Box):
 			buyingTokenId: Buffer.from(parsed[1]).toString('hex')
 		};
 	}
+}
+
+
+// serialization functinos
+export function db_getBoxesString(db){
+	const serializedData = serializeBigInt(db.boxRows);
+	return serializedData;
 }

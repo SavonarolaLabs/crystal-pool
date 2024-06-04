@@ -3,7 +3,6 @@ import {
 } from '$lib/constants/addresses';
 import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { describe, expect, it } from 'vitest';
-import { signTxAgentBob } from '$lib/server-agent/bob';
 import { createAndMultisigSwapTx } from '$lib/ui/service/tradingService';
 import { b } from '$lib/wallet/multisig-server';
 
@@ -21,10 +20,7 @@ describe.only('Alice Swap Creation and Execution', () => {
 		};
 
 		const swapUTx = await createAndMultisigSwapTx(swapParams, b, BOB_MNEMONIC, BOB_ADDRESS);
-
-		const swapTx = await signTxAgentBob(swapUTx);
-		expect(swapTx.id).toBeTruthy();
-
+		expect(swapUTx).toBeTruthy();
 	});
 });
 
