@@ -2,7 +2,7 @@
 	import { BOB_ADDRESS } from '$lib/constants/addresses';
 	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
 	import { TOKEN } from '$lib/constants/tokens';
-	import { b } from '$lib/wallet/multisig-client';
+	import { b, signTxInput } from '$lib/wallet/multisig-client';
 	import { createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
 	import { user_address, user_mnemonic } from '../ui_state';
@@ -75,7 +75,7 @@
 		};
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
-		let signedTx = await executeAndSignInputsSwapTx(swapParams); // UNSIGNED TX
+		let signedTx = await executeAndSignInputsSwapTx(swapParams, signTxInput); // UNSIGNED TX
 		console.log(signedTx);
 	}
 
@@ -121,7 +121,7 @@
 
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
-		let signedTx = await createAndMultisigSwapTx(swapParams);
+		let signedTx = await createAndMultisigSwapTx(swapParams, b, $user_mnemonic, $user_address);
 		console.log(signedTx);
 		return;
 	}
@@ -167,7 +167,7 @@
 		};
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
-		let signedTx = await createAndMultisigSwapTx(swapParams);
+		let signedTx = await createAndMultisigSwapTx(swapParams, b, $user_mnemonic, $user_address);
 		console.log(signedTx);
 	}
 </script>

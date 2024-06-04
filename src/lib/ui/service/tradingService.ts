@@ -2,7 +2,6 @@ import { get } from 'svelte/store';
 import { createSwapTx, executeSwapTx, signExecuteSwapTx, signSwapTx } from './crystalPoolService';
 import { user_address, user_mnemonic } from '../ui_state';
 import type { Box } from '@fleet-sdk/common';
-import { b, signTxInput } from '$lib/wallet/multisig-client';
 import { parse } from '@fleet-sdk/serializer';
 import { ErgoAddress } from '@fleet-sdk/core';
 
@@ -14,13 +13,13 @@ export type SwapRequest = {
 	buyingTokenId: string;
 };
 
-export async function createAndMultisigSwapTx(swapParams: SwapRequest) {
+export async function createAndMultisigSwapTx(swapParams: SwapRequest, b:Function, userMnemonic, userAddress) {
 	const { unsignedTx, publicCommitsPool } = await createSwapTx(swapParams);
 
 	const extractedHints = await b(
 		unsignedTx,
-		get(user_mnemonic),
-		get(user_address),
+		userMnemonic,
+		userAddress,
 		publicCommitsPool
 	);
 
@@ -40,7 +39,7 @@ export function decodeR4(box: Box): { userPk: string; poolPk: string } | undefin
 	}
 }
 
-export async function executeAndSignInputsSwapTx(swapParams: SwapRequest) {
+export async function executeAndSignInputsSwapTx(swapParams: SwapRequest, signTxInput: Function) {
 	const unsignedTx = await executeSwapTx(swapParams);
 		const inputIndex = unsignedTx.inputs
 		.findIndex((b: Box) => decodeR4(b)?.userPk == swapParams.address);
