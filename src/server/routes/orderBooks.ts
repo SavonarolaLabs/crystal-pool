@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from 'express';
 import type { BoxDB } from '../db/db';
-import { createOrderBook } from '../orderBookUtils';
+import { createOrderBook } from '../db/orderBookUtils';
 import { sendJSON } from './utils';
 
 interface OrderBooksParams {

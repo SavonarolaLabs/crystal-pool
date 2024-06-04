@@ -1,6 +1,6 @@
-import type { BoxDB } from './db/db';
+import type { BoxDB } from './db';
 import BigNumber from 'bignumber.js';
-import { serializeBigInt } from './serializeBigInt';
+import { serializeBigInt } from '../serializeBigInt';
 import type { Amount } from '@fleet-sdk/common';
 import { TOKEN } from '$lib/constants/tokens';
 
@@ -24,7 +24,6 @@ export function createOrderBook(tradingPair: string, db: BoxDB) {
 	const buyOrders = allOrders.filter((order) => order.side == 'buy');
 	const sellOrders = allOrders.filter((order) => order.side == 'sell');
 
-	console.log('buyOrders', buyOrders);
 	const orderbook = {
 		buy: buyOrders.map((r) => {
 			return {
@@ -41,8 +40,6 @@ export function createOrderBook(tradingPair: string, db: BoxDB) {
 			};
 		})
 	};
-	console.log('sell');
-	console.log(orderbook.buy);
 	return serializeBigInt(orderbook);
 }
 

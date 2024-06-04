@@ -160,16 +160,11 @@ function createSwapOrderTxR9AgentBob(
 ): EIP12UnsignedTransaction {
 	const swapUTx = createSwapOrderTxR9(
 		BOB_ADDRESS,
-		DEPOSIT_ADDRESS,
 		inputBoxes,
 		{ tokenId: TOKEN.rsBTC.tokenId, amount: amount },
 		price,
 		CHAIN_HEIGHT,
-		1300000,
-		TOKEN.rsBTC.tokenId,
 		TOKEN.sigUSD.tokenId,
-		SWAP_ORDER_ADDRESS,
-		nanoErg
 	);
 	return swapUTx;
 }

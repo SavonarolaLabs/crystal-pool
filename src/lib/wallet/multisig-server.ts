@@ -30,7 +30,7 @@ export async function signTxMulti(
 	return (await signMultisig(unsignedTx, userMnemonic, userAddress)).to_js_eip12();
 }
 
-type JSONTransactionHintsBag = any;
+export type JSONTransactionHintsBag = any;
 
 function _removeSecrets(privateCommitments: JSONTransactionHintsBag, address: string) {
 	let copy = JSON.parse(JSON.stringify(privateCommitments));

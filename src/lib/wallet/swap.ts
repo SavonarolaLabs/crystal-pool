@@ -20,8 +20,6 @@ import {
 import { SByte, SLong, SPair } from '@fleet-sdk/serializer';
 
 import { amountByTokenId, asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
-import type { SwapRequest } from '../../server/routes/swapOrder';
-import type { BoxDB } from '../../server/db/db';
 
 export function splitSellRate(sellRate: string): [bigint, bigint] {
 	let floatRate = parseFloat(sellRate);
@@ -35,32 +33,29 @@ export function splitSellRate(sellRate: string): [bigint, bigint] {
 	return [bigRate, bigDenom];
 }
 
+
 export function createSwapOrderTxR9(
 	sellerPK: string,
-	sellerMultisigAddress: string,
 	inputBoxes: OneOrMore<Box<Amount>>,
 	token: { tokenId: string; amount: Amount },
 	sellRate: string,
 	currentHeight: number,
-	unlockHeight: number,
-	sellingTokenId: string,
 	buyingTokenId: string,
-	contractAddress: string,
-	nanoErg: bigint
+	nanoErg: bigint = SAFE_MIN_BOX_VALUE
 ): EIP12UnsignedTransaction {
 	const [bigRate, bigDenom] = splitSellRate(sellRate);
 
-	const outputSwapOrder = new OutputBuilder(nanoErg, contractAddress)
+	const outputSwapOrder = new OutputBuilder(nanoErg, SWAP_ORDER_ADDRESS)
 		.addTokens(token)
 		.setAdditionalRegisters({
 			R4: SColl(SSigmaProp, [
 				SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
 				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
 			]).toHex(),
-			R5: SInt(unlockHeight).toHex(),
-			R6: SPair(SColl(SByte, sellingTokenId), SColl(SByte, buyingTokenId)).toHex(),
+			R5: inputBoxes[0].additionalRegisters.R5,
+			R6: SPair(SColl(SByte, token.tokenId), SColl(SByte, buyingTokenId)).toHex(),
 			R7: SLong(bigRate).toHex(),
-			R8: SColl(SByte, ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree).toHex(),
+			R8: SColl(SByte, ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree).toHex(),
 			R9: SLong(bigDenom).toHex()
 		});
 
@@ -177,58 +172,4 @@ export function createSwapOrderTx(
 		.build()
 		.toEIP12Object();
 	return unsignedTransaction;
-}
-
-export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
-	const [rate, denom] = splitSellRate(swapParams.price);
-	const height = 1273521;
-
-	//console.log('ALL BOXES AT DEPOSIT');
-	const allDepositBoxes: any = db.boxRows.filter((b) => b.contract == 'DEPOSIT');
-
-	//console.log(allDepositBoxes.map((b) => b.box));
-
-	const swapOrderInputBoxes: any = db.boxRows.filter(
-		(b) =>
-			b.contract == 'SWAP' &&
-			//@ts-ignore
-			b.parameters.side == 'sell' &&
-			//@ts-ignore
-			b.parameters.rate == rate &&
-			//@ts-ignore
-			b.parameters.denom == denom
-	);
-	swapOrderInputBoxes.length = 1;
-
-	const paymentInputBoxes: any = db.boxRows.filter(
-		(b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapParams.address
-	);
-	console.log('userAddress', swapParams.address);
-	if (swapOrderInputBoxes.length < 1 || paymentInputBoxes.length < 1) {
-		console.dir({ swapOrderInputBoxes, paymentInputBoxes });
-		throw new Error(
-			'not enough boxes, swapOrderInputBoxes:' +
-				swapOrderInputBoxes.length +
-				', paymentInputBoxes:' +
-				paymentInputBoxes.length
-		);
-	}
-
-	const buyingAmount = +swapParams.price * +swapParams.amount;
-	const paymentAmount = +swapOrderInputBoxes[0].box.assets[0].amount;
-
-	const tokensFromSwapContract = {
-		tokenId: swapParams.buyingTokenId,
-		amount: BigInt(buyingAmount)
-	};
-	const tokensAsPayment = { tokenId: swapParams.sellingTokenId, amount: BigInt(paymentAmount) };
-
-	const unsignedTx = executeSwap(
-		height,
-		swapOrderInputBoxes.map((b) => b.box),
-		paymentInputBoxes.map((b) => b.box),
-		tokensAsPayment,
-		tokensFromSwapContract
-	);
-	return unsignedTx;
 }

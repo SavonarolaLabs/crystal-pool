@@ -193,16 +193,11 @@ describe('New Swap order with R9', async () => {
 	it.only('Order + deposit[ALICE], change:ALICE: FULL execute', async () => {
 		let unsignedTx1 = createSwapOrderTxR9(
 			BOB_ADDRESS,
-			DEPOSIT_ADDRESS,
 			utxos[DEPOSIT_ADDRESS][1],
 			tokenForSale,
 			tokenForSale.price,
 			height,
-			unlockHeight,
-			tokenForSale.tokenId,
 			paymentToken.tokenId,
-			CONTRACT_WITH_R9,
-			SAFE_MIN_BOX_VALUE
 		);
 
 		const bobSwapTx = await signTxMulti(unsignedTx1, BOB_MNEMONIC, BOB_ADDRESS);

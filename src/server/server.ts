@@ -6,13 +6,12 @@ import cors from 'cors';
 import { getBoxes, getBoxesByAddress } from './routes/boxes';
 import {
 	createSwapOrder,
-	executeSwapOrder,
-	signExecuteSwapOrder,
+	executeSwap,
+	signExecuteSwap,
 	signSwapOrder
 } from './routes/swapOrder';
-import { initDb, initDepositUtxo, type BoxDB } from './db/db';
-import { createOrderBook } from './orderBookUtils';
-import type { Express } from 'express-serve-static-core';
+import { initDb, initDepositUtxo} from './db/db';
+import { createOrderBook } from './db/orderBookUtils';
 import { getOrderBookByTradingPair } from './routes/orderBooks';
 
 const app = express();
@@ -47,10 +46,11 @@ initDepositUtxo(db);
 getBoxes(app, db);
 getBoxesByAddress(app, db);
 getOrderBookByTradingPair(app, db);
+
 createSwapOrder(app, io, db);
-executeSwapOrder(app, io, db);
 signSwapOrder(app, io, db);
-signExecuteSwapOrder(app, io, db);
+executeSwap(app, io, db);
+signExecuteSwap(app, io, db);
 
 // Basic test route
 app.get('/test', (req, res) => {

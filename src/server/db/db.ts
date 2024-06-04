@@ -1,4 +1,4 @@
-import { type Box, type EIP12UnsignedTransaction } from '@fleet-sdk/common';
+import { type Box, type EIP12UnsignedTransaction, type SignedTransaction } from '@fleet-sdk/common';
 import type { ContractType, BoxParameters, BoxRow } from '../../lib/types/boxRow';
 import type { TxRow } from '../../lib/types/txRow';
 import { ErgoAddress, ErgoTree } from '@fleet-sdk/core';
@@ -13,6 +13,7 @@ import { tradingPairs } from '../../lib/constants/tokens';
 import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes } from './sqlDb';
 import { initDeposits } from '../../lib/server-agent/simulator';
 import { serializeBigInt } from '../serializeBigInt';
+import { boxesAtAddress } from '$lib/utils/test-helper';
 
 interface HasId {
 	id: number;
@@ -286,6 +287,23 @@ export function decodeTokenIdPairFromR6(box: Box):
 	}
 }
 
+// helper functions
+export function db_depositBoxes(userAddress:string, db:BoxDB): BoxRow[]{
+    return db.boxRows.filter(
+		(b) => b.contract == 'DEPOSIT' && b.parameters.userPk == userAddress
+	);
+}
+
+export function db_storeSignedSwapTx(signedTx: SignedTransaction, db: BoxDB) {
+	db_removeBoxesByBoxIds(
+		db,
+		signedTx.inputs.map((box) => box.boxId)
+	);
+
+	const boxes1 = boxesAtAddress(signedTx, SWAP_ORDER_ADDRESS);
+	const boxes2 = boxesAtAddress(signedTx, DEPOSIT_ADDRESS);
+	db_addBoxes(db, [...boxes1, ...boxes2]);
+}
 
 // serialization functinos
 export function db_getBoxesString(db: BoxDB){
