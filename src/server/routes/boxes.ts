@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from 'express';
 import { db_getBoxesByAddressString, db_getBoxesString, type BoxDB } from '../db/db';
-import { sendJSON } from '../serverResponseUtils';
+import { sendJSON } from './utils';
 
 export function getBoxes(app: Express, db: BoxDB) {
   app.get('/boxes', (req: Request, res: Response) => {

@@ -1,5 +1,4 @@
-import { BOB_ADDRESS, DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '../../lib/constants/addresses';
-import { utxos } from '../../lib/data/utxos';
+import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '../../lib/constants/addresses';
 import { db_addBoxes, db_removeBoxesByBoxIds, type BoxDB } from '../db/db';
 import { boxesAtAddress } from '../../lib/utils/test-helper';
 import { a, c, signTxInput } from '../../lib/wallet/multisig-server';
@@ -8,7 +7,7 @@ import type { Box, SignedTransaction } from '@fleet-sdk/common';
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
 import { createOrderBook } from '../orderBookUtils';
-import { ErgoAddress, ErgoTree, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
+import { ErgoAddress, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 import { SHADOW_MNEMONIC } from '../../lib/constants/mnemonics';
 import { UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
 

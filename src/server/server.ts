@@ -4,15 +4,16 @@ import { Server } from 'socket.io';
 import { json } from 'body-parser';
 import cors from 'cors';
 import { getBoxes, getBoxesByAddress } from './routes/boxes';
-import { orderBooks } from './routes/orderBooks';
 import {
 	createSwapOrder,
 	executeSwapOrder,
 	signExecuteSwapOrder,
 	signSwapOrder
 } from './routes/swapOrder';
-import { initDb, initDepositUtxo } from './db/db';
+import { initDb, initDepositUtxo, type BoxDB } from './db/db';
 import { createOrderBook } from './orderBookUtils';
+import type { Express } from 'express-serve-static-core';
+import { getOrderBookByTradingPair } from './routes/orderBooks';
 
 const app = express();
 const server = http.createServer(app);
@@ -45,7 +46,7 @@ initDepositUtxo(db);
 // Register routes
 getBoxes(app, db);
 getBoxesByAddress(app, db);
-orderBooks(app, db);
+getOrderBookByTradingPair(app, db);
 createSwapOrder(app, io, db);
 executeSwapOrder(app, io, db);
 signSwapOrder(app, io, db);
