@@ -12,7 +12,7 @@ import { parse } from '@fleet-sdk/serializer';
 import { tradingPairs } from '../../lib/constants/tokens';
 import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes } from './sqlDb';
 import { initDeposits } from '../../lib/server-agent/simulator';
-import { serializeBigInt } from '../serializeBigInt';
+import { serializeBigInt } from './serializeBigInt';
 import { boxesAtAddress } from '$lib/utils/test-helper';
 
 interface HasId {

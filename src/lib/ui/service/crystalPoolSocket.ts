@@ -12,7 +12,7 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
     console.log('Connected to the server:', socket.id);
   });
 
-  socket.on('update', (data) => {
+  socket.on('orderbook', (data) => {
     try{
       const book = JSON.parse(data)
       setOrderBook(book);

@@ -52,16 +52,12 @@ signSwapOrder(app, io, db);
 executeSwap(app, io, db);
 signExecuteSwap(app, io, db);
 
-// Basic test route
-app.get('/test', (req, res) => {
-	res.json({ message: 'Test route is working' });
-});
 
 // WebSocket connection
 io.on('connection', (socket) => {
 	console.log('A client connected:', socket.id);
 	const orderbook = createOrderBook('rsBTC_sigUSD', db);
-	io.emit('update', orderbook);
+	io.emit('orderbook', orderbook);
 
 	socket.on('disconnect', () => {
 		console.log('Client disconnected:', socket.id);
@@ -70,7 +66,7 @@ io.on('connection', (socket) => {
 	// Example: Emit an update to all clients
 	socket.on('exampleEvent', (data) => {
 		console.log('Received exampleEvent:', data);
-		io.emit('update', { buy: [], sell: [] });
+		io.emit('orderbook', { buy: [], sell: [] });
 	});
 });
 

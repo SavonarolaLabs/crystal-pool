@@ -40,7 +40,7 @@ export async function swapOrderTxWithCommits(swapParams: SwapParams, db:BoxDB): 
 	return { unsignedTx, publicCommitsPool };
 }
 
-export async function signSwapOrder(unsignedTx, hints, db){
+export async function signSwap(unsignedTx, hints, db){
 	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
 	const signedTxWasm = await c(unsignedTx, privateCommitsPool, hints);
 	const signedTx = signedTxWasm.to_js_eip12();
