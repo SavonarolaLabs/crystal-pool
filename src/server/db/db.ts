@@ -10,7 +10,13 @@ import {
 } from '../../lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
 import { tradingPairs } from '../../lib/constants/tokens';
-import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes, deleteAllBoxes } from './sqlDb';
+import {
+	persistBox,
+	persistMultipleBoxes,
+	loadBoxRows,
+	deleteMultipleBoxes,
+	deleteAllBoxes
+} from './sqlDb';
 import { initDeposits } from '../../lib/server-agent/simulator';
 import { serializeBigInt } from './serializeBigInt';
 import { boxesAtAddress } from '$lib/utils/test-helper';
@@ -32,8 +38,10 @@ export async function initDb(): Promise<BoxDB> {
 	};
 }
 
-export async function clearDB(){
+export async function db_clearDB(db: BoxDB) {
 	await deleteAllBoxes();
+	db.boxRows.length == 0;
+	db.boxRows = [];
 }
 
 export async function db_initDepositUtxo(db: BoxDB) {
@@ -292,10 +300,8 @@ export function decodeTokenIdPairFromR6(box: Box):
 }
 
 // helper functions
-export function db_depositBoxes(userAddress:string, db:BoxDB): BoxRow[]{
-    return db.boxRows.filter(
-		(b) => b.contract == 'DEPOSIT' && b.parameters.userPk == userAddress
-	);
+export function db_depositBoxes(userAddress: string, db: BoxDB): BoxRow[] {
+	return db.boxRows.filter((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == userAddress);
 }
 
 export function db_storeSignedSwapTx(signedTx: SignedTransaction, db: BoxDB) {
@@ -310,13 +316,13 @@ export function db_storeSignedSwapTx(signedTx: SignedTransaction, db: BoxDB) {
 }
 
 // serialization functinos
-export function db_getBoxesString(db: BoxDB){
+export function db_getBoxesString(db: BoxDB) {
 	const serializedData = serializeBigInt(db.boxRows);
 	return serializedData;
 }
 
-export function db_getBoxesByAddressString(db: BoxDB, address: string ){
-	const userBoxes = db.boxRows.filter(box => box.parameters.userPk == address);
+export function db_getBoxesByAddressString(db: BoxDB, address: string) {
+	const userBoxes = db.boxRows.filter((box) => box.parameters.userPk == address);
 	const serializedData = serializeBigInt(userBoxes);
 	return serializedData;
 }

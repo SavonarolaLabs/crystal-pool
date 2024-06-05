@@ -1,11 +1,11 @@
-import type { Box, EIP12UnsignedTransaction } from "@fleet-sdk/common";
-import { db_depositBoxes, db_storeSignedSwapTx, type BoxDB } from "./db/db";
-import { a, c, signTxInput, type JSONTransactionHintsBag } from "$lib/wallet/multisig-server";
-import { createSwapOrderTxR9, executeSwap, splitSellRate } from "$lib/wallet/swap";
-import { ErgoAddress } from "@fleet-sdk/core";
-import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from "$lib/constants/addresses";
-import { SHADOW_MNEMONIC } from "$lib/constants/mnemonics";
-import { UnsignedTransaction } from "ergo-lib-wasm-nodejs";
+import type { Box, EIP12UnsignedTransaction } from '@fleet-sdk/common';
+import { db_depositBoxes, db_storeSignedSwapTx, type BoxDB } from './db/db';
+import { a, c, signTxInput, type JSONTransactionHintsBag } from '$lib/wallet/multisig-server';
+import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swap';
+import { ErgoAddress } from '@fleet-sdk/core';
+import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
+import { SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
+import { UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
 
 export type SwapParams = {
 	address: string;
@@ -15,14 +15,17 @@ export type SwapParams = {
 	buyingTokenId: string;
 };
 
-export type TxWithCommits = { 
-	unsignedTx: EIP12UnsignedTransaction, 
-	publicCommitsPool: JSONTransactionHintsBag,
-}
+export type TxWithCommits = {
+	unsignedTx: EIP12UnsignedTransaction;
+	publicCommitsPool: JSONTransactionHintsBag;
+};
 
-export async function swapOrderTxWithCommits(swapParams: SwapParams, db:BoxDB): Promise<TxWithCommits> {
+export async function swapOrderTxWithCommits(
+	swapParams: SwapParams,
+	db: BoxDB
+): Promise<TxWithCommits> {
 	const height = 1273521;
-	const depositInputs: any = db_depositBoxes(swapParams.address, db)
+	const depositInputs: any = db_depositBoxes(swapParams.address, db);
 
 	const unsignedTx = createSwapOrderTxR9(
 		swapParams.address,
@@ -40,7 +43,7 @@ export async function swapOrderTxWithCommits(swapParams: SwapParams, db:BoxDB): 
 	return { unsignedTx, publicCommitsPool };
 }
 
-export async function signSwap(unsignedTx, hints, db){
+export async function signSwap(unsignedTx, hints, db) {
 	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
 	const signedTxWasm = await c(unsignedTx, privateCommitsPool, hints);
 	const signedTx = signedTxWasm.to_js_eip12();
@@ -67,7 +70,7 @@ export function createExecuteSwapOrderTx(swapParams: SwapParams, db: BoxDB) {
 	const paymentInputBoxes: any = db.boxRows.filter(
 		(b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapParams.address
 	);
-	console.log('userAddress', swapParams.address);
+	//console.log('userAddress', swapParams.address);
 	if (swapOrderInputBoxes.length < 1 || paymentInputBoxes.length < 1) {
 		console.dir({ swapOrderInputBoxes, paymentInputBoxes });
 		throw new Error(
@@ -97,7 +100,7 @@ export function createExecuteSwapOrderTx(swapParams: SwapParams, db: BoxDB) {
 	return unsignedTx;
 }
 
-export async function signExecuteSwapOrder(unsignedTx, proof, db){
+export async function signExecuteSwapOrder(unsignedTx, proof, db) {
 	const inputIndexDeposit = unsignedTx.inputs.findIndex(
 		(box: Box) => box.ergoTree == ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree
 	);

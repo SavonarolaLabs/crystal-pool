@@ -1,23 +1,16 @@
 import {
 	ALICE_ADDRESS,
 	BOB_ADDRESS,
-	DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS
+	DEPOSIT_ADDRESS,
+	SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { createWithdrawTx, deposit } from '$lib/wallet/deposit';
-import {
-	signMultisig,
-	signTx
-} from '$lib/wallet/multisig-server';
+import { signMultisig, signTx } from '$lib/wallet/multisig-server';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { utxos } from '$lib/data/utxos';
-import {
-	SAFE_MIN_BOX_VALUE
-} from '@fleet-sdk/core';
-import {
-	getDepositsBoxesByAddress,
-	updateContractBoxes
-} from '$lib/utils/test-helper';
+import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
+import { getDepositsBoxesByAddress, updateContractBoxes } from '$lib/utils/test-helper';
 import {
 	type Amount,
 	type Box,
@@ -164,7 +157,7 @@ function createSwapOrderTxR9AgentBob(
 		{ tokenId: TOKEN.rsBTC.tokenId, amount: amount },
 		price,
 		CHAIN_HEIGHT,
-		TOKEN.sigUSD.tokenId,
+		TOKEN.sigUSD.tokenId
 	);
 	return swapUTx;
 }

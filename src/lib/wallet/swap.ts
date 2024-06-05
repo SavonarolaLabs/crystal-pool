@@ -33,10 +33,9 @@ export function splitSellRate(sellRate: string): [bigint, bigint] {
 	return [bigRate, bigDenom];
 }
 
-
 export function createSwapOrderTxR9(
 	sellerPK: string,
-	inputBoxes: OneOrMore<Box<Amount>>,
+	inputBoxes: Box[],
 	token: { tokenId: string; amount: Amount },
 	sellRate: string,
 	currentHeight: number,
@@ -74,7 +73,7 @@ export function createSwapOrderTxR9(
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
 		// @ts-ignore
-		.configureSelector((selector) => selector.ensureInclusion([inputBoxes].map((b) => b.boxId)))
+		.configureSelector((selector) => selector.ensureInclusion(inputBoxes.map((b) => b.boxId)))
 		.from(inputBoxes)
 		.to([outputSwapOrder, change])
 		.payFee(RECOMMENDED_MIN_FEE_VALUE)
