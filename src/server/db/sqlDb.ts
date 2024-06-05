@@ -74,3 +74,7 @@ export async function deleteMultipleBoxes(ids: number[]): Promise<void> {
     const placeholders = ids.map(() => '?').join(',');
     await sqlDb.run(`DELETE FROM boxes WHERE id IN (${placeholders})`, ids);
 }
+
+export async function deleteAllBoxes(): Promise<void> {
+    await sqlDb.run(`DELETE FROM boxes`);
+}

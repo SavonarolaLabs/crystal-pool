@@ -10,7 +10,7 @@ import {
 } from '../../lib/constants/addresses';
 import { parse } from '@fleet-sdk/serializer';
 import { tradingPairs } from '../../lib/constants/tokens';
-import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes } from './sqlDb';
+import { persistBox, persistMultipleBoxes, loadBoxRows, deleteMultipleBoxes, deleteAllBoxes } from './sqlDb';
 import { initDeposits } from '../../lib/server-agent/simulator';
 import { serializeBigInt } from './serializeBigInt';
 import { boxesAtAddress } from '$lib/utils/test-helper';
@@ -30,6 +30,10 @@ export async function initDb(): Promise<BoxDB> {
 		boxRows,
 		txes: []
 	};
+}
+
+export async function clearDB(){
+	await deleteAllBoxes();
 }
 
 export async function db_initDepositUtxo(db: BoxDB) {
