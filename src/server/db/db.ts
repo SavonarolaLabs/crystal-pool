@@ -32,7 +32,7 @@ export async function initDb(): Promise<BoxDB> {
 	};
 }
 
-export async function initDepositUtxo(db: BoxDB) {
+export async function db_initDepositUtxo(db: BoxDB) {
 	if (db.boxRows?.length == 0) {
 		const aliceAndBobDeposits = await initDeposits();
 		db_addBoxes(db, aliceAndBobDeposits);

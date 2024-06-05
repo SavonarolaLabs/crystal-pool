@@ -59,6 +59,7 @@ export function createSwapOrderTxR9(
 			R9: SLong(bigDenom).toHex()
 		});
 
+	// TODO: make change conditional
 	const change = new OutputBuilder(
 		// @ts-ignore
 		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
