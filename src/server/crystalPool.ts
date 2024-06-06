@@ -1,4 +1,4 @@
-import type { Box, EIP12UnsignedTransaction } from '@fleet-sdk/common';
+import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
 import { db_depositBoxes, db_storeSignedSwapTx, type BoxDB } from './db/db';
 import { a, c, signTxInput, type JSONTransactionHintsBag } from '$lib/wallet/multisig-server';
 import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swap';
@@ -116,18 +116,35 @@ export async function signExecuteSwapOrder(unsignedTx, proof, db) {
 	const wasmUnsigned = UnsignedTransaction.from_json(JSON.stringify(unsignedTx));
 	const transaction = Transaction.from_unsigned_tx(wasmUnsigned, [proof, proofSwap]);
 
-	//console.log(transaction.to_js_eip12());
 	const txId = UnsignedTransaction.from_json(JSON.stringify(unsignedTx)).id().to_str();
 
 	unsignedTx.txId = txId;
 	//ADD FUNCTION
-	unsignedTx.inputs[inputIndexDeposit].spendingProof = proof;
-	unsignedTx.inputs[inputIndexSwap].spendingProof = proofSwap;
-	//TODO: sign or calculate outputs IDs
-	//console.log(unsignedTx);
-	//from_unsigned_tx
-	//from_unsigned_tx()
+	const proofs = [proof, proofSwap].map((p) => p.proofBytes); // TODO: more than 1 input
+	const signedTx = addOutputIds(unsignedTx, proofs);
 
-	db_storeSignedSwapTx(unsignedTx, db);
+	db_storeSignedSwapTx(signedTx, db);
 	return unsignedTx;
+}
+
+function addOutputIds(unsignedTx: EIP12UnsignedTransaction, proofs: string[]): SignedTransaction {
+	//TODO: ADD TYPE
+	const uint8arrays = proofs.map(hexStringToUint8Array);
+	const wasmUnsigned = UnsignedTransaction.from_json(JSON.stringify(unsignedTx));
+	const transaction = Transaction.from_unsigned_tx(wasmUnsigned, uint8arrays);
+	return transaction.to_js_eip12();
+}
+
+function hexStringToUint8Array(hexString: string): Uint8Array {
+	if (hexString.length % 2 !== 0) {
+		throw new Error('Invalid hex string');
+	}
+
+	const array = new Uint8Array(hexString.length / 2);
+
+	for (let i = 0; i < hexString.length; i += 2) {
+		array[i / 2] = parseInt(hexString.substr(i, 2), 16);
+	}
+
+	return array;
 }

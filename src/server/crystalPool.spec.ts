@@ -44,7 +44,6 @@ describe('swap', () => {
 			buyingTokenId: TOKEN.sigUSD.tokenId
 		};
 		let { unsignedTx, publicCommitsPool } = await swapOrderTxWithCommits(swapParamsCreate, db);
-		console.dir(unsignedTx, { depth: null });
 		expect(unsignedTx).toBeDefined();
 
 		//signByUser
@@ -105,27 +104,54 @@ describe('swap', () => {
 			expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapExecutorAddress)).toBeDefined();
 		}
 
+		//SWAP 2
+		console.log('ROUND 2');
 		const { unsignedTx: unsignedTx2, publicCommitsPool: publicCommitsPool2 } =
 			await swapOrderTxWithCommits(swapParamsCreate, db);
-		expect(unsignedTx).toBeDefined();
+		expect(unsignedTx2).toBeDefined();
 
-		// //signByUser
-		// let extractedHints2 = await b(
-		// 	unsignedTx,
-		// 	swapCreatorMnemonic,
-		// 	swapCreatorAddress,
-		// 	publicCommitsPool
-		// );
-		// expect(extractedHints).toBeDefined();
+		//signByUser
+		let extractedHints2 = await b(
+			unsignedTx2,
+			swapCreatorMnemonic,
+			swapCreatorAddress,
+			publicCommitsPool
+		);
+		expect(extractedHints2).toBeDefined();
 
-		// //signByServer
-		// let signedTx2 = await signSwap(unsignedTx, extractedHints, db);
+		//signByServer
+		//console.log(db.boxRows);
 
-		// // prettier-ignore
-		// {
-		// expect(db.boxRows.find((b) => b.contract == 'SWAP')).toBeDefined();
-		// expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapCreatorAddress)).toBeDefined();
-		// expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapExecutorAddress)).toBeDefined();
-		// }
+		let signedTx2 = await signSwap(unsignedTx2, extractedHints2, db);
+		const executeUTx2 = createExecuteSwapOrderTx(swapParamsExecute, db);
+
+		// prettier-ignore
+		{
+			expect(executeUTx2).toBeDefined();
+			expect(executeUTx2.inputs.find((i)=>parseBox(i)?.contract=='SWAP')).toBeDefined();
+			expect(executeUTx2.inputs.find((i)=>parseBox(i)?.contract=="DEPOSIT"&&parseBox(i)?.parameters.userPk==swapExecutorAddress)).toBeDefined();
+			expect(executeUTx2.outputs.find((i)=>parseBox(i)?.contract=="DEPOSIT"&&parseBox(i)?.parameters.userPk==swapCreatorAddress)).toBeDefined();
+			expect(executeUTx2.outputs.find((i)=>parseBox(i)?.contract=="DEPOSIT"&&parseBox(i)?.parameters.userPk==swapExecutorAddress)).toBeDefined();
+		}
+
+		//Sign 1 INPUT By User
+		let inputIndex2 = executeUTx2.inputs.findIndex(
+			(b: Box) => decodeR4(b)?.userPk == swapExecutorAddress
+		); //MANY INPUTS
+
+		const signedInput2 = await signTxInput(swapExecutorMnemonic, executeUTx2, inputIndex2);
+		const proof2 = JSON.parse(signedInput2.spending_proof().to_json());
+		expect(proof2).toBeDefined();
+
+		//Sign 2 INPUT By Server
+		const executeTx2 = await signExecuteSwapOrder(executeUTx2, proof2, db);
+		expect(executeTx2).toBeDefined();
+
+		// prettier-ignore
+		{
+			expect(db.boxRows.find((b) => b.contract == 'SWAP')).toBeUndefined();
+			expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapCreatorAddress)).toBeDefined();
+			expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapExecutorAddress)).toBeDefined();
+		}
 	});
 });

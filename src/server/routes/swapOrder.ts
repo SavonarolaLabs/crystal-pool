@@ -1,7 +1,13 @@
 import { type BoxDB } from '../db/db';
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
-import { createExecuteSwapOrderTx, signExecuteSwapOrder, signSwap, swapOrderTxWithCommits, type SwapParams } from '../crystalPool';
+import {
+	createExecuteSwapOrderTx,
+	signExecuteSwapOrder,
+	signSwap,
+	swapOrderTxWithCommits,
+	type SwapParams
+} from '../crystalPool';
 import { broadcastOrderBook, broadcastSwapExecute } from '../ioSocket';
 
 export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
@@ -33,9 +39,9 @@ export function executeSwap(app: Express, io: Server, db: BoxDB) {
 
 export function signExecuteSwap(app: Express, io: Server, db: BoxDB) {
 	app.post('/execute-swap/sign', async (req: Request, res: Response) => {
-		const { unsignedTx, proof} = req.body;
+		const { unsignedTx, proof } = req.body;
 
-		const signedTx = signExecuteSwapOrder(unsignedTx, proof, db);
+		const signedTx = await signExecuteSwapOrder(unsignedTx, proof, db);
 		broadcastOrderBook('rsBTC_sigUSD', io, db);
 		broadcastSwapExecute('rsBTC_sigUSD', io);
 
