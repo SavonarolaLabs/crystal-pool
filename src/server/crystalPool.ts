@@ -5,7 +5,7 @@ import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swa
 import { ErgoAddress } from '@fleet-sdk/core';
 import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
 import { SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
-import { UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
+import { Transaction, UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
 
 export type SwapParams = {
 	address: string;
@@ -110,11 +110,23 @@ export async function signExecuteSwapOrder(unsignedTx, proof, db) {
 	const signed = await signTxInput(SHADOW_MNEMONIC, unsignedTx, inputIndexSwap);
 	const proofSwap = JSON.parse(signed.spending_proof().to_json());
 
+	//console.log('proof', proof);
+	//console.log('proofSwap', proofSwap);
+
+	const wasmUnsigned = UnsignedTransaction.from_json(JSON.stringify(unsignedTx));
+	const transaction = Transaction.from_unsigned_tx(wasmUnsigned, [proof, proofSwap]);
+
+	//console.log(transaction.to_js_eip12());
 	const txId = UnsignedTransaction.from_json(JSON.stringify(unsignedTx)).id().to_str();
 
+	unsignedTx.txId = txId;
+	//ADD FUNCTION
 	unsignedTx.inputs[inputIndexDeposit].spendingProof = proof;
 	unsignedTx.inputs[inputIndexSwap].spendingProof = proofSwap;
-	unsignedTx.txId = txId;
+	//TODO: sign or calculate outputs IDs
+	//console.log(unsignedTx);
+	//from_unsigned_tx
+	//from_unsigned_tx()
 
 	db_storeSignedSwapTx(unsignedTx, db);
 	return unsignedTx;

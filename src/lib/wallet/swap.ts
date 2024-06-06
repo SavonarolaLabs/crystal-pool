@@ -20,6 +20,7 @@ import {
 import { SByte, SLong, SPair } from '@fleet-sdk/serializer';
 
 import { amountByTokenId, asBigInt, calcTokenChange, sumNanoErg } from '$lib/utils/helper';
+import { c } from './multisig-server';
 
 export function splitSellRate(sellRate: string): [bigint, bigint] {
 	let floatRate = parseFloat(sellRate);
@@ -61,7 +62,7 @@ export function createSwapOrderTxR9(
 	// TODO: make change conditional
 	const change = new OutputBuilder(
 		// @ts-ignore
-		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
+		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE, // 4997900000 + 3200000 - SAFE_MIN_BOX_VALUE -  RECOMMENDED_MIN_FEE_VALUE
 		DEPOSIT_ADDRESS
 	)
 		.setAdditionalRegisters({
@@ -70,6 +71,15 @@ export function createSwapOrderTxR9(
 		})
 		// @ts-ignore
 		.addTokens(calcTokenChange([...inputBoxes], token));
+
+	// console.log('inputBoxes:', inputBoxes);
+	// console.dir(change, { depth: null });
+	// console.log(
+	// 	'change amount',
+	// 	4997900000n + 3200000n - SAFE_MIN_BOX_VALUE - RECOMMENDED_MIN_FEE_VALUE
+	// );
+	// console.log('inputBoxes:', inputBoxes); //
+	// console.log(inputBoxes.map((b) => b.boxId)); //
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
 		// @ts-ignore

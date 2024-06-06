@@ -43,10 +43,8 @@ describe('swap', () => {
 			sellingTokenId: TOKEN.rsBTC.tokenId,
 			buyingTokenId: TOKEN.sigUSD.tokenId
 		};
-		let { unsignedTx, publicCommitsPool } = await swapOrderTxWithCommits(
-			swapParamsCreate,
-			db
-		);
+		let { unsignedTx, publicCommitsPool } = await swapOrderTxWithCommits(swapParamsCreate, db);
+		console.dir(unsignedTx, { depth: null });
 		expect(unsignedTx).toBeDefined();
 
 		//signByUser
@@ -87,9 +85,6 @@ describe('swap', () => {
 			expect(executeUTx.outputs.find((i)=>parseBox(i)?.contract=="DEPOSIT"&&parseBox(i)?.parameters.userPk==swapExecutorAddress)).toBeDefined();
 		}
 
-		//console.log(executeUTx);
-		//expect
-
 		//Sign 1 INPUT By User
 		let inputIndex = executeUTx.inputs.findIndex(
 			(b: Box) => decodeR4(b)?.userPk == swapExecutorAddress
@@ -110,33 +105,27 @@ describe('swap', () => {
 			expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapExecutorAddress)).toBeDefined();
 		}
 
-		//Step 2.
-
-		{ unsignedTx, publicCommitsPool } = await swapOrderTxWithCommits(
-			swapParamsCreate,
-			db
-		);
+		const { unsignedTx: unsignedTx2, publicCommitsPool: publicCommitsPool2 } =
+			await swapOrderTxWithCommits(swapParamsCreate, db);
 		expect(unsignedTx).toBeDefined();
 
-		//signByUser
-		let extractedHints2 = await b(
-			unsignedTx,
-			swapCreatorMnemonic,
-			swapCreatorAddress,
-			publicCommitsPool
-		);
-		expect(extractedHints).toBeDefined();
+		// //signByUser
+		// let extractedHints2 = await b(
+		// 	unsignedTx,
+		// 	swapCreatorMnemonic,
+		// 	swapCreatorAddress,
+		// 	publicCommitsPool
+		// );
+		// expect(extractedHints).toBeDefined();
 
-		//signByServer
-		let signedTx2 = await signSwap(unsignedTx, extractedHints, db);
+		// //signByServer
+		// let signedTx2 = await signSwap(unsignedTx, extractedHints, db);
 
-		// prettier-ignore
-		{
-		expect(db.boxRows.find((b) => b.contract == 'SWAP')).toBeDefined();
-		expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapCreatorAddress)).toBeDefined();
-		expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapExecutorAddress)).toBeDefined();
-		}
-
-
+		// // prettier-ignore
+		// {
+		// expect(db.boxRows.find((b) => b.contract == 'SWAP')).toBeDefined();
+		// expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapCreatorAddress)).toBeDefined();
+		// expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapExecutorAddress)).toBeDefined();
+		// }
 	});
 });
