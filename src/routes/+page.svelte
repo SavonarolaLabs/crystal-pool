@@ -6,10 +6,10 @@
 	import { initSocket } from '$lib/ui/service/crystalPoolSocket';
 	import { fetchBalance } from '$lib/ui/ui_state';
 
-	onMount(async ()=>{
+	onMount(async () => {
 		await initSocket();
 		await fetchBalance();
-	})
+	});
 </script>
 
 <Header></Header>
