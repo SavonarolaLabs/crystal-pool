@@ -6,15 +6,7 @@ import { ErgoAddress } from '@fleet-sdk/core';
 import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
 import { SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
 import { Transaction, UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
-
-export type SwapParams = {
-	address: string;
-	price: string;
-	amount: string;
-	sellingTokenId: string;
-	buyingTokenId: string;
-	side: string;
-};
+import type { SwapRequest } from '$lib/ui/service/tradingService';
 
 export type TxWithCommits = {
 	unsignedTx: EIP12UnsignedTransaction;
@@ -22,7 +14,7 @@ export type TxWithCommits = {
 };
 
 export async function swapOrderTxWithCommits(
-	swapParams: SwapParams,
+	swapParams: SwapRequest,
 	db: BoxDB
 ): Promise<TxWithCommits> {
 	const height = 1273521;
@@ -52,7 +44,7 @@ export async function signSwap(unsignedTx, hints, db) {
 	return signedTx;
 }
 
-export function createExecuteSwapOrderTx(swapParams: SwapParams, db: BoxDB) {
+export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
 	const [rate, denom] = splitSellRate(swapParams.price);
 	const height = 1273521;
 
