@@ -1,3 +1,7 @@
+<script>
+	import { orderbook_latest } from '../ui_state';
+</script>
+
 <div class="markets_wrapper">
 	<div class="markets_searchBar">
 		<div class="ant-input-affix-wrapper ant-input-affix-wrapper-sm">
@@ -19,12 +23,7 @@
 				></span
 			>
 
-			<input
-				placeholder="Search"
-				class="ant-input"
-				type="text"
-				value=""
-			/>
+			<input placeholder="Search" class="ant-input" type="text" value="" />
 		</div>
 	</div>
 
@@ -52,8 +51,8 @@
 				</div>
 
 				<div class="markets_col2">
-					<div class="markets_strong">4.5452</div>
-					<div class="markets_secondLine">$4.54</div>
+					<div class="markets_strong">{$orderbook_latest.price}</div>
+					<div class="markets_secondLine">${$orderbook_latest.price}</div>
 				</div>
 				<div class="markets_col3">
 					<div class="markets_changeUp">+0.24%</div>
@@ -174,8 +173,7 @@
 		display: inline-block;
 		width: 100%;
 		min-width: 0;
-		padding: var(--input-padding-vertical-base)
-			var(--input-padding-horizontal-base);
+		padding: var(--input-padding-vertical-base) var(--input-padding-horizontal-base);
 		color: var(--input-color);
 		font-size: var(--font-size-base);
 		line-height: var(--line-height-base);
@@ -223,8 +221,7 @@
 		display: inline-block;
 		width: 100%;
 		min-width: 0;
-		padding: var(--input-padding-vertical-base)
-			var(--input-padding-horizontal-base);
+		padding: var(--input-padding-vertical-base) var(--input-padding-horizontal-base);
 		color: var(--input-color);
 		font-size: var(--font-size-base);
 		line-height: var(--line-height-base);
@@ -283,8 +280,7 @@
 		box-sizing: border-box;
 	}
 
-	.styles_scrollTabsWrapper__QM7GP
-		.mx-scroll-tabs__nav-item.mx-scroll-is-active {
+	.styles_scrollTabsWrapper__QM7GP .mx-scroll-tabs__nav-item.mx-scroll-is-active {
 		color: var(--text-primary);
 		text-shadow: 0 0 0.3px currentcolor;
 	}

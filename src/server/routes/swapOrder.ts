@@ -55,21 +55,20 @@ export function signExecuteSwap(app: Express, io: Server, db: BoxDB) {
 		const denomB = parseBox(swapInput)?.parameters.denom;
 		const sideB = parseBox(swapInput)?.parameters.side;
 
-		let price;
-		let amount;
-		if (sideB == 'sell') {
-			price = sellPrice(rateB, denomB);
-			amount = sellAmount(amountB);
-		} else {
-			price = buyPrice(rateB, denomB);
-			amount = buyAmount(rateB, denomB, amountB);
-		}
-
 		const params = {
-			side: sideB,
-			price: Number(price),
-			amount: Number(amount)
+			side: 'buy',
+			price: 0,
+			amount: 0
 		};
+		if (sideB == 'sell') {
+			params.price = Number(sellPrice(rateB, denomB));
+			params.amount = Number(sellAmount(amountB));
+			params.side = 'buy';
+		} else {
+			params.price = Number(buyPrice(rateB, denomB));
+			params.amount = Number(buyAmount(rateB, denomB, amountB));
+			params.side = 'sell';
+		}
 
 		broadcastSwapExecute('rsBTC_sigUSD', io, params);
 

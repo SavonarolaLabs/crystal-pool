@@ -1,3 +1,7 @@
+<script>
+	import { orderbook_latest } from '../ui_state';
+</script>
+
 <div class="exchange_headline_wrapper">
 	<div class="header_wrapper">
 		<div class="headline_left">
@@ -24,15 +28,13 @@
 			<div class="headline_leftItem">
 				<div>
 					<span class="headline_title headline_latestPrice"
-						>69,450.01</span
-					><span class="headline_change headline_changeUp">
-						+1.62%</span
-					>
+						>{$orderbook_latest.price}</span
+					><span class="headline_change headline_changeUp"> +1.62%</span>
 				</div>
 				<div class="headline_priceBox">
 					<span dir="ltr">
 						<span style="margin-inline-end: 2px">$</span>
-						<span dir="ltr">69,406.50</span>
+						<span dir="ltr">{$orderbook_latest.price}</span>
 					</span>
 				</div>
 			</div>
@@ -51,15 +53,11 @@
 							</div>
 
 							<div class="subtabs_leftItem">
-								<div class="headline_withBorder">
-									24h Volume (rsBTC)
-								</div>
+								<div class="headline_withBorder">24h Volume (rsBTC)</div>
 								<div class="headline_title">12.38K</div>
 							</div>
 							<div class="subtabs_leftItem">
-								<div class="headline_withBorder">
-									24h Amount (sigUSD)
-								</div>
+								<div class="headline_withBorder">24h Amount (sigUSD)</div>
 								<div class="headline_title">836.47M</div>
 							</div>
 						</div>
