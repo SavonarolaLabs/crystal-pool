@@ -1,4 +1,4 @@
-import { type BoxDB } from '../db/db';
+import { decodeR7, decodeTokenIdPairFromR6, parseBox, type BoxDB } from '../db/db';
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
 import {
@@ -9,6 +9,7 @@ import {
 	type SwapParams
 } from '../crystalPool';
 import { broadcastOrderBook, broadcastSwapExecute } from '../ioSocket';
+import { sellAmount, sellPrice } from '../db/orderBookUtils';
 
 export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/swap-order', async (req: Request, res: Response) => {
@@ -43,7 +44,25 @@ export function signExecuteSwap(app: Express, io: Server, db: BoxDB) {
 
 		const signedTx = await signExecuteSwapOrder(unsignedTx, proof, db);
 		broadcastOrderBook('rsBTC_sigUSD', io, db);
-		broadcastSwapExecute('rsBTC_sigUSD', io);
+
+		const swapInput = signedTx.inputs.find((i) => parseBox(i)?.contract == 'SWAP');
+		console.log('decodeR6:', decodeTokenIdPairFromR6(swapInput));
+		console.log('decodeR7:', decodeR7(swapInput));
+		console.dir(parseBox(swapInput));
+
+		const price = sellPrice(
+			parseBox(swapInput)?.parameters.rate,
+			parseBox(swapInput)?.parameters.denom
+		);
+		const amount = sellAmount(swapInput.assets[0].amount);
+
+		const params = {
+			side: parseBox(swapInput)?.parameters.side,
+			price: Number(price),
+			amount: Number(amount)
+		};
+
+		broadcastSwapExecute('rsBTC_sigUSD', io, params);
 
 		res.json(signedTx);
 	});

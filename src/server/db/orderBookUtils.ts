@@ -42,12 +42,12 @@ export function createOrderBook(tradingPair: string, db: BoxDB) {
 	return serializeBigInt(orderbook);
 }
 
-function buyValue(amount: Amount) {
+export function buyValue(amount: Amount) {
 	const decimalsCurrency = TOKEN.sigUSD.decimals;
 	return BigNumber(amount.toString()).dividedBy(BigNumber(10).pow(decimalsCurrency));
 }
 
-function buyAmount(price: bigint, denom: bigint, amount: Amount) {
+export function buyAmount(price: bigint, denom: bigint, amount: Amount) {
 	//0.00001
 	const decimalsToken = TOKEN.rsBTC.decimals;
 	const real_price = BigNumber(price.toString()).dividedBy(denom.toString());
@@ -57,7 +57,7 @@ function buyAmount(price: bigint, denom: bigint, amount: Amount) {
 	return real_amount.toString(10);
 }
 
-function buyPrice(price: bigint, denom: bigint) {
+export function buyPrice(price: bigint, denom: bigint) {
 	const real_price = BigNumber(price.toString()).dividedBy(denom.toString());
 	//500n
 	const decimalsToken = TOKEN.rsBTC.decimals;
@@ -68,7 +68,7 @@ function buyPrice(price: bigint, denom: bigint) {
 	return bigDecimalsToken.dividedBy(BigNumber(real_price)).dividedBy(bigDecimalsCurrency);
 }
 
-function sellPrice(price: bigint, denom: bigint) {
+export function sellPrice(price: bigint, denom: bigint) {
 	const real_price = BigNumber(price.toString()).dividedBy(denom.toString());
 
 	const decimalsToken = TOKEN.rsBTC.decimals;
@@ -81,12 +81,12 @@ function sellPrice(price: bigint, denom: bigint) {
 	return initial_input.toString(10);
 }
 
-function sellAmount(amount: Amount) {
+export function sellAmount(amount: Amount) {
 	const decimals = TOKEN.rsBTC.decimals;
 	return BigNumber(amount.toString()).dividedBy(BigNumber(10).pow(decimals)).toString(10);
 }
 
-function sellValue(price: bigint, denom: bigint, amount: Amount) {
+export function sellValue(price: bigint, denom: bigint, amount: Amount) {
 	const decimalsCurrency = TOKEN.sigUSD.decimals;
 	const real_price = BigNumber(price.toString()).dividedBy(denom.toString());
 	return real_price

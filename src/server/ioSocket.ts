@@ -7,15 +7,15 @@ export function broadcastOrderBook(pair, io, db) {
 	io.emit('orderbook', orderbook);
 }
 
-export function broadcastSwapExecute(pair: string, io: Server) {
+export function broadcastSwapExecute(pair: string, io: Server, params: any) {
 	io.emit(
 		'trades',
 		JSON.stringify([
 			{
-				price: 20000,
-				amount: 0.00001,
+				price: params.price,
+				amount: params.amount,
 				time: getCurrentTime(),
-				side: 'buy'
+				side: params.side
 			}
 		])
 	);
