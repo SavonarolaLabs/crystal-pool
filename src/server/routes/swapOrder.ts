@@ -21,7 +21,6 @@ export function configureSwapOrder(app: Express, io: Server, db: BoxDB) {
 		//return swapParamsToExecute and swapParamsToBuy? or return box to execute???
 		const swapParamsExecute = swapParams;
 		// find box
-		console.log('BROKEN PEOPLE NOW');
 
 		const allBoxes = JSON.parse(
 			serializeBigInt(db.boxRows.filter((br) => br.contract == 'SWAP'))

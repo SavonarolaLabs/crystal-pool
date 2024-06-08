@@ -272,8 +272,10 @@
 		console.log('swap params for configuring buy action:', swapParams);
 		//Request Server
 		let swapParamsExecute = await configureSwapTx(swapParams); // new SwapParams
-
 		console.log(swapParamsExecute);
+		//EXECUTE IT
+		let signedTx = await executeAndSignInputsSwapTx(swapParamsExecute, signTxInput); // UNSIGNED TX
+		console.log(signedTx);
 		//configure 2-nd pack for Buy Execution
 	}
 </script>

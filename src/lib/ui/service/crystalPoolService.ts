@@ -31,9 +31,7 @@ export async function post(address: string, props: any) {
 	return data;
 }
 
-export async function configureSwapTx(
-	swapParams: SwapRequest
-): Promise<{ swapParamsExecute: SwapRequest }> {
+export async function configureSwapTx(swapParams: SwapRequest): Promise<SwapRequest> {
 	return await post(CONFIGURE_SWAP_REQUEST, swapParams);
 }
 
