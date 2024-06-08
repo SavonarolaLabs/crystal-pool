@@ -13,6 +13,7 @@ export type SwapParams = {
 	amount: string;
 	sellingTokenId: string;
 	buyingTokenId: string;
+	side: string;
 };
 
 export type TxWithCommits = {

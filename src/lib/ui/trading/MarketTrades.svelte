@@ -2,27 +2,27 @@
 	import { market_trades } from '../ui_state';
 </script>
 
-	<div class="tab">Market Trades</div>
-	<div class="trades_tableHeader">
-		<h2 class="trades_column trades_price">Price(sigUSD)</h2>
-		<h2 class="trades_column trades_vol">Amount(rsBTC)</h2>
-		<h2 class="trades_column trades_time">Time</h2>
-	</div>
-		<div class="trades_asks">
-			{#each $market_trades as trade}
-				<div class="trades_row">
-					<div
-						class="trades_price"
-						class:trades_sell={trade.side == 'sell'}
-						class:trades_buy={trade.side == 'buy'}
-					>
-						{trade.price}
-					</div>
-					<div class="trades_vol"><span>{trade.amount}</span></div>
-					<div class="trades_time"><span>{trade.time}</span></div>
-				</div>
-			{/each}
+<div class="tab">Market Trades</div>
+<div class="trades_tableHeader">
+	<h2 class="trades_column trades_price">Price(sigUSD)</h2>
+	<h2 class="trades_column trades_vol">Amount(rsBTC)</h2>
+	<h2 class="trades_column trades_time">Time</h2>
+</div>
+<div class="trades_asks">
+	{#each $market_trades as trade}
+		<div class="trades_row">
+			<div
+				class="trades_price"
+				class:trades_sell={trade.side == 'sell'}
+				class:trades_buy={trade.side == 'buy'}
+			>
+				{trade.price}
+			</div>
+			<div class="trades_vol"><span>{trade.amount}</span></div>
+			<div class="trades_time"><span>{trade.time}</span></div>
 		</div>
+	{/each}
+</div>
 
 <style lang="postcss">
 	.tab {

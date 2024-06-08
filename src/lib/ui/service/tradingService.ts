@@ -11,17 +11,18 @@ export type SwapRequest = {
 	amount: string;
 	sellingTokenId: string;
 	buyingTokenId: string;
+	side: string;
 };
 
-export async function createAndMultisigSwapTx(swapParams: SwapRequest, b:Function, userMnemonic, userAddress) {
+export async function createAndMultisigSwapTx(
+	swapParams: SwapRequest,
+	b: Function,
+	userMnemonic,
+	userAddress
+) {
 	const { unsignedTx, publicCommitsPool } = await createSwapTx(swapParams);
 
-	const extractedHints = await b(
-		unsignedTx,
-		userMnemonic,
-		userAddress,
-		publicCommitsPool
-	);
+	const extractedHints = await b(unsignedTx, userMnemonic, userAddress, publicCommitsPool);
 
 	let signedTx = await signSwapTx(extractedHints, unsignedTx);
 	return signedTx;
@@ -41,13 +42,14 @@ export function decodeR4(box: Box): { userPk: string; poolPk: string } | undefin
 
 export async function executeAndSignInputsSwapTx(swapParams: SwapRequest, signTxInput: Function) {
 	const unsignedTx = await executeSwapTx(swapParams);
-		const inputIndex = unsignedTx.inputs
-		.findIndex((b: Box) => decodeR4(b)?.userPk == swapParams.address);
+	const inputIndex = unsignedTx.inputs.findIndex(
+		(b: Box) => decodeR4(b)?.userPk == swapParams.address
+	);
 	const signed = await signTxInput(get(user_mnemonic), unsignedTx, inputIndex);
 	const proof = JSON.parse(signed.spending_proof().to_json());
-	console.log({proof})
-	
+	console.log({ proof });
+
 	const signedTx = await signExecuteSwapTx(proof, unsignedTx);
-	console.log({signedTx})
+	console.log({ signedTx });
 	return signedTx;
 }

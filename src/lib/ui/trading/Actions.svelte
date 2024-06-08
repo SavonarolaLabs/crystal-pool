@@ -103,7 +103,8 @@
 			price: bigIntReplacer(price),
 			amount: bigIntReplacer(amount),
 			sellingTokenId: sellingTokenId,
-			buyingTokenId: buyingTokenId
+			buyingTokenId: buyingTokenId,
+			side: 'sell'
 		};
 
 		return swapParams;
@@ -137,7 +138,8 @@
 			price: real_price.toString(),
 			amount: real_amount.toString(),
 			sellingTokenId: sellingToken.tokenId,
-			buyingTokenId: buyingToken.tokenId
+			buyingTokenId: buyingToken.tokenId,
+			side: 'sell'
 		};
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
@@ -181,7 +183,8 @@
 			price: real_price.toString(),
 			amount: real_amount.toString(),
 			sellingTokenId: sellingToken.tokenId,
-			buyingTokenId: buyingToken.tokenId
+			buyingTokenId: buyingToken.tokenId,
+			side: 'buy'
 		};
 		//
 
@@ -229,7 +232,8 @@
 			price: real_price.toString(),
 			amount: real_amount.toString(),
 			sellingTokenId: sellingToken.tokenId,
-			buyingTokenId: buyingToken.tokenId
+			buyingTokenId: buyingToken.tokenId,
+			side: 'sell'
 		};
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
@@ -267,12 +271,15 @@
 			price: real_price.toString(),
 			amount: real_amount.toString(),
 			sellingTokenId: sellingToken.tokenId,
-			buyingTokenId: buyingToken.tokenId
+			buyingTokenId: buyingToken.tokenId,
+			side: 'sell'
 		};
 		console.log('swap params for configuring buy action:', swapParams);
+
 		//Request Server
 		let swapParamsExecute = await configureSwapTx(swapParams); // new SwapParams
 		console.log(swapParamsExecute);
+
 		//EXECUTE IT
 		let signedTx = await executeAndSignInputsSwapTx(swapParamsExecute, signTxInput); // UNSIGNED TX
 		console.log(signedTx);

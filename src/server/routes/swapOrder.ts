@@ -18,15 +18,18 @@ export function configureSwapOrder(app: Express, io: Server, db: BoxDB) {
 		//take Pararms
 		//find Swap
 
-		//return swapParamsToExecute and swapParamsToBuy? or return box to execute???
 		const swapParamsExecute = swapParams;
 		// find box
+		console.log(swapParams.side);
 
 		const allBoxes = JSON.parse(
-			serializeBigInt(db.boxRows.filter((br) => br.contract == 'SWAP'))
+			serializeBigInt(
+				db.boxRows.filter(
+					(br) => br.contract == 'SWAP' && br.parameters.side == swapParams.side
+				)
+			)
 		);
 
-		//console.log(allBoxes);
 		const maxDenom = allBoxes
 			.map((br) => br.parameters.denom)
 			.reduce((a, d) => (a < d ? d : a), 0n);
@@ -40,9 +43,8 @@ export function configureSwapOrder(app: Express, io: Server, db: BoxDB) {
 			(a, b) => a.parameters.rateXmaxDenom - b.parameters.rateXmaxDenom
 		)[0];
 
-		//const minPrice = allBoxes[0]?.parameters.rate
-		//const minPriceBox = allBoxes.filter(())
 		swapParamsExecute.amount = boxWithMinPrice.box.assets[0].amount;
+
 		swapParamsExecute.price = (
 			boxWithMinPrice.parameters.rate / boxWithMinPrice.parameters.denom
 		).toString();
