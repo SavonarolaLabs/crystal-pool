@@ -14,53 +14,71 @@
 
 	let buyPriceInput = '20000';
   let buyAmountInput = '0.1';
-  let buyTotalInput;
+  let buyTotalInput = (parseFloat(buyPriceInput) * parseFloat(buyAmountInput)).toFixed(8).replace(/\.?0+$/, '');
 
   let sellPriceInput = '20000';
   let sellAmountInput = '0.1';
-  let sellTotalInput;
+  let sellTotalInput = (parseFloat(sellPriceInput) * parseFloat(sellAmountInput)).toFixed(8).replace(/\.?0+$/, '');
 
-  // Recalculate buyTotalInput whenever buyPriceInput or buyAmountInput changes
-  $: calcBuyTotal(buyPriceInput, buyAmountInput);
+  function handleBuyPriceChange(event) {
+    buyPriceInput = event.target.value;
+    calcBuyTotal();
+  }
 
-  // Recalculate buyAmountInput whenever buyTotalInput changes
-  $: if (buyTotalInput !== undefined) calcBuyAmount(buyTotalInput);
+  function handleBuyAmountChange(event) {
+    buyAmountInput = event.target.value;
+    calcBuyTotal();
+  }
 
-  // Recalculate sellTotalInput whenever sellPriceInput or sellAmountInput changes
-  $: calcSellTotal(sellPriceInput, sellAmountInput);
+  function handleBuyTotalChange(event) {
+    buyTotalInput = event.target.value;
+    calcBuyAmount();
+  }
 
-  // Recalculate sellAmountInput whenever sellTotalInput changes
-  $: if (sellTotalInput !== undefined) calcSellAmount(sellTotalInput);
+  function handleSellPriceChange(event) {
+    sellPriceInput = event.target.value;
+    calcSellTotal();
+  }
 
-  function calcBuyTotal(priceInput, amountInput) {
-    const price = parseFloat(priceInput);
-    const amount = parseFloat(amountInput);
+  function handleSellAmountChange(event) {
+    sellAmountInput = event.target.value;
+    calcSellTotal();
+  }
+
+  function handleSellTotalChange(event) {
+    sellTotalInput = event.target.value;
+    calcSellAmount();
+  }
+
+  function calcBuyTotal() {
+    const price = parseFloat(buyPriceInput);
+    const amount = parseFloat(buyAmountInput);
     if (!isNaN(price) && !isNaN(amount)) {
-      buyTotalInput = parseFloat((price * amount).toFixed(2)).toString();
+      buyTotalInput = (price * amount).toFixed(8).replace(/\.?0+$/, '');
     }
   }
 
-  function calcBuyAmount(totalInput) {
-    const total = parseFloat(totalInput);
+  function calcBuyAmount() {
+    const total = parseFloat(buyTotalInput);
     const price = parseFloat(buyPriceInput);
     if (!isNaN(price) && !isNaN(total)) {
-      buyAmountInput = parseFloat((total / price).toFixed(8)).toString();
+      buyAmountInput = (total / price).toFixed(8).replace(/\.?0+$/, '');
     }
   }
 
-  function calcSellTotal(priceInput, amountInput) {
-    const price = parseFloat(priceInput);
-    const amount = parseFloat(amountInput);
+  function calcSellTotal() {
+    const price = parseFloat(sellPriceInput);
+    const amount = parseFloat(sellAmountInput);
     if (!isNaN(price) && !isNaN(amount)) {
-      sellTotalInput = parseFloat((price * amount).toFixed(2)).toString();
+      sellTotalInput = (price * amount).toFixed(8).replace(/\.?0+$/, '');
     }
   }
 
-  function calcSellAmount(totalInput) {
-    const total = parseFloat(totalInput);
+  function calcSellAmount() {
+    const total = parseFloat(sellTotalInput);
     const price = parseFloat(sellPriceInput);
     if (!isNaN(price) && !isNaN(total)) {
-      sellAmountInput = parseFloat((total / price).toFixed(8)).toString();
+      sellAmountInput = (total / price).toFixed(8).replace(/\.?0+$/, '');
     }
   }
 
@@ -277,7 +295,7 @@
 								data-testid="spot-trade-buyPrice"
 								class="ant-input ant-input-sm"
 								type="text"
-								on:input={calcBuyTotal}
+								on:input={handleBuyPriceChange}
 								bind:value={buyPriceInput}
 							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
@@ -294,7 +312,7 @@
 								data-testid="spot-trade-buyQuantity"
 								class="ant-input ant-input-sm"
 								type="text"
-								on:input={calcBuyTotal}
+								on:input={handleBuyAmountChange}
 								bind:value={buyAmountInput}
 							/><span class="ant-input-suffix"><span>rsBTC</span> </span></span
 						>
@@ -369,6 +387,7 @@
 								data-testid="spot-trade-buyTotal"
 								class="ant-input ant-input-sm"
 								type="text"
+								on:input={handleBuyTotalChange}
 								bind:value={buyTotalInput}
 							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
@@ -387,7 +406,7 @@
 								{($user_tokens.find((t) => t.name == 'rsBTC')?.amount ?? 0) /
 									10 **
 										($user_tokens.find((t) => t.name == 'rsBTC')?.decimals ??
-											9)}</span
+											9)} </span
 							><span> rsBTC</span></span
 						>
 					</div>
@@ -419,6 +438,7 @@
 								data-testid="spot-trade-sellPrice"
 								class="ant-input ant-input-sm"
 								type="text"
+								on:input={handleSellPriceChange}
 								bind:value={sellPriceInput}
 							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
@@ -435,6 +455,7 @@
 								data-testid="spot-trade-sellQuantity"
 								class="ant-input ant-input-sm"
 								type="text"
+								on:input={handleSellAmountChange}
 								bind:value={sellAmountInput}
 							/><span class="ant-input-suffix"><span>rsBTC</span> </span></span
 						>
@@ -509,6 +530,7 @@
 								data-testid="spot-trade-sellTotal"
 								class="ant-input ant-input-sm"
 								type="text"
+								on:input={handleSellTotalChange}
 								bind:value={sellTotalInput}
 							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
