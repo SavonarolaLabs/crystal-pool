@@ -3,7 +3,7 @@
 	import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
 	import { TOKEN } from '$lib/constants/tokens';
 	import { b, signTxInput } from '$lib/wallet/multisig-client';
-	import { createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
+	import { configureSwapTx, createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
 	import { user_address, user_mnemonic, user_tokens } from '../ui_state';
 	import {
@@ -13,74 +13,78 @@
 	} from '../service/tradingService';
 
 	let buyPriceInput = '20000';
-  let buyAmountInput = '0.1';
-  let buyTotalInput = (parseFloat(buyPriceInput) * parseFloat(buyAmountInput)).toFixed(8).replace(/\.?0+$/, '');
+	let buyAmountInput = '0.1';
+	let buyTotalInput = (parseFloat(buyPriceInput) * parseFloat(buyAmountInput))
+		.toFixed(8)
+		.replace(/\.?0+$/, '');
 
-  let sellPriceInput = '20000';
-  let sellAmountInput = '0.1';
-  let sellTotalInput = (parseFloat(sellPriceInput) * parseFloat(sellAmountInput)).toFixed(8).replace(/\.?0+$/, '');
+	let sellPriceInput = '20000';
+	let sellAmountInput = '0.1';
+	let sellTotalInput = (parseFloat(sellPriceInput) * parseFloat(sellAmountInput))
+		.toFixed(8)
+		.replace(/\.?0+$/, '');
 
-  function handleBuyPriceChange(event) {
-    buyPriceInput = event.target.value;
-    calcBuyTotal();
-  }
+	function handleBuyPriceChange(event) {
+		buyPriceInput = event.target.value;
+		calcBuyTotal();
+	}
 
-  function handleBuyAmountChange(event) {
-    buyAmountInput = event.target.value;
-    calcBuyTotal();
-  }
+	function handleBuyAmountChange(event) {
+		buyAmountInput = event.target.value;
+		calcBuyTotal();
+	}
 
-  function handleBuyTotalChange(event) {
-    buyTotalInput = event.target.value;
-    calcBuyAmount();
-  }
+	function handleBuyTotalChange(event) {
+		buyTotalInput = event.target.value;
+		calcBuyAmount();
+	}
 
-  function handleSellPriceChange(event) {
-    sellPriceInput = event.target.value;
-    calcSellTotal();
-  }
+	function handleSellPriceChange(event) {
+		sellPriceInput = event.target.value;
+		calcSellTotal();
+	}
 
-  function handleSellAmountChange(event) {
-    sellAmountInput = event.target.value;
-    calcSellTotal();
-  }
+	function handleSellAmountChange(event) {
+		sellAmountInput = event.target.value;
+		calcSellTotal();
+	}
 
-  function handleSellTotalChange(event) {
-    sellTotalInput = event.target.value;
-    calcSellAmount();
-  }
+	function handleSellTotalChange(event) {
+		sellTotalInput = event.target.value;
+		calcSellAmount();
+	}
 
-  function calcBuyTotal() {
-    const price = parseFloat(buyPriceInput);
-    const amount = parseFloat(buyAmountInput);
-    if (!isNaN(price) && !isNaN(amount)) {
-      buyTotalInput = (price * amount).toFixed(8).replace(/\.?0+$/, '');
-    }
-  }
+	function calcBuyTotal() {
+		const price = parseFloat(buyPriceInput);
+		const amount = parseFloat(buyAmountInput);
+		if (!isNaN(price) && !isNaN(amount)) {
+			buyTotalInput = (price * amount).toFixed(8).replace(/\.?0+$/, '');
+		}
+	}
 
-  function calcBuyAmount() {
-    const total = parseFloat(buyTotalInput);
-    const price = parseFloat(buyPriceInput);
-    if (!isNaN(price) && !isNaN(total)) {
-      buyAmountInput = (total / price).toFixed(8).replace(/\.?0+$/, '');
-    }
-  }
+	function calcBuyAmount() {
+		const total = parseFloat(buyTotalInput);
+		const price = parseFloat(buyPriceInput);
+		if (!isNaN(price) && !isNaN(total)) {
+			buyAmountInput = (total / price).toFixed(8).replace(/\.?0+$/, '');
+		}
+	}
 
-  function calcSellTotal() {
-    const price = parseFloat(sellPriceInput);
-    const amount = parseFloat(sellAmountInput);
-    if (!isNaN(price) && !isNaN(amount)) {
-      sellTotalInput = (price * amount).toFixed(8).replace(/\.?0+$/, '');
-    }
-  }
+	function calcSellTotal() {
+		const price = parseFloat(sellPriceInput);
+		const amount = parseFloat(sellAmountInput);
+		if (!isNaN(price) && !isNaN(amount)) {
+			sellTotalInput = (price * amount).toFixed(8).replace(/\.?0+$/, '');
+		}
+	}
 
-  function calcSellAmount() {
-    const total = parseFloat(sellTotalInput);
-    const price = parseFloat(sellPriceInput);
-    if (!isNaN(price) && !isNaN(total)) {
-      sellAmountInput = (total / price).toFixed(8).replace(/\.?0+$/, '');
-    }
-  }
+	function calcSellAmount() {
+		const total = parseFloat(sellTotalInput);
+		const price = parseFloat(sellPriceInput);
+		if (!isNaN(price) && !isNaN(total)) {
+			sellAmountInput = (total / price).toFixed(8).replace(/\.?0+$/, '');
+		}
+	}
 
 	function bigIntReplacer(value: any): string {
 		return typeof value === 'bigint' ? value.toString() : value;
@@ -231,6 +235,46 @@
 		//----------------------------
 		let signedTx = await createAndMultisigSwapTx(swapParams, b, $user_mnemonic, $user_address);
 		console.log(signedTx);
+	}
+
+	async function configureBuy() {
+		//configure 1-st pack of params for Sell Check
+		const sellingToken = TOKEN.rsBTC;
+		const buyingToken = TOKEN.sigUSD;
+
+		// take user inputs
+		const amountInput = new BigNumber(buyAmountInput);
+		const priceInput = new BigNumber(buyPriceInput);
+
+		// load and calculate decimals
+		const decimalsToken = TOKEN.rsBTC.decimals;
+		const decimalsCurrency = TOKEN.sigUSD.decimals;
+		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
+		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
+		const bigDecimalsDelta = bigDecimalsToken.dividedBy(bigDecimalsCurrency);
+
+		// apply decimals
+		const real_price = priceInput.dividedBy(bigDecimalsDelta);
+		const real_amount = amountInput.multipliedBy(bigDecimalsToken);
+		const total = real_price.multipliedBy(real_amount);
+
+		console.log('real price: 1 sat in cents =', real_price.toString());
+		console.log('real amount: sats =', real_amount.toString());
+		console.log('total amount: cents =', total.toString());
+
+		const swapParams: SwapRequest = {
+			address: $user_address,
+			price: real_price.toString(),
+			amount: real_amount.toString(),
+			sellingTokenId: sellingToken.tokenId,
+			buyingTokenId: buyingToken.tokenId
+		};
+		console.log('swap params for configuring buy action:', swapParams);
+		//Request Server
+		let swapParamsExecute = await configureSwapTx(swapParams); // new SwapParams
+
+		console.log(swapParamsExecute);
+		//configure 2-nd pack for Buy Execution
 	}
 </script>
 
@@ -394,7 +438,7 @@
 					</div>
 				</div>
 
-				<button class="buySellButton buyButton" on:click={swapExecuteBuy}>Buy</button>
+				<button class="buySellButton buyButton" on:click={configureBuy}>Buy</button>
 			</div>
 			<div class="actions_doWrapper">
 				<div class="actions_balance">
@@ -406,8 +450,8 @@
 								{($user_tokens.find((t) => t.name == 'rsBTC')?.amount ?? 0) /
 									10 **
 										($user_tokens.find((t) => t.name == 'rsBTC')?.decimals ??
-											9)} </span
-							><span> rsBTC</span></span
+											9)}
+							</span><span> rsBTC</span></span
 						>
 					</div>
 					<a href="/assets/deposit/rsBTC" class="actions_deposit"

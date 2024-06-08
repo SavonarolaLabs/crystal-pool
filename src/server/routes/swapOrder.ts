@@ -10,6 +10,47 @@ import {
 } from '../crystalPool';
 import { broadcastOrderBook, broadcastSwapExecute } from '../ioSocket';
 import { sellAmount, sellPrice, buyPrice, buyAmount } from '../db/orderBookUtils';
+import { serializeBigInt } from '../db/serializeBigInt';
+
+export function configureSwapOrder(app: Express, io: Server, db: BoxDB) {
+	app.post('/swap-order/configure', async (req: Request, res: Response) => {
+		const swapParams: SwapParams = req.body;
+		//take Pararms
+		//find Swap
+
+		//return swapParamsToExecute and swapParamsToBuy? or return box to execute???
+		const swapParamsExecute = swapParams;
+		// find box
+		console.log('BROKEN PEOPLE NOW');
+
+		const allBoxes = JSON.parse(
+			serializeBigInt(db.boxRows.filter((br) => br.contract == 'SWAP'))
+		);
+
+		//console.log(allBoxes);
+		const maxDenom = allBoxes
+			.map((br) => br.parameters.denom)
+			.reduce((a, d) => (a < d ? d : a), 0n);
+
+		const allBoxesWithPrices = allBoxes.map((br) => {
+			br.parameters.rateXmaxDenom = (br.parameters.rate * maxDenom) / br.parameters.denom;
+			return br;
+		});
+
+		const boxWithMinPrice = allBoxesWithPrices.sort(
+			(a, b) => a.parameters.rateXmaxDenom - b.parameters.rateXmaxDenom
+		)[0];
+
+		//const minPrice = allBoxes[0]?.parameters.rate
+		//const minPriceBox = allBoxes.filter(())
+		swapParamsExecute.amount = boxWithMinPrice.box.assets[0].amount;
+		swapParamsExecute.price = (
+			boxWithMinPrice.parameters.rate / boxWithMinPrice.parameters.denom
+		).toString();
+
+		res.json(swapParamsExecute);
+	});
+}
 
 export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/swap-order', async (req: Request, res: Response) => {

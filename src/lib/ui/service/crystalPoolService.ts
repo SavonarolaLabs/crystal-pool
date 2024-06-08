@@ -1,4 +1,7 @@
+import type { SwapRequest } from './tradingService';
+
 const CRYSTALPOOL_URL = 'http://127.0.0.1:3000';
+const CONFIGURE_SWAP_REQUEST = '/swap-order/configure';
 const NEW_SWAP_REQUEST = '/swap-order';
 const NEW_EXECUTE_REQUEST = '/execute-swap';
 const NEW_EXECUTE_SIGN = '/execute-swap/sign';
@@ -28,6 +31,12 @@ export async function post(address: string, props: any) {
 	return data;
 }
 
+export async function configureSwapTx(
+	swapParams: SwapRequest
+): Promise<{ swapParamsExecute: SwapRequest }> {
+	return await post(CONFIGURE_SWAP_REQUEST, swapParams);
+}
+
 export async function createSwapTx(
 	swapParams: any
 ): Promise<{ unsignedTx: any; publicCommitsPool: any }> {
@@ -45,7 +54,7 @@ export async function signSwapTx(extractedHints: any, unsignedTx: any): Promise<
 	});
 }
 
-export async function signExecuteSwapTx(proof:any, unsignedTx: any):Promise<any>{
+export async function signExecuteSwapTx(proof: any, unsignedTx: any): Promise<any> {
 	return await post(NEW_EXECUTE_SIGN, {
 		proof,
 		unsignedTx

@@ -4,7 +4,13 @@ import { Server } from 'socket.io';
 import { json } from 'body-parser';
 import cors from 'cors';
 import { getBoxes, getBoxesByAddress } from './routes/boxes';
-import { createSwapOrder, executeSwap, signExecuteSwap, signSwapOrder } from './routes/swapOrder';
+import {
+	configureSwapOrder,
+	createSwapOrder,
+	executeSwap,
+	signExecuteSwap,
+	signSwapOrder
+} from './routes/swapOrder';
 import { initDb, db_initDepositUtxo } from './db/db';
 import { createOrderBook } from './db/orderBookUtils';
 import { getOrderBookByTradingPair } from './routes/orderBooks';
@@ -42,6 +48,7 @@ getBoxes(app, db);
 getBoxesByAddress(app, db);
 getOrderBookByTradingPair(app, db);
 
+configureSwapOrder(app, io, db);
 createSwapOrder(app, io, db);
 signSwapOrder(app, io, db);
 executeSwap(app, io, db);
