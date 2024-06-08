@@ -15,10 +15,19 @@
 	let buyPriceInput: string = '20000';
 	let buyAmountInput: string = '0.1';
 	let buyTotalInput: string;
+	calcBuyTotal();
 
 	let sellPriceInput: string = '20000';
 	let sellAmountInput: string = '0.1';
 	let sellTotalInput: string;
+
+	function calcBuyTotal(){
+		const price  = parseFloat(buyPriceInput);
+		const amount = parseFloat(buyAmountInput);
+		if(!isNaN(price) && !isNaN(amount)){
+			buyTotalInput = (price * amount).toFixed(2)
+		}
+	}
 
 	function bigIntReplacer(value: any): string {
 		return typeof value === 'bigint' ? value.toString() : value;
@@ -233,6 +242,7 @@
 								data-testid="spot-trade-buyPrice"
 								class="ant-input ant-input-sm"
 								type="text"
+								on:input={calcBuyTotal}
 								bind:value={buyPriceInput}
 							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
 						>
@@ -249,6 +259,7 @@
 								data-testid="spot-trade-buyQuantity"
 								class="ant-input ant-input-sm"
 								type="text"
+								on:input={calcBuyTotal}
 								bind:value={buyAmountInput}
 							/><span class="ant-input-suffix"><span>rsBTC</span> </span></span
 						>
