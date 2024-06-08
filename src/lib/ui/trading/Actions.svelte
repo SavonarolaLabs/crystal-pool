@@ -5,7 +5,7 @@
 	import { b, signTxInput } from '$lib/wallet/multisig-client';
 	import { createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
-	import { user_address, user_mnemonic } from '../ui_state';
+	import { user_address, user_mnemonic, user_tokens } from '../ui_state';
 	import {
 		createAndMultisigSwapTx,
 		executeAndSignInputsSwapTx,
@@ -196,7 +196,14 @@
 					<div>
 						<span class="actions_primaryText" style="margin-inline-end: 8px;"
 							>Available
-						</span><span><span>--</span><span> sigUSD</span></span>
+						</span><span
+							><span>
+								{($user_tokens.find((t) => t.name == 'sigUSD')?.amount ?? 0) /
+									10 **
+										($user_tokens.find((t) => t.name == 'sigUSD')?.decimals ??
+											2)}
+							</span><span> sigUSD</span></span
+						>
 					</div>
 					<a href="/assets/deposit/sigUSD" class="actions_deposit"
 						><svg
@@ -329,7 +336,14 @@
 					<div>
 						<span class="actions_primaryText" style="margin-inline-end: 8px;"
 							>Available
-						</span><span><span>--</span><span> rsBTC</span></span>
+						</span><span
+							><span>
+								{($user_tokens.find((t) => t.name == 'rsBTC')?.amount ?? 0) /
+									10 **
+										($user_tokens.find((t) => t.name == 'rsBTC')?.decimals ??
+											9)}</span
+							><span> rsBTC</span></span
+						>
 					</div>
 					<a href="/assets/deposit/rsBTC" class="actions_deposit"
 						><svg
