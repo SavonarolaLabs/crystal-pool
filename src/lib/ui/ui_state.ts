@@ -33,6 +33,11 @@ export function addRecentTrades(recentTrades: Array<MarketTrade>) {
 		return updatedTrades;
 	});
 	recentTrades.forEach((trade) => {
+		orderbook_latest.set({
+			price: trade.price.toFixed(2),
+			value: (trade.price * trade.amount).toFixed(2),
+			side: trade.side
+		});
 		showToast(
 			`SOLD: ${trade.amount}rsBTC for $${(trade.price * trade.amount).toFixed(2)}`,
 			'success'
