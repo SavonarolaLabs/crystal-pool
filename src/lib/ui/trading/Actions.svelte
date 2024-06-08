@@ -15,17 +15,26 @@
 	let buyPriceInput: string = '20000';
 	let buyAmountInput: string = '0.1';
 	let buyTotalInput: string;
-	calcBuyTotal();
+	$: calcBuyTotal(buyPriceInput, buyAmountInput);
 
 	let sellPriceInput: string = '20000';
 	let sellAmountInput: string = '0.1';
 	let sellTotalInput: string;
+	$: calcSellTotal(sellPriceInput, sellAmountInput);
 
-	function calcBuyTotal(){
-		const price  = parseFloat(buyPriceInput);
-		const amount = parseFloat(buyAmountInput);
+	function calcBuyTotal(priceInput, amountInput){
+		const price  = parseFloat(priceInput);
+		const amount = parseFloat(amountInput);
 		if(!isNaN(price) && !isNaN(amount)){
 			buyTotalInput = (price * amount).toFixed(2)
+		}
+	}
+
+	function calcSellTotal(priceInput, amountInput){
+		const price  = parseFloat(priceInput);
+		const amount = parseFloat(amountInput);
+		if(!isNaN(price) && !isNaN(amount)){
+			sellTotalInput = (price * amount).toFixed(2)
 		}
 	}
 
