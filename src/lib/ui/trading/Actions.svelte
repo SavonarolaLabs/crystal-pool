@@ -13,11 +13,11 @@
 	} from '../service/tradingService';
 
 	let buyPriceInput: string = '20000';
-	let buyAmountInput: string = '0.00001';
+	let buyAmountInput: string = '0.1';
 	let buyTotalInput: string;
 
 	let sellPriceInput: string = '20000';
-	let sellAmountInput: string = '0.00001';
+	let sellAmountInput: string = '0.1';
 	let sellTotalInput: string;
 
 	function bigIntReplacer(value: any): string {

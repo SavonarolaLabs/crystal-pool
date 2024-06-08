@@ -40,8 +40,6 @@ export function addRecentTrades(recentTrades: Array<MarketTrade>) {
 	});
 }
 
-// orderbook
-
 interface Order {
 	price: number;
 	amount: number;
@@ -144,8 +142,8 @@ export async function fetchBalance() {
 		user_tokens.update((all) => {
 			all.forEach((t) => {
 				t.amount = Number(
-					updatedTokens.find((x: { tokenId: string }) => x.tokenId == t.tokenId)?.amount ??
-						0n
+					updatedTokens.find((x: { tokenId: string }) => x.tokenId == t.tokenId)
+						?.amount ?? 0n
 				);
 			});
 			return all;

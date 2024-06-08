@@ -9,7 +9,7 @@ import {
 	type SwapParams
 } from '../crystalPool';
 import { broadcastOrderBook, broadcastSwapExecute } from '../ioSocket';
-import { sellAmount, sellPrice } from '../db/orderBookUtils';
+import { sellAmount, sellPrice, buyPrice, buyAmount } from '../db/orderBookUtils';
 
 export function createSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/swap-order', async (req: Request, res: Response) => {
@@ -50,14 +50,23 @@ export function signExecuteSwap(app: Express, io: Server, db: BoxDB) {
 		console.log('decodeR7:', decodeR7(swapInput));
 		console.dir(parseBox(swapInput));
 
-		const price = sellPrice(
-			parseBox(swapInput)?.parameters.rate,
-			parseBox(swapInput)?.parameters.denom
-		);
-		const amount = sellAmount(swapInput.assets[0].amount);
+		const amountB = swapInput.assets[0].amount;
+		const rateB = parseBox(swapInput)?.parameters.rate;
+		const denomB = parseBox(swapInput)?.parameters.denom;
+		const sideB = parseBox(swapInput)?.parameters.side;
+
+		let price;
+		let amount;
+		if (sideB == 'sell') {
+			price = sellPrice(rateB, denomB);
+			amount = sellAmount(amountB);
+		} else {
+			price = buyPrice(rateB, denomB);
+			amount = buyAmount(rateB, denomB, amountB);
+		}
 
 		const params = {
-			side: parseBox(swapInput)?.parameters.side,
+			side: sideB,
 			price: Number(price),
 			amount: Number(amount)
 		};
