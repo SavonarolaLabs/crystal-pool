@@ -12,31 +12,57 @@
 		type SwapRequest
 	} from '../service/tradingService';
 
-	let buyPriceInput: string = '20000';
-	let buyAmountInput: string = '0.1';
-	let buyTotalInput: string;
-	$: calcBuyTotal(buyPriceInput, buyAmountInput);
+	let buyPriceInput = '20000';
+  let buyAmountInput = '0.1';
+  let buyTotalInput;
 
-	let sellPriceInput: string = '20000';
-	let sellAmountInput: string = '0.1';
-	let sellTotalInput: string;
-	$: calcSellTotal(sellPriceInput, sellAmountInput);
+  let sellPriceInput = '20000';
+  let sellAmountInput = '0.1';
+  let sellTotalInput;
 
-	function calcBuyTotal(priceInput, amountInput){
-		const price  = parseFloat(priceInput);
-		const amount = parseFloat(amountInput);
-		if(!isNaN(price) && !isNaN(amount)){
-			buyTotalInput = (price * amount).toFixed(2)
-		}
-	}
+  // Recalculate buyTotalInput whenever buyPriceInput or buyAmountInput changes
+  $: calcBuyTotal(buyPriceInput, buyAmountInput);
 
-	function calcSellTotal(priceInput, amountInput){
-		const price  = parseFloat(priceInput);
-		const amount = parseFloat(amountInput);
-		if(!isNaN(price) && !isNaN(amount)){
-			sellTotalInput = (price * amount).toFixed(2)
-		}
-	}
+  // Recalculate buyAmountInput whenever buyTotalInput changes
+  $: if (buyTotalInput !== undefined) calcBuyAmount(buyTotalInput);
+
+  // Recalculate sellTotalInput whenever sellPriceInput or sellAmountInput changes
+  $: calcSellTotal(sellPriceInput, sellAmountInput);
+
+  // Recalculate sellAmountInput whenever sellTotalInput changes
+  $: if (sellTotalInput !== undefined) calcSellAmount(sellTotalInput);
+
+  function calcBuyTotal(priceInput, amountInput) {
+    const price = parseFloat(priceInput);
+    const amount = parseFloat(amountInput);
+    if (!isNaN(price) && !isNaN(amount)) {
+      buyTotalInput = parseFloat((price * amount).toFixed(2)).toString();
+    }
+  }
+
+  function calcBuyAmount(totalInput) {
+    const total = parseFloat(totalInput);
+    const price = parseFloat(buyPriceInput);
+    if (!isNaN(price) && !isNaN(total)) {
+      buyAmountInput = parseFloat((total / price).toFixed(8)).toString();
+    }
+  }
+
+  function calcSellTotal(priceInput, amountInput) {
+    const price = parseFloat(priceInput);
+    const amount = parseFloat(amountInput);
+    if (!isNaN(price) && !isNaN(amount)) {
+      sellTotalInput = parseFloat((price * amount).toFixed(2)).toString();
+    }
+  }
+
+  function calcSellAmount(totalInput) {
+    const total = parseFloat(totalInput);
+    const price = parseFloat(sellPriceInput);
+    if (!isNaN(price) && !isNaN(total)) {
+      sellAmountInput = parseFloat((total / price).toFixed(8)).toString();
+    }
+  }
 
 	function bigIntReplacer(value: any): string {
 		return typeof value === 'bigint' ? value.toString() : value;
