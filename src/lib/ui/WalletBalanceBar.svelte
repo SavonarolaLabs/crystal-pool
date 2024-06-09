@@ -7,10 +7,10 @@
 </script>
 
 <div class="flex gap-4">
-    {#if $user_address}
-        <div>PK: {shortenAddress($user_address)} ({$user_name})</div>
-    {/if}
-	{#each $user_tokens as token}
+	{#if $user_address}
+		<div>PK: {shortenAddress($user_address)} ({$user_name})</div>
+	{/if}
+	<!-- {#each $user_tokens as token}
 		<div>{token.name}: {token.amount / 10 ** token.decimals}</div>
-	{/each}
+	{/each} -->
 </div>

@@ -38,10 +38,12 @@ export function addRecentTrades(recentTrades: Array<MarketTrade>) {
 			value: (trade.price * trade.amount).toFixed(2),
 			side: trade.side
 		});
-		showToast(
-			`order filled: ${trade.amount}rsBTC for $${(trade.price * trade.amount).toFixed(2)}`,
-			'success'
-		);
+		if (get(user_name) == 'Bob') {
+			showToast(
+				`order filled: ${trade.amount}rsBTC for $${(trade.price * trade.amount).toFixed(2)}`,
+				'success'
+			);
+		}
 	});
 }
 

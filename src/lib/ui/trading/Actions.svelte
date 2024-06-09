@@ -12,13 +12,13 @@
 		type SwapRequest
 	} from '../service/tradingService';
 
-	let buyPriceInput = '20000';
+	let buyPriceInput = '69000';
 	let buyAmountInput = '0.1';
 	let buyTotalInput = (parseFloat(buyPriceInput) * parseFloat(buyAmountInput))
 		.toFixed(8)
 		.replace(/\.?0+$/, '');
 
-	let sellPriceInput = '20000';
+	let sellPriceInput = '69000';
 	let sellAmountInput = '0.1';
 	let sellTotalInput = (parseFloat(sellPriceInput) * parseFloat(sellAmountInput))
 		.toFixed(8)
