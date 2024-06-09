@@ -11,6 +11,7 @@ import {
 import { broadcastOrderBook, broadcastSwapExecute } from '../ioSocket';
 import { sellAmount, sellPrice, buyPrice, buyAmount } from '../db/orderBookUtils';
 import { serializeBigInt } from '../db/serializeBigInt';
+import { splitSellRate } from '$lib/wallet/swap';
 
 export function configureSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/swap-order/configure', async (req: Request, res: Response) => {
@@ -19,8 +20,8 @@ export function configureSwapOrder(app: Express, io: Server, db: BoxDB) {
 		//find Swap
 
 		const swapParamsExecute = swapParams;
-		// find box
-		console.log(swapParams.side);
+
+		const [swapBigRate, swapBigDenom] = splitSellRate(swapParams.price);
 
 		const allBoxes = JSON.parse(
 			serializeBigInt(
@@ -30,26 +31,42 @@ export function configureSwapOrder(app: Express, io: Server, db: BoxDB) {
 			)
 		);
 
-		const maxDenom = allBoxes
+		let maxDenom = allBoxes
 			.map((br) => br.parameters.denom)
 			.reduce((a, d) => (a < d ? d : a), 0n);
 
-		const allBoxesWithPrices = allBoxes.map((br) => {
+		let swapRateXmaxDenom;
+
+		if (maxDenom < swapBigDenom) {
+			maxDenom = swapBigDenom;
+		}
+
+		swapRateXmaxDenom = (swapBigRate * maxDenom) / swapBigDenom;
+		// Filter Price lower than requested
+
+		let allBoxesWithPrices = allBoxes.map((br) => {
 			br.parameters.rateXmaxDenom = (br.parameters.rate * maxDenom) / br.parameters.denom;
 			return br;
 		});
 
-		const boxWithMinPrice = allBoxesWithPrices.sort(
-			(a, b) => a.parameters.rateXmaxDenom - b.parameters.rateXmaxDenom
-		)[0];
+		let sortBoxes;
+		if (swapParams.side == 'sell') {
+			sortBoxes = allBoxesWithPrices.sort(
+				(a, b) => a.parameters.rateXmaxDenom - b.parameters.rateXmaxDenom
+			)[0];
+		} else {
+			sortBoxes = allBoxesWithPrices.sort(
+				(a, b) => b.parameters.rateXmaxDenom - a.parameters.rateXmaxDenom
+			)[0];
+		}
 
-		swapParamsExecute.amount = boxWithMinPrice.box.assets[0].amount;
+		swapParamsExecute.amount = sortBoxes.box.assets[0].amount;
 
 		swapParamsExecute.price = (
-			boxWithMinPrice.parameters.rate / boxWithMinPrice.parameters.denom
+			sortBoxes.parameters.rate / sortBoxes.parameters.denom
 		).toString();
 
-		res.json(swapParamsExecute);
+		res.json(swapParamsExecute); //TODO: Add multiple Swap and Box selector
 	});
 }
 
