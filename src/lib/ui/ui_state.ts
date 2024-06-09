@@ -39,7 +39,7 @@ export function addRecentTrades(recentTrades: Array<MarketTrade>) {
 			side: trade.side
 		});
 		showToast(
-			`SOLD: ${trade.amount}rsBTC for $${(trade.price * trade.amount).toFixed(2)}`,
+			`order filled: ${trade.amount}rsBTC for $${(trade.price * trade.amount).toFixed(2)}`,
 			'success'
 		);
 	});
