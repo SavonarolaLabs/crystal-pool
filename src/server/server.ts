@@ -3,7 +3,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { json } from 'body-parser';
 import cors from 'cors';
-import { getBoxes, getBoxesByAddress } from './routes/boxes';
+import { getBoxes, getBoxesByAddress, getSwapContractBoxes } from './routes/boxes';
 import {
 	configureSwapOrder,
 	createSwapOrder,
@@ -46,6 +46,7 @@ db_initDepositUtxo(db);
 // Register routes
 getBoxes(app, db);
 getBoxesByAddress(app, db);
+getSwapContractBoxes(app,db)
 getOrderBookByTradingPair(app, db);
 
 configureSwapOrder(app, io, db);

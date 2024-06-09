@@ -326,3 +326,9 @@ export function db_getBoxesByAddressString(db: BoxDB, address: string) {
 	const serializedData = serializeBigInt(userBoxes);
 	return serializedData;
 }
+
+export function db_getBoxesByContract(db: BoxDB, contract: ContractType) {
+	const userBoxes = db.boxRows.filter((box) => box.contract == contract);
+	const serializedData = serializeBigInt(userBoxes);
+	return serializedData;
+}
