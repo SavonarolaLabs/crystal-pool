@@ -90,7 +90,7 @@ let sellContractUtxo = [
 // not this box: a340b2d618ddf2a6d62ed0f68040be004c701eaf25836a129a5c6b1c19d5ada4
 
 describe(`Bob sellOrder: height:${height}, unlock +10`, () => {
-	it.skip('100/100 sigmaProp(orderFilled) && getPoolPk(SELF)', async () => {
+	it('100/100 sigmaProp(orderFilled) && getPoolPk(SELF)', async () => {
 		const sellerPK = BOB_ADDRESS;
 		const output = new OutputBuilder(
 			price * BigInt(tokenForSale.amount) * 1000n,

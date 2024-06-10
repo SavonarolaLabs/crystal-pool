@@ -1,3 +1,5 @@
+import { BlockHeader, BlockHeaders, ErgoStateContext, Parameters, PreHeader } from "ergo-lib-wasm-nodejs";
+
 const headers = [
   `{
       "extensionId" : "1d6a13a3ad0723eeb2c1de056d17be6ea1908393c5768e46cc83898e5cd025dd",
@@ -241,10 +243,45 @@ const headers = [
     }`,
 ];
 
-export const fakeContext = (wasm: any) => {
-  const blockHeaders = wasm.BlockHeaders.from_json(headers);
-  const preHeader = wasm.PreHeader.from_block_header(
-    wasm.BlockHeader.from_json(headers[0]),
+export function fakeContextX(){
+  const blockHeaders = BlockHeaders.from_json(headers);
+  const preHeader = PreHeader.from_block_header(
+    BlockHeader.from_json(headers[0]),
   );
-  return new wasm.ErgoStateContext(preHeader, blockHeaders);
+  const chanParams = blockchainParameterFromErgoNodeIfo(info)
+  return new ErgoStateContext(preHeader, blockHeaders, Parameters.default_parameters());
+};
+
+const info = {
+	lastBlockId: '5b9b19ac028c6956b4cdf8ec75227934b8134ff3635ed3aceac8a8bf20788dce',
+	height: 1282261,
+	maxBoxGix: 6197269,
+	maxTxGix: 1167892,
+	params: {
+		height: 506880,
+		storageFeeFactor: 1250000,
+		minValuePerByte: 360,
+		maxBlockSize: 1271009,
+		maxBlockCost: 7030268,
+		blockVersion: 2,
+		tokenAccessCost: 100,
+		inputCost: 2000,
+		dataInputCost: 100,
+		outputCost: 100,
+	},
+};
+function blockchainParameterFromErgoNodeIfo(info){
+    return{
+        storageFeeFactor: info.params.storageFeeFactor,
+        minValuePerByte: info.params.minValuePerByte,
+        maxBlockSize: info.params.maxBlockSize,
+        tokenAccessCost: info.params.tokenAccessCost,
+        inputCost: info.params.inputCost,
+        dataInputCost: info.params.dataInputCost,
+        outputCost: info.params.outputCost,
+        maxBlockCost: info.params.maxBlockCost,
+        softForkStartingHeight: 100,
+        softForkVotesCollected: 50,
+        blockVersion: info.params.blockVersion,
+    }
 };

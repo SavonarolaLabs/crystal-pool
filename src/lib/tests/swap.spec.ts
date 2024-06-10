@@ -11,11 +11,7 @@ import {
 import { ALICE_MNEMONIC, BOB_MNEMONIC, SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
 import { utxos } from '$lib/data/utxos';
 import { boxesAtAddress, boxesAtAddressUnsigned } from '$lib/utils/test-helper';
-import {
-	signMultisigEIP12,
-	signTxInput,
-	signTxMulti,
-} from '$lib/wallet/multisig-server';
+import { a, arrayToProposition, bInput, c, cInput, signMultisigEIP12, signTx, signTxInput, signTxMulti } from '$lib/wallet/multisig-server';
 import { ErgoAddress, ErgoTree, SAFE_MIN_BOX_VALUE, type Box } from '@fleet-sdk/core';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { describe, expect, it } from 'vitest';
@@ -24,6 +20,9 @@ import { TOKEN } from '$lib/constants/tokens';
 import { sumAssetsFromBoxes } from '$lib/utils/helper';
 import { parseBox } from '../../server/db/db';
 import type { BoxParameters, ContractType } from '$lib/types/boxRow';
+import { deposit } from '$lib/wallet/deposit';
+import { ErgoBoxes, extract_hints, Transaction, UnsignedTransaction, type Input } from 'ergo-lib-wasm-nodejs';
+import { fakeContextX } from '$lib/constants/fakeContext';
 
 const CONTRACT_FOR_TEST = `{	
 	def getSellerPk(box: Box)              	= box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
@@ -157,7 +156,7 @@ const CONTRACT_FOR_TEST = `{
 }`;
 
 const CONTRACT_WITH_R9 = compileContract(CONTRACT_FOR_TEST);
-let height = 1_275_000;
+let height = 1_265_098;
 let unlockHeight = 1300000;
 
 function customRecognizer(box: Box): ContractType {
@@ -179,7 +178,7 @@ function parseBoxCustom(box: Box): BoxParameters | undefined {
 	return parseBox(box, customRecognizer);
 }
 
-describe('New Swap order with R9', async () => {
+describe('Execute Swap with R9', async () => {
 	const tokenForSale = {
 		tokenId: TOKEN.rsBTC.tokenId,
 		price: '0.002',
@@ -190,14 +189,38 @@ describe('New Swap order with R9', async () => {
 		amount: 20n
 	};
 
-	it.only('Order + deposit[ALICE], change:ALICE: FULL execute', async () => {
+	it('swap[BOB] + multisig_deposit[ALICE]', async () => {
+		let depositTx = deposit(
+			height,
+			[utxos[BOB_ADDRESS][0]],
+			BOB_ADDRESS,
+			BOB_ADDRESS,
+			unlockHeight,
+			tokenForSale
+		);
+		let signedDepositTx = await signTx(depositTx, BOB_MNEMONIC);
+		let depositsBob = boxesAtAddress(signedDepositTx,DEPOSIT_ADDRESS);
+		expect(depositsBob.length).toBe(1);
+		let depositTxAlice = deposit(
+			height,
+			[utxos[ALICE_ADDRESS][0]],
+			ALICE_ADDRESS,
+			ALICE_ADDRESS,
+			unlockHeight,
+			paymentToken
+		);
+		let signedDepositTxAlice = await signTx(depositTxAlice, ALICE_MNEMONIC);
+		let depositsAlice = boxesAtAddress(signedDepositTxAlice,DEPOSIT_ADDRESS);
+		expect(depositsAlice.length).toBe(1);
+
 		let unsignedTx1 = createSwapOrderTxR9(
 			BOB_ADDRESS,
-			utxos[DEPOSIT_ADDRESS][1],
+			depositsBob,
 			tokenForSale,
 			tokenForSale.price,
 			height,
 			paymentToken.tokenId,
+			CONTRACT_WITH_R9
 		);
 
 		const bobSwapTx = await signTxMulti(unsignedTx1, BOB_MNEMONIC, BOB_ADDRESS);
@@ -213,8 +236,8 @@ describe('New Swap order with R9', async () => {
 		const executeSwapOrderTx = executeSwap(
 			height,
 			swapOrderBoxes,
-			[utxos[DEPOSIT_ADDRESS][0]],
-			{ tokenId: tokenForSale.tokenId, amount: tokenForSale.amount },
+			depositsAlice,
+			tokenForSale,
 			paymentInTokens,
 			SAFE_MIN_BOX_VALUE
 		);
@@ -230,18 +253,67 @@ describe('New Swap order with R9', async () => {
 		);
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[0])?.parameters.unlockHeight).toBe(1300000);
 
-		const signedBobInput = await signTxInput(
+		const sInput0 = await signTxInput(
 			SHADOW_MNEMONIC,
 			JSON.parse(JSON.stringify(executeSwapOrderTx)),
 			0
 		);
-		expect(signedBobInput, 'bob can sign index:0').toBeDefined();
+		expect(sInput0, 'shadow can sign index:0').toBeDefined();
 
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.contract).toBe('DEPOSIT');
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.parameters.userPk).toBe(ALICE_ADDRESS);
 		expect(parseBoxCustom(executeSwapOrderTx.inputs[1])?.parameters.unlockHeight).toBe(1300000);
 
-		console.log(executeSwapOrderTx.inputs);
-		//const signed = signTxMultiPartial(executeSwapOrderTx, ALICE_MNEMONIC, ALICE_ADDRESS);
+		// multisig signing a single input[1]
+		const { privateCommitsPool, publicCommitsPool } = await a(executeSwapOrderTx);
+		expect(publicCommitsPool).toBeDefined();
+		
+		const sInput1: Input = await bInput(
+			executeSwapOrderTx,
+			ALICE_MNEMONIC,
+			ALICE_ADDRESS,
+			publicCommitsPool,
+			1,
+		)
+		
+		function hexToUint8Array(str: string): Uint8Array {
+			const utf8: string = unescape(encodeURIComponent(str));
+			const array = new Uint8Array(utf8.length);
+			for (let i = 0; i < utf8.length; i++) {
+				array[i] = utf8.charCodeAt(i);
+			}
+			return array;
+		}
+
+		function getProof(input:Input){
+			return hexToUint8Array(input.spending_proof().to_json())
+		}
+		
+		// const transaction = proverAlice.sign_reduced_transaction_multi(reducedTx, combinedHints);
+		const unsigned_tx = UnsignedTransaction.from_json(JSON.stringify(executeSwapOrderTx));
+		;
+		const tx = Transaction.from_unsigned_tx(unsigned_tx,[getProof(sInput0),getProof(sInput1)]);
+		//expect(executeSwapOrderTx.inputs).toBe(1);
+
+		 const hUser = ErgoAddress.fromBase58(ALICE_ADDRESS).ergoTree.slice(6);
+		 let extractedHints = extract_hints(
+			tx,
+		 	fakeContextX(),
+		 	ErgoBoxes.from_boxes_json(executeSwapOrderTx.inputs),
+		 	ErgoBoxes.empty(),
+		 	arrayToProposition([hUser]),
+		 	arrayToProposition([])
+		 ).to_json();
+//		 expect(extractedHints).toBe(1);
+
+		const signedInput = await cInput(
+			executeSwapOrderTx,
+			privateCommitsPool,
+			extractedHints,
+			1
+		);
+		const utx = UnsignedTransaction.from_json(JSON.stringify(executeSwapOrderTx));
+		const signedTx = Transaction.from_unsigned_tx(utx,[getProof(sInput0),getProof(signedInput)]).to_js_eip12();
+		expect(signedTx).toBeDefined();
 	});
 });

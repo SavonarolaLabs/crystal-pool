@@ -41,17 +41,19 @@ export function createSwapOrderTxR9(
 	sellRate: string,
 	currentHeight: number,
 	buyingTokenId: string,
+	contract: string = SWAP_ORDER_ADDRESS,
 	nanoErg: bigint = SAFE_MIN_BOX_VALUE
 ): EIP12UnsignedTransaction {
 	const [bigRate, bigDenom] = splitSellRate(sellRate);
 
-	const outputSwapOrder = new OutputBuilder(nanoErg, SWAP_ORDER_ADDRESS)
+	const outputSwapOrder = new OutputBuilder(nanoErg, contract)
 		.addTokens(token)
 		.setAdditionalRegisters({
 			R4: SColl(SSigmaProp, [
 				SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
 				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
 			]).toHex(),
+			//@ts-ignore
 			R5: inputBoxes[0].additionalRegisters.R5,
 			R6: SPair(SColl(SByte, token.tokenId), SColl(SByte, buyingTokenId)).toHex(),
 			R7: SLong(bigRate).toHex(),
@@ -71,15 +73,6 @@ export function createSwapOrderTxR9(
 		})
 		// @ts-ignore
 		.addTokens(calcTokenChange([...inputBoxes], token));
-
-	// console.log('inputBoxes:', inputBoxes);
-	// console.dir(change, { depth: null });
-	// console.log(
-	// 	'change amount',
-	// 	4997900000n + 3200000n - SAFE_MIN_BOX_VALUE - RECOMMENDED_MIN_FEE_VALUE
-	// );
-	// console.log('inputBoxes:', inputBoxes); //
-	// console.log(inputBoxes.map((b) => b.boxId)); //
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
 		// @ts-ignore
