@@ -1,7 +1,13 @@
-import { BlockHeader, BlockHeaders, ErgoStateContext, Parameters, PreHeader } from "ergo-lib-wasm-nodejs";
+import {
+	BlockHeader,
+	BlockHeaders,
+	ErgoStateContext,
+	Parameters,
+	PreHeader
+} from 'ergo-lib-wasm-nodejs';
 
 const headers = [
-  `{
+	`{
       "extensionId" : "1d6a13a3ad0723eeb2c1de056d17be6ea1908393c5768e46cc83898e5cd025dd",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -25,7 +31,7 @@ const headers = [
       "transactionsId" : "f1c11b39c4aff5f3870be6ecea1e976775d2af16548c42b0795735e3d114c44b",
       "parentId" : "7b282808fc13bf596de3192b2bf399b3de3fccc95a31199774413f62d05e010b"
     }`,
-  `{
+	`{
       "extensionId" : "22ff689392bac51a0f67e54d8b1affe6141d1d64076a6a1e532807e9def6a59e",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -49,7 +55,7 @@ const headers = [
       "transactionsId" : "357d0ec3d5c41d83783a5365d122b57cdcc7b44afd2b8d835d0872d3d89fdf6c",
       "parentId" : "378dba6a164fc2410cfc0c81ce345865a58cf3b7a4b11c30b93fc3ac2fcd77e5"
     }`,
-  `{
+	`{
       "extensionId" : "e5537ad2aabf7f2d879508096fa8ee675f1d3ed8f24ff5b6ca1b49c849dcccdc",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -73,7 +79,7 @@ const headers = [
       "transactionsId" : "c9233d46390ffce777862578a1a8729a1a0e49ad94f68ff5bf174a4443161b59",
       "parentId" : "903c0fd3c16f78326ba94dc0941901dedd7adb2a53db4477251b0d2a42e1694c"
     }`,
-  `{
+	`{
       "extensionId" : "6e83dea79fc2d13f98373d3df27db1bd6568f05a0fc4912eeb0ebfe9b4425660",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -97,7 +103,7 @@ const headers = [
       "transactionsId" : "35ecf7d06381acbbe74df7d7b967777c8b54955ae7d72a52448ae47d3a944b11",
       "parentId" : "c851ee374e924999c681f3b1097c966f69f869c2870c8d3ecdaa985b845e5f06"
     }`,
-  `{
+	`{
       "extensionId" : "a7925aba13f020a4c7f99716f755ed992256d5ffe51796bd1cad8bdd82be8fcc",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -121,7 +127,7 @@ const headers = [
       "transactionsId" : "bd3168acace3654ef3915c4f0583f2a8ea6f04b1d4102292226eb9dd69354cc8",
       "parentId" : "6dc0f04ea3f0ac40126ff9672bf9e56ccf6eaa13c30c73193ac7f14be0ae5e37"
     }`,
-  `{
+	`{
       "extensionId" : "9865d1b362e65581f96223a210aa1ae2480763650248ce7eb3375fd3fa9aba7f",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -145,7 +151,7 @@ const headers = [
       "transactionsId" : "82a6c3846ab99c54d982048f557b0694f4a0893819b74411d94114f6655de845",
       "parentId" : "f1384657f47f71df003a9b61b790dd61e50c14739bc8a4136df3f1613716ef2b"
     }`,
-  `{
+	`{
       "extensionId" : "3e405a2b3b63acb13e7692bec16bb51e88f0d8c1efc768e9f11dcf5af6df96dd",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -169,7 +175,7 @@ const headers = [
       "transactionsId" : "51afabff78d7d46c461819828e2a99bfc9033f4e119e8ddddf95e60c535b0af0",
       "parentId" : "932a58dfd28b6fdf741943b0ddc9f7e1c461ec90b8ca90b7d2e1a5f5ec754d31"
     }`,
-  `{
+	`{
       "extensionId" : "fe309b8a2ad43f93ee3b69bb726bf90af0f3927e6182ff21b5e59c6fe2e96161",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -193,7 +199,7 @@ const headers = [
       "transactionsId" : "57c19f6b38aae5b198fdb5098aa64a296c6419e7ba9e5e751c09a9f44e7b00be",
       "parentId" : "53d9950a70b8c8bc5411c560526b500e0105b0c0929fc3f15fc4ecd59d962c66"
     }`,
-  `{
+	`{
       "extensionId" : "83e464e5575a7c1fb90b98be7353e3ca6ca90555330422563e5480d6deac92cc",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -217,7 +223,7 @@ const headers = [
       "transactionsId" : "fa5fb2401087bd1d23e5bd9346d15586bd50808d7c74e6ae9c0ba3ff2fae675a",
       "parentId" : "1fbc3eb714852862463fff30969f06367004394f1ea0a20165a6a3e72fd27eb1"
     }`,
-  `{
+	`{
       "extensionId" : "8e4496761ad525ef2b193e1e8a76f8edbb8497447314e608473564641321c65b",
       "difficulty" : "1814331624783872",
       "votes" : "000000",
@@ -240,17 +246,15 @@ const headers = [
       "adProofsId" : "8295f7fff6c29199a981598a3af3bee6682e361a68138000fc7bde9260a29167",
       "transactionsId" : "ce8afe8ae2dbfd81057dd7bba422a78e327152a5c74a930634b4d9b7725cc681",
       "parentId" : "4fcf937adf9b18420fd32fa09947d913dcd021b9a0f9adb93b2e149afe60bbc3"
-    }`,
+    }`
 ];
 
-export function fakeContextX(){
-  const blockHeaders = BlockHeaders.from_json(headers);
-  const preHeader = PreHeader.from_block_header(
-    BlockHeader.from_json(headers[0]),
-  );
-  const chanParams = blockchainParameterFromErgoNodeIfo(info)
-  return new ErgoStateContext(preHeader, blockHeaders, Parameters.default_parameters());
-};
+export function fakeContextX() {
+	const blockHeaders = BlockHeaders.from_json(headers);
+	const preHeader = PreHeader.from_block_header(BlockHeader.from_json(headers[0]));
+	const chanParams = blockchainParameterFromErgoNodeIfo(info);
+	return new ErgoStateContext(preHeader, blockHeaders, Parameters.default_parameters());
+}
 
 const info = {
 	lastBlockId: '5b9b19ac028c6956b4cdf8ec75227934b8134ff3635ed3aceac8a8bf20788dce',
@@ -267,21 +271,21 @@ const info = {
 		tokenAccessCost: 100,
 		inputCost: 2000,
 		dataInputCost: 100,
-		outputCost: 100,
-	},
+		outputCost: 100
+	}
 };
-function blockchainParameterFromErgoNodeIfo(info){
-    return{
-        storageFeeFactor: info.params.storageFeeFactor,
-        minValuePerByte: info.params.minValuePerByte,
-        maxBlockSize: info.params.maxBlockSize,
-        tokenAccessCost: info.params.tokenAccessCost,
-        inputCost: info.params.inputCost,
-        dataInputCost: info.params.dataInputCost,
-        outputCost: info.params.outputCost,
-        maxBlockCost: info.params.maxBlockCost,
-        softForkStartingHeight: 100,
-        softForkVotesCollected: 50,
-        blockVersion: info.params.blockVersion,
-    }
-};
+function blockchainParameterFromErgoNodeIfo(info) {
+	return {
+		storageFeeFactor: info.params.storageFeeFactor,
+		minValuePerByte: info.params.minValuePerByte,
+		maxBlockSize: info.params.maxBlockSize,
+		tokenAccessCost: info.params.tokenAccessCost,
+		inputCost: info.params.inputCost,
+		dataInputCost: info.params.dataInputCost,
+		outputCost: info.params.outputCost,
+		maxBlockCost: info.params.maxBlockCost,
+		softForkStartingHeight: 100,
+		softForkVotesCollected: 50,
+		blockVersion: info.params.blockVersion
+	};
+}
