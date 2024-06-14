@@ -312,7 +312,6 @@ describe('Execute Swap with R9', async () => {
 			getProof(sInput0),
 			getProof(sInput1)
 		]);
-		//expect(executeSwapOrderTx.inputs).toBe(1);
 
 		const hUser = ErgoAddress.fromBase58(ALICE_ADDRESS).ergoTree.slice(6);
 		let extractedHints = extract_hints(
@@ -333,8 +332,15 @@ describe('Execute Swap with R9', async () => {
 		]);
 		expect(signedTx).toBeDefined();
 
+		const jsonSignedTx = signedTx.to_js_eip12();
+		jsonSignedTx.inputs[0].spendingProof = JSON.parse(sInput0.spending_proof().to_json());
+		//console.log(jsonSignedTx);
+
+		//Transaction from_json
+		const signedTxnew = Transaction.from_json(JSON.stringify(jsonSignedTx));
+
 		const valid = validate_tx(
-			signedTx,
+			signedTxnew,
 			fakeContextX(),
 			ErgoBoxes.from_boxes_json(executeSwapOrderTx.inputs),
 			ErgoBoxes.empty()
