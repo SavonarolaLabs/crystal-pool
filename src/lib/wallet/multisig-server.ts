@@ -65,7 +65,7 @@ export async function bInput(
 	userMnemonic: string,
 	userAddress: string,
 	publicCommits: JSONTransactionHintsBag,
-	index: number,
+	index: number
 ): Promise<Input> {
 	const publicBag = TransactionHintsBag.from_json(JSON.stringify(publicCommits));
 	const proverAlice = await getProver(userMnemonic);
@@ -75,17 +75,18 @@ export async function bInput(
 	const combinedHints = TransactionHintsBag.empty();
 
 	for (let i = 0; i < unsignedTx.inputs.length; i++) {
-		combinedHints.add_hints_for_input(1, initialCommitsAlice.all_hints_for_input(i));
+		//	combinedHints.add_hints_for_input(1, initialCommitsAlice.all_hints_for_input(i));
 		combinedHints.add_hints_for_input(1, publicBag.all_hints_for_input(i));
 	}
 
 	const input = proverAlice.sign_tx_input_multi(
-		index, 
-		fakeContextX(), 
+		index,
+		fakeContextX(),
 		UnsignedTransaction.from_json(JSON.stringify(unsignedTx)),
 		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
 		ErgoBoxes.empty(),
-		combinedHints);
+		combinedHints
+	);
 	return input;
 }
 
@@ -121,12 +122,11 @@ export async function b(
 	return extractedHints;
 }
 
-
 export async function cInput(
 	unsignedTx: EIP12UnsignedTransaction,
 	privateCommitsPool: JSONTransactionHintsBag,
 	hints: JSONTransactionHintsBag,
-	index: number,
+	index: number
 ) {
 	const hintsForBobSign = privateCommitsPool;
 
@@ -146,12 +146,13 @@ export async function cInput(
 	// 	convertedHintsForBobSign
 	// );
 	const input = proverBob.sign_tx_input_multi(
-		index, 
-		fakeContextX(), 
+		index,
+		fakeContextX(),
 		UnsignedTransaction.from_json(JSON.stringify(unsignedTx)),
 		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
 		ErgoBoxes.empty(),
-		convertedHintsForBobSign);
+		convertedHintsForBobSign
+	);
 
 	return input;
 }
