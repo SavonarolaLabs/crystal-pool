@@ -37,6 +37,7 @@ import {
 	Transaction,
 	UnsignedTransaction,
 	validate_tx,
+	verify_tx_input_proof,
 	type Input
 } from 'ergo-lib-wasm-nodejs';
 import { fakeContextX } from '$lib/constants/fakeContext';
@@ -339,12 +340,31 @@ describe('Execute Swap with R9', async () => {
 		//Transaction from_json
 		const signedTxnew = Transaction.from_json(JSON.stringify(jsonSignedTx));
 
-		const valid = validate_tx(
-			signedTxnew,
+		const valid0 = verify_tx_input_proof(
+			0,
 			fakeContextX(),
+			signedTxnew,
 			ErgoBoxes.from_boxes_json(executeSwapOrderTx.inputs),
 			ErgoBoxes.empty()
 		);
-		console.log(valid);
+		expect(valid0, 'input0 proof').toBe(true);
+
+		const valid1 = verify_tx_input_proof(
+			1,
+			fakeContextX(),
+			signedTxnew,
+			ErgoBoxes.from_boxes_json(executeSwapOrderTx.inputs),
+			ErgoBoxes.empty()
+		);
+		expect(valid1, 'input1 proof').toBe(true);
+		console.log(valid1);
+
+		// const valid = validate_tx(
+		// 	signedTxnew,
+		// 	fakeContextX(),
+		// 	ErgoBoxes.from_boxes_json(executeSwapOrderTx.inputs),
+		// 	ErgoBoxes.empty()
+		// );
+		// console.log(valid);
 	});
 });
