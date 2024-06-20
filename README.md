@@ -15,23 +15,23 @@ CrystalPool is simple concept for self-custodial instant trading on L1. At Ergoh
   - [x] Web UI with alipay css
   - [x] Real-time market trades
   - [x] Real-time orderbook
+  - [ ] NEXT Wallet View (DEPOSIT + other contracts)
   - [ ] Orderbook settings
-  - [ ] Wallet View
   - [ ] Import/Export Wallet
   - [ ] Trading Pairs
   - [ ] Current Trading Pair Stats (Header)
-  - [ ] Price Chart
-  - [ ] Open Orders
+  - [ ] NEXT Price Chart
+  - [ ] NEXT Open Orders
   - [ ] Order History
   - [ ] Available Mempool space
   - [ ] Connection Status
 
 - **Basic Functions:**
   - [ ] different trading pairs
-  - [ ] deposit
-  - [ ] deposit via ergopay
-  - [ ] deposit via webwallet
-  - [ ] withdraw
+  - [ ] NEXT deposit
+  - [ ] NEXT deposit via ergopay
+  - [ ] NEXT deposit via webwallet
+  - [ ] NEXT withdraw
 
 - **Pool Service:**
   - [x] webserver

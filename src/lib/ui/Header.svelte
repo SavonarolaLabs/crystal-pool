@@ -1,12 +1,13 @@
 <script lang="ts">
 	import WalletBalanceBar from './WalletBalanceBar.svelte';
-	import { setUserAlice, setUserBob, toggleWallet, user_name } from './ui_state';
+	import { isDarkMode, setUserAlice, setUserBob, toggleWallet, user_name } from './ui_state';
 
 	function toggleTheme() {
 		if (typeof document !== 'undefined') {
 			const currentTheme = document.documentElement.getAttribute('data-theme');
 			const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 			document.documentElement.setAttribute('data-theme', newTheme);
+			isDarkMode.set(newTheme == 'dark')
 		}
 	}
 </script>

@@ -6,6 +6,8 @@ import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { showToast } from './toaster';
 import { TOKEN } from '$lib/constants/tokens';
 
+export const isDarkMode = writable(true);
+
 // market trades
 
 interface MarketTrade {

@@ -66,6 +66,7 @@
 		"ergo-lib-wasm-nodejs": "0.28.0-alpha-03551ca",
 		"express": "^4.19.2",
 		"json-bigint": "^1.0.0",
+		"lightweight-charts": "^4.1.5",
 		"rollup-plugin-node-polyfills": "^0.2.1",
 		"safe-buffer": "^5.2.1",
 		"socket.io": "^4.7.5",
