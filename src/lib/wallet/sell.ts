@@ -1,6 +1,12 @@
 import { DEPOSIT_ADDRESS, SELL_ORDER_ADDRESS, SHADOWPOOL_ADDRESS } from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
-import { asBigInt, sumNanoErg, calcTokenChange } from '$lib/utils/helper';
+import {
+	asBigInt,
+	sumNanoErg,
+	calcTokenChange,
+	amountByTokenId,
+	sumAssetsFromBoxes
+} from '$lib/utils/helper';
 import {
 	first,
 	type Amount,
@@ -71,6 +77,79 @@ export function createSellOrderTxR9(
 		.build()
 		.toEIP12Object();
 	return unsignedTransaction;
+}
+
+export function executeSell(
+	blockchainHeight: number,
+	sellOrderInputBoxes: Box<Amount>[],
+	paymentInputBoxes: Box<Amount>[],
+	tokensFromSellContract: { tokenId: string; amount: Amount },
+	ergoAsPayment: string | bigint,
+	nanoErg: string | bigint = 2n * RECOMMENDED_MIN_FEE_VALUE + SAFE_MIN_BOX_VALUE
+): EIP12UnsignedTransaction {
+	const paymentOutputBox = new OutputBuilder(
+		ergoAsPayment,
+		DEPOSIT_ADDRESS
+	).setAdditionalRegisters({
+		R4: sellOrderInputBoxes[0].additionalRegisters.R4,
+		R5: sellOrderInputBoxes[0].additionalRegisters.R5,
+		R6: sellOrderInputBoxes[0].additionalRegisters.R6
+	});
+
+	let remainingSellOrderBox: any = undefined;
+
+	const remainingTokens =
+		asBigInt(tokensFromSellContract.amount) -
+		asBigInt(amountByTokenId(sellOrderInputBoxes, tokensFromSellContract.tokenId));
+	//console.log(remainingTokens);
+
+	let changeErgo;
+
+	if (remainingTokens > 0n) {
+		const remainingRateBox = sellOrderInputBoxes[0]; // TODO select the proper box;
+		remainingSellOrderBox = new OutputBuilder(nanoErg, DEPOSIT_ADDRESS)
+			.setAdditionalRegisters(remainingRateBox.additionalRegisters)
+			.addTokens({
+				tokenId: tokensFromSellContract.tokenId,
+				amount: remainingTokens
+			});
+		changeErgo =
+			sumNanoErg(sellOrderInputBoxes) +
+			sumNanoErg(paymentInputBoxes) -
+			asBigInt(ergoAsPayment) -
+			asBigInt(nanoErg) -
+			RECOMMENDED_MIN_FEE_VALUE;
+	} else {
+		changeErgo =
+			sumNanoErg(sellOrderInputBoxes) +
+			sumNanoErg(paymentInputBoxes) -
+			asBigInt(ergoAsPayment) -
+			RECOMMENDED_MIN_FEE_VALUE;
+	}
+
+	const change = new OutputBuilder(
+		sumNanoErg(sellOrderInputBoxes) +
+			sumNanoErg(paymentInputBoxes) -
+			asBigInt(ergoAsPayment) -
+			RECOMMENDED_MIN_FEE_VALUE,
+		DEPOSIT_ADDRESS
+	)
+		.setAdditionalRegisters({
+			R4: paymentInputBoxes[0].additionalRegisters.R4,
+			R5: paymentInputBoxes[0].additionalRegisters.R5
+		})
+		.addTokens(sumAssetsFromBoxes([...sellOrderInputBoxes, ...paymentInputBoxes]));
+
+	const uTx = new TransactionBuilder(blockchainHeight)
+		.configureSelector((selector) =>
+			selector.ensureInclusion(sellOrderInputBoxes.map((b) => b.boxId))
+		)
+		.from([...sellOrderInputBoxes, ...paymentInputBoxes])
+		.to([paymentOutputBox, change, remainingSellOrderBox].filter((x) => x) as OutputBuilder[])
+		.payFee(RECOMMENDED_MIN_FEE_VALUE)
+		.build()
+		.toEIP12Object();
+	return uTx;
 }
 
 export function createSellOrderTx(

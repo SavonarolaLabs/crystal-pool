@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import {
 	OutputBuilder,
 	RECOMMENDED_MIN_FEE_VALUE,
+	SAFE_MIN_BOX_VALUE,
 	TransactionBuilder,
 	type Box
 } from '@fleet-sdk/core';
@@ -12,7 +13,7 @@ import { utxos } from '$lib/data/utxos';
 import { signTx, signTxMulti } from '$lib/wallet/multisig-server';
 import { boxesAtAddress } from '$lib/utils/test-helper';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
-import { createSellOrderTxR9 } from '$lib/wallet/sell';
+import { createSellOrderTxR9, executeSell } from '$lib/wallet/sell';
 import { compileContract } from '$lib/compiler/compile';
 
 const CONTRACT_FOR_TEST = `{	
@@ -129,12 +130,27 @@ let unlockHeight = 1300000;
 
 describe('limit sell order', () => {
 	let sellOrderBoxes: Box[];
+	let depositsAlice: Box[];
 
+	//To check basic contract
+	const tokenForSale0 = {
+		tokenId: TOKEN.rsBTC.tokenId,
+		price: '2',
+		amount: 1_000_000n
+	};
+
+	//To check R9 contract
 	const tokenForSale = {
 		tokenId: TOKEN.rsBTC.tokenId,
-		price: '0.002',
-		amount: '10000'
+		price: '0.02',
+		amount: 100_000_000n
 	};
+
+	//Need checks that what u pay is more than Min Safe Box
+	const minimalErgo = SAFE_MIN_BOX_VALUE; //1_000_000n
+	const ergoFee = RECOMMENDED_MIN_FEE_VALUE; //1_100_000n
+
+	let paymentInErgo = 2_000_000n;
 
 	beforeAll(async () => {
 		//DEPOSIT
@@ -155,10 +171,11 @@ describe('limit sell order', () => {
 			[utxos[ALICE_ADDRESS][0]],
 			ALICE_ADDRESS,
 			ALICE_ADDRESS,
-			unlockHeight
+			unlockHeight,
+			2n * paymentInErgo
 		);
 		let signedDepositTxAlice = await signTx(depositTxAlice, ALICE_MNEMONIC);
-		let depositsAlice = boxesAtAddress(signedDepositTxAlice, DEPOSIT_ADDRESS);
+		depositsAlice = boxesAtAddress(signedDepositTxAlice, DEPOSIT_ADDRESS);
 		expect(depositsAlice.length).toBe(1);
 
 		const sellUTx = createSellOrderTxR9(
@@ -179,5 +196,15 @@ describe('limit sell order', () => {
 		expect(sellOrderBoxes.length, 'sell order boxes length').toBe(1);
 	});
 
-	it('execture sell contract', async () => {});
+	it('execture sell contract', async () => {
+		const executeSellOrderTx = executeSell(
+			height,
+			sellOrderBoxes,
+			depositsAlice,
+			tokenForSale,
+			paymentInErgo
+		);
+
+		expect(executeSellOrderTx.inputs.length).toBe(2);
+	});
 });

@@ -358,13 +358,5 @@ describe('Execute Swap with R9', async () => {
 		);
 		expect(valid1, 'input1 proof').toBe(true);
 		console.log(valid1);
-
-		// const valid = validate_tx(
-		// 	signedTxnew,
-		// 	fakeContextX(),
-		// 	ErgoBoxes.from_boxes_json(executeSwapOrderTx.inputs),
-		// 	ErgoBoxes.empty()
-		// );
-		// console.log(valid);
 	});
 });
