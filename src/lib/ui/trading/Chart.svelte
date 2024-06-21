@@ -10,11 +10,13 @@
 
 	function selectInterval(interval) {
 		selectedInterval = interval;
+		chart.remove();
+		chart = initializeChart(chartContainer, $isDarkMode, selectedInterval);
 	}
 
 	onMount(() => {
 		chartContainer = document.getElementById('chart');
-		chart = initializeChart(chartContainer, $isDarkMode);
+		chart = initializeChart(chartContainer, $isDarkMode, selectedInterval);
 
 		const resizeObserver = new ResizeObserver(() => {
 			chart.applyOptions({
@@ -26,7 +28,7 @@
 
 		const unsubscribe = isDarkMode.subscribe((value) => {
 			chart.remove();
-			initializeChart(chartContainer, value);
+			chart = initializeChart(chartContainer, value, selectedInterval);
 		});
 
 		return () => {
@@ -40,8 +42,7 @@
 <div class="flex flex-col w-full h-full">
 	<div class="interval_wrapper">
 		{#each intervalOptions as i}
-			<button on:click={() => selectInterval(i)} class:interval_active={selectedInterval == i}
-				>{i}</button>
+			<button on:click={() => selectInterval(i)} class:interval_active={selectedInterval == i}>{i}</button>
 		{/each}
 	</div>
 	<div id="chart" class="chart grow-1"></div>
@@ -67,7 +68,7 @@
 		height: 40px;
 		@apply flex gap-2 items-center pl-4;
 		color: var(--text-secondary);
-		font-size: 12;
+		font-size: 12px;
 	}
 	.interval_wrapper:not(:first-child) {
 		-webkit-margin-start: 4px;

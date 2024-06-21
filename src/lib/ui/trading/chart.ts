@@ -1,5 +1,5 @@
 import { createChart } from 'lightweight-charts';
-import { generateRandomData } from './data';
+import { generateHighResolutionData, aggregateData } from './data';
 
 function cssVar(variableName) {
     return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
@@ -11,6 +11,7 @@ export const chartOptionsLight = {
         background: { type: 'solid', color: cssVar('--body-background') }
     }
 };
+
 export const chartOptionsDark = {
     layout: {
         textColor: 'white',
@@ -26,7 +27,9 @@ export const chartOptionsDark = {
     }
 };
 
-export function initializeChart(chartContainer, darkMode) {
+let highResolutionData;
+
+export function initializeChart(chartContainer, darkMode, interval) {
     let chart;
     if (darkMode) {
         chart = createChart(chartContainer, chartOptionsDark);
@@ -41,7 +44,13 @@ export function initializeChart(chartContainer, darkMode) {
         wickUpColor: '#26a69a',
         wickDownColor: '#ef5350'
     });
-    candlestickSeries.setData(generateRandomData(100000));
+
+    if (!highResolutionData) {
+        highResolutionData = generateHighResolutionData(100000);
+    }
+
+    const data = aggregateData(highResolutionData, interval);
+    candlestickSeries.setData(data);
 
     chart.timeScale().fitContent();
     return chart;
