@@ -48,7 +48,7 @@ export function initializeChart(chartContainer, darkMode, interval) {
     });
 
     if (!highResolutionData) {
-        highResolutionData = generateHighResolutionData(1_000_000);
+        highResolutionData = generateHighResolutionData(100_000);
     }
 
     const data = aggregateData(highResolutionData, interval);
