@@ -81,7 +81,7 @@ export async function bInput(
 
 	const input = proverAlice.sign_tx_input_multi(
 		index,
-		fakeContextX(),
+		fakeContext(),
 		UnsignedTransaction.from_json(JSON.stringify(unsignedTx)),
 		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
 		ErgoBoxes.empty(),
@@ -113,7 +113,7 @@ export async function b(
 	const hAlice = ErgoAddress.fromBase58(userAddress).ergoTree.slice(6);
 	let extractedHints = extract_hints(
 		partialSignedTx,
-		fakeContextX(),
+		fakeContext(),
 		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
 		ErgoBoxes.empty(),
 		arrayToProposition([hAlice]),
