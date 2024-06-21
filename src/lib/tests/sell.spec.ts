@@ -10,9 +10,9 @@ import { ALICE_ADDRESS, BOB_ADDRESS, DEPOSIT_ADDRESS } from '$lib/constants/addr
 import { TOKEN } from '$lib/constants/tokens';
 import { deposit, depositNoTokens } from '$lib/wallet/deposit';
 import { utxos } from '$lib/data/utxos';
-import { signTx, signTxMulti } from '$lib/wallet/multisig-server';
+import { signTx, signTxInput, signTxMulti } from '$lib/wallet/multisig-server';
 import { boxesAtAddress } from '$lib/utils/test-helper';
-import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
+import { ALICE_MNEMONIC, BOB_MNEMONIC, SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
 import { createSellOrderTxR9, executeSell } from '$lib/wallet/sell';
 import { compileContract } from '$lib/compiler/compile';
 
@@ -150,7 +150,7 @@ describe('limit sell order', () => {
 	const minimalErgo = SAFE_MIN_BOX_VALUE; //1_000_000n
 	const ergoFee = RECOMMENDED_MIN_FEE_VALUE; //1_100_000n
 
-	let paymentInErgo = 2_000_000n;
+	let paymentInErgo = 20_000_000n; //2_000_000 fair price
 
 	beforeAll(async () => {
 		//DEPOSIT
@@ -204,7 +204,15 @@ describe('limit sell order', () => {
 			tokenForSale,
 			paymentInErgo
 		);
-
 		expect(executeSellOrderTx.inputs.length).toBe(2);
+
+		//console.log(executeSellOrderTx);
+		//Basic sign
+		const sInput0 = await signTxInput(
+			SHADOW_MNEMONIC,
+			JSON.parse(JSON.stringify(executeSellOrderTx)),
+			0
+		);
+		expect(sInput0, 'shadow can sign index:0').toBeDefined();
 	});
 });
