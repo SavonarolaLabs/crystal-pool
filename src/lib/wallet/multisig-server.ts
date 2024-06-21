@@ -113,7 +113,7 @@ export async function b(
 	const hAlice = ErgoAddress.fromBase58(userAddress).ergoTree.slice(6);
 	let extractedHints = extract_hints(
 		partialSignedTx,
-		fakeContext(),
+		fakeContextX(),
 		ErgoBoxes.from_boxes_json(unsignedTx.inputs),
 		ErgoBoxes.empty(),
 		arrayToProposition([hAlice]),
