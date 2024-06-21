@@ -8,13 +8,14 @@ function cssVar(variableName) {
 export const chartOptionsLight = {
     layout: {
         textColor: 'black',
-        background: { type: 'solid', color: cssVar('--body-background') }
-    }
+        background: { type: 'solid', color: 'white' }
+    },
+    timeScale: { barSpacing: 10 }
 };
 
 export const chartOptionsDark = {
     layout: {
-        textColor: 'white',
+        textColor: '#87909f',
         background: { type: 'solid', color: '#16171A' }
     },
     grid: {
@@ -24,7 +25,8 @@ export const chartOptionsDark = {
         horzLines: {
             color: '#1E1E1E'
         }
-    }
+    },
+    timeScale: { barSpacing: 10 }
 };
 
 let highResolutionData;
@@ -46,12 +48,11 @@ export function initializeChart(chartContainer, darkMode, interval) {
     });
 
     if (!highResolutionData) {
-        highResolutionData = generateHighResolutionData(100000);
+        highResolutionData = generateHighResolutionData(1_000_000);
     }
 
     const data = aggregateData(highResolutionData, interval);
     candlestickSeries.setData(data);
 
-    chart.timeScale().fitContent();
     return chart;
 }
