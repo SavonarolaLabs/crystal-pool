@@ -35,7 +35,6 @@
     right: 0;
     z-index: 10;
     margin-top: 0.5rem;
-    box-shadow: var(--shadow-level2);
   }
 
   .dropdown.show {
@@ -116,7 +115,7 @@
     </button>
   </div>
 
-  <div class={`dropdown ${menuOpen ? 'show' : ''}`} role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+  <div class={`shadow-s2-down dropdown ${menuOpen ? 'show' : ''}`} role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
     <div class="balance text-xs">
       Estimated Balance: 
       <div class="balance-total text-xl py-2">0 ERG</div>
