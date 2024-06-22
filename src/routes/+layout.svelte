@@ -3,13 +3,15 @@
 		import { Buffer } from 'buffer';
 	import '../app.css';
 	import '../mxui.css';
+	import Header from '$lib/ui/Header.svelte';
+	import Footer from '$lib/ui/Footer.svelte';
 
 	onMount(()=>{
-
-		// Make Buffer globally available
 		(window as any).Buffer = Buffer;
 	})
 
 </script>
 
+<Header></Header>
 <slot />
+<Footer></Footer>

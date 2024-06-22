@@ -66,9 +66,6 @@
 					<WalletBalanceBar></WalletBalanceBar>
 				</div>
 				<div class="header_navItem">
-					<button on:click={toggleWallet}>Wallet</button>
-				</div>
-				<div class="header_navItem">
 					<WalletDropdown></WalletDropdown>
 				</div>
 				<div class="header_navItem">

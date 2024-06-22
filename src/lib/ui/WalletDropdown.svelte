@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+  import { goto } from '$app/navigation';
     let menuOpen = false;
   
     function toggleMenu() {
@@ -7,6 +8,10 @@
   
     function closeMenu() {
       menuOpen = false;
+    }
+    function deposit() {
+      menuOpen = false;
+      goto('/assets/deposit')
     }
   </script>
   
@@ -48,8 +53,13 @@
         background-color: var(--fill-container);
     }
     .balance {
-      font-size: 1.25rem;
-      margin-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+        padding: 1em;
+        background-color: var(--fill-container);
+        color: var(--text-secondary);
+    }
+    .balance-total{
+        color: var(--text-primary);
     }
     .actions {
       display: flex;
@@ -97,14 +107,16 @@
   
     {#if !menuOpen}
       <div class="shadow-s1-down absolute right-0 z-10 mt-2 origin-top-right dropdown" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-        <div class="balance">
-          Estimated Balance: 0 USDT ≈ 0.00 USD
+        <div class="balance text-xs">
+          Estimated Balance: 
+          <div class="balance-total text-xl py-2">0 ERG</div>
+          ≈ 0.00 USD
         </div>
         <div class="actions">
-          <button class="deposit" on:click={closeMenu}>Deposit</button>
+          <button class="deposit" on:click={deposit}>Deposit</button>
           <button class="withdraw" on:click={closeMenu}>Withdraw</button>
         </div>
-        <a href="#" role="menuitem" tabindex="-1" on:click={closeMenu}>Spot</a>
+        <a href="/assets" role="menuitem" tabindex="-1" on:click={closeMenu}>Spot</a>
         <a href="#" role="menuitem" tabindex="-1" on:click={closeMenu}>Disconnect</a>
       </div>
     {/if}
