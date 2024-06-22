@@ -9,9 +9,3 @@
 </script>
 
 <TradingView></TradingView>
-
-<style lang="postcss">
-	:root {
-		background-color: var(--bg-level-primary);
-	}
-</style>

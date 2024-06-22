@@ -30045,7 +30045,8 @@ textarea.ant-mentions {
 
 body,html {
     width: 100%;
-    height: 100%
+    height: 100%;
+    background-color: var(--bg-level-primary);
 }
 
 input::-ms-clear,input::-ms-reveal {
@@ -30072,7 +30073,6 @@ body {
     font-family: var(--font-family);
     font-variant: var(--font-variant-base);
     line-height: var(--line-height-base);
-    background-color: var(--body-background);
     font-feature-settings: var(--font-feature-settings-base),
 }
 
