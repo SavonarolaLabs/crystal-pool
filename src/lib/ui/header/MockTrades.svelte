@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { addRecentTrades } from './ui_state';
+	import { addRecentTrades } from '../ui_state';
 
 	function generateRandomTrade() {
 		return {
