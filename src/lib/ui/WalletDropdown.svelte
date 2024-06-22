@@ -35,7 +35,6 @@
       border-radius: 0.5rem;
       padding: 1rem;
       width: 250px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
     .dropdown a, .dropdown button {
       display: block;
@@ -97,7 +96,7 @@
     </div>
   
     {#if !menuOpen}
-      <div class="dark:shadow-lg shadow-xl absolute right-0 z-10 mt-2 origin-top-right dropdown" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+      <div class="shadow-s1-down absolute right-0 z-10 mt-2 origin-top-right dropdown" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="balance">
           Estimated Balance: 0 USDT ≈ 0.00 USD
         </div>
