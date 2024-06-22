@@ -1,4 +1,3 @@
-import { compileBuyContract, compileDepositContract, compileSellContract, compileSwapContract } from '$lib/compiler/compile';
 export const BOB_ADDRESS =
 	'9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU';
 export const SHADOWPOOL_ADDRESS =
