@@ -1,5 +1,5 @@
 <script>
-	import Network from "./footer/Network.svelte";
+	import Network from "./Network.svelte";
 </script>
 <div class="footer">
 	<Network></Network>

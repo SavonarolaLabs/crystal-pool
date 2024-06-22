@@ -1,7 +1,7 @@
 <script lang="ts">
-	import WalletBalanceBar from './WalletBalanceBar.svelte';
-	import WalletDropdown from './WalletDropdown.svelte';
-	import { isDarkMode, toggleWallet } from './ui_state';
+	import WalletBalanceBar from "../wallet/WalletBalanceBar.svelte";
+	import WalletDropdown from "../wallet/WalletDropdown.svelte";
+
 
 	function toggleTheme() {
 		if (typeof document !== 'undefined') {

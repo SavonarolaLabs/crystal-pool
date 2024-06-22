@@ -3,7 +3,7 @@ import { get, writable, type Writable } from 'svelte/store';
 import { userBoxes } from './service/crystalPoolService';
 import { sumAssets } from '$lib/utils/helper';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
-import { showToast } from './toaster';
+import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
 
 export const isDarkMode = writable(true);

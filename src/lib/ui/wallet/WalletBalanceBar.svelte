@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { user_address, user_name, user_tokens } from './ui_state';
+	import { user_address, user_name, user_tokens } from '../ui_state';
 
 	function shortenAddress(str: string) {
 		return str.length > 6 ? str.slice(0, 3) + '...' + str.slice(-3) : str;

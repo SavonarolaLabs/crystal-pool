@@ -1,5 +1,5 @@
 <script>
-	import MockTrades from '../MockTrades.svelte';
+	import MockTrades from '../header/MockTrades.svelte';
 	import Actions from './Actions.svelte';
 	import Chart from './Chart.svelte';
 	import Headline from './Headline.svelte';

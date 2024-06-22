@@ -3,8 +3,8 @@
 		import { Buffer } from 'buffer';
 	import '../app.css';
 	import '../mxui.css';
-	import Header from '$lib/ui/Header.svelte';
-	import Footer from '$lib/ui/Footer.svelte';
+	import Header from '$lib/ui/header/Header.svelte';
+	import Footer from '$lib/ui/footer/Footer.svelte';
 
 	onMount(()=>{
 		(window as any).Buffer = Buffer;
