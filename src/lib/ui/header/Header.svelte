@@ -1,5 +1,5 @@
 <script lang="ts">
-	import WalletBalanceBar from "../wallet/WalletBalanceBar.svelte";
+	import { isDarkMode } from "../ui_state";
 	import WalletDropdown from "../wallet/WalletDropdown.svelte";
 
 
@@ -63,7 +63,7 @@
 		<div class="header_leftWrapper">
 			<div class="header_leftMenu">
 				<div class="balance">
-					<WalletBalanceBar></WalletBalanceBar>
+					<!-- <WalletBalanceBar></WalletBalanceBar> -->
 				</div>
 				<div class="header_navItem">
 					<WalletDropdown></WalletDropdown>

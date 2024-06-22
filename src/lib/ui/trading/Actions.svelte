@@ -293,7 +293,7 @@
 		<div class="fee">
 			Maker <span style="display: inline-block; direction: ltr;">0.000%</span>
 			/ Taker
-			<span style="display: inline-block; direction: ltr;">0.000%</span>
+			<span style="display: inline-block; direction: ltr;">0.200%</span>
 		</div>
 	</div>
 	<div class="actions_contentWrapper">

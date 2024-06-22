@@ -32,6 +32,7 @@ export const chartOptionsDark = {
 let highResolutionData;
 
 export function initializeChart(chartContainer, darkMode, interval) {
+    console.log("initializeChart")
     let chart;
     if (darkMode) {
         chart = createChart(chartContainer, chartOptionsDark);

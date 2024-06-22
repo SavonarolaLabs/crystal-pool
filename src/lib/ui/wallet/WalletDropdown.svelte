@@ -88,16 +88,16 @@
   }
 
   .actions button.withdraw {
-    background-color: #1f2937; /* Darker color */
+    background-color: #1f2937;
     color: white;
   }
 
   .actions button.deposit:hover {
-    background-color: #2563eb; /* Darker blue on hover */
+    background-color: #2563eb;
   }
 
   .actions button.withdraw:hover {
-    background-color: #374151; /* Darker color on hover */
+    background-color: #374151;
   }
 </style>
 
