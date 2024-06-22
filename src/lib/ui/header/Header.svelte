@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { DEPOSIT_ADDRESS } from "$lib/constants/addresses";
 	import { isDarkMode } from "../ui_state";
 	import WalletDropdown from "../wallet/WalletDropdown.svelte";
 
@@ -54,9 +55,9 @@
 				<a
 					class="header_navItem"
 					target="_blank"
-					href="https://explorer.ergoplatform.com/en/addresses/t5UVmPtqprz5zN2M2X5fRTajpYD2CYuamxePkcwNFc2t9Yc3DhNMyB81fLAqoL7t91hzyYacMA8uVzkpTYTRdg4A6gZHFZxVsvLo"
+					href={`https://explorer.ergoplatform.com/en/addresses/${DEPOSIT_ADDRESS}`}
 				>
-					Deposits
+					Total Deposits
 				</a>
 			</div>
 		</div>
