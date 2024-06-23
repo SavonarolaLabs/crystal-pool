@@ -8,6 +8,9 @@ import { TOKEN } from '$lib/constants/tokens';
 
 export const isDarkMode = writable(true);
 
+// wallet_initialized
+export const wallet_initialized = writable(false);
+
 // market trades
 
 interface MarketTrade {

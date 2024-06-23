@@ -1,5 +1,4 @@
 <script>
-	import MockTrades from '../header/MockTrades.svelte';
 	import Actions from './Actions.svelte';
 	import Chart from './Chart.svelte';
 	import Headline from './Headline.svelte';
@@ -7,10 +6,7 @@
 	import Markets from './Markets.svelte';
 	import OrderBook from './OrderBook.svelte';
 	import Orders from './Orders.svelte';
-    import { Toaster } from 'svelte-french-toast';
 </script>
-<Toaster />
-<!-- <MockTrades /> -->
 <div class="exchange_pageWrapper">
     <div class="exchange">
 	<!-- left -->
