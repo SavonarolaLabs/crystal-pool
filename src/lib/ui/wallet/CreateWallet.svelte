@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { showToast } from "../header/toaster";
+	import { setMnemonic } from "../ui_wallet";
 
 	let mnemonic = `project story magnet again
 rule trap holiday point
 actress metal thrive wall`;
+	let password = '';
 
     function createWallet(){
         showToast('Wallet created');
-		goto('/assets/deposit')
+		//goto('/assets/deposit')
+		setMnemonic(mnemonic, password);
     }
 </script>
 

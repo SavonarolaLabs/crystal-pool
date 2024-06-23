@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { DEPOSIT_ADDRESS } from "$lib/constants/addresses";
 	import { isDarkMode } from "../ui_state";
+	import { mnemonic } from "../ui_wallet";
 	import WalletDropdown from "../wallet/WalletDropdown.svelte";
-
 
 	function toggleTheme() {
 		if (typeof document !== 'undefined') {
@@ -44,6 +44,7 @@
 					></svg
 				>
 			</a>
+			
 			<div class="header_leftMenu">
 				<a
 					class="header_navItem"
@@ -61,6 +62,7 @@
 				</a>
 			</div>
 		</div>
+		m:{$mnemonic}
 		<div class="header_leftWrapper">
 			<div class="header_leftMenu">
 				<div class="balance">
