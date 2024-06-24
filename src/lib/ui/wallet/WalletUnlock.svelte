@@ -13,8 +13,6 @@
 	function unlockWallet() {
 		if (onDecrypt(password)) {
 			closeDialog();
-			showToast('Wallet unlocked.');
-			wallet_initialized.set(true);
 		} else {
 			shake = true;
 			setTimeout(() => (shake = false), 300);

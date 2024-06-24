@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js';
 import { get, writable } from 'svelte/store';
 import { wallet_initialized } from './ui_state';
+import { showToast } from './header/toaster';
 
 export const mnemonic = writable('');
 
@@ -30,7 +31,10 @@ export function onDecrypt(password) {
 		if(!(decryptedMnemonic.split(' ').length == 12)){
 			return false;
 		}
+
+		showToast('Wallet unlocked.');
 		mnemonic.set(decryptedMnemonic);
+		wallet_initialized.set(true);
 
 		if (navigator.serviceWorker.controller) {
 			navigator.serviceWorker.controller.postMessage({
@@ -38,13 +42,14 @@ export function onDecrypt(password) {
 				mnemonic: decryptedMnemonic
 			});
 		}
+
 		return true;
 	} catch (error) {
 		return false;
 	}
 }
 
-export async function setMnemonic(m: string, password: string): Promise<void> {
+export async function persistMnemonic(m: string, password: string): Promise<void> {
 	mnemonic.set(m);
 	encryptAndStoreMnemonic(m, password);
 	wallet_initialized.set(true);
