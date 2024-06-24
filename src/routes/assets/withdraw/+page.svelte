@@ -1,7 +1,7 @@
 <div class="flex flex-col items-center">
 	<div class="page-header flex items-center">
 		<div class="back-arrow">&#8592;</div>
-		<div class="title">Deposit</div>
+		<div class="title">Withdraw</div>
 	</div>
 	<div class="deposit_container flex items-center">
         <div class=" grow">
@@ -32,15 +32,6 @@
 
             <div class="deposit_dot">Enter Amount</div>
             <div class="select-token_wrapper">
-				<div>
-					<span class="actions_primaryText" style="margin-inline-end: 8px;"
-						>Available
-					</span><span
-						><span>
-							{0}
-						</span><span> rsBTC</span></span
-					>
-				</div>
                 <input class="w-full ant-input ant-input-lg">
             </div>
 

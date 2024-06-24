@@ -20,6 +20,11 @@
 		goto('/assets/deposit');
 	}
 
+	function withdraw() {
+		menuOpen = false;
+		goto('/assets/withdraw');
+	}
+
 	function toToWalletOrAssets() {
 		menuOpen = false;
 		if ($wallet_initialized) {
@@ -77,33 +82,32 @@
 		aria-labelledby="menu-button"
 		tabindex="-1"
 	>
-		<div class="balance text-xs">
-			Estimated Balance:
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div class="balance text-xs" on:click={()=> goto('/assets')}>
+			<div class="flex items-center gap-2">
+				Estimated Balance
+				<svg
+					fill="currentColor"
+					height="1em"
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 512 512"
+					><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path
+						d="M432 320H400a16 16 0 0 0 -16 16V448H64V128H208a16 16 0 0 0 16-16V80a16 16 0 0 0 -16-16H48A48 48 0 0 0 0 112V464a48 48 0 0 0 48 48H400a48 48 0 0 0 48-48V336A16 16 0 0 0 432 320zM488 0h-128c-21.4 0-32.1 25.9-17 41l35.7 35.7L135 320.4a24 24 0 0 0 0 34L157.7 377a24 24 0 0 0 34 0L435.3 133.3 471 169c15 15 41 4.5 41-17V24A24 24 0 0 0 488 0z"
+					/></svg
+				>
+			</div>
 			<div class="balance-total text-xl py-2">0 ERG</div>
 			≈ 0.00 USD
 		</div>
 		<div class="actions">
 			{#if $wallet_initialized}
 				<button class="deposit" on:click={deposit}>Deposit</button>
-				<button
-					class="withdraw"
-					on:click={() => {
-						menuOpen = false;
-					}}>Withdraw</button
-				>
+				<button class="withdraw" on:click={withdraw}>Withdraw</button>
 			{:else}
 				<button class="deposit" on:click={createWallet}>Create</button>
 				<button class="withdraw" on:click={restoreWallet}>Restore</button>
 			{/if}
 		</div>
-		<a
-			href="/assets"
-			role="menuitem"
-			tabindex="-1"
-			on:click={() => {
-				menuOpen = false;
-			}}>Spot</a
-		>
 		<!-- svelte-ignore a11y-invalid-attribute -->
 		<a
 			href="#"

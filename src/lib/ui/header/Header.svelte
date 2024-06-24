@@ -53,7 +53,7 @@
 				</a>
 			</div>
 		</div>
-		m:{$mnemonic}
+		<!-- m:{$mnemonic} -->
 		<div class="header_leftWrapper">
 			<div class="header_leftMenu">
 				<div class="balance">
