@@ -11,6 +11,7 @@ actress metal thrive wall`;
     function createWallet(){
         showToast('Wallet created');
 		//goto('/assets/deposit')
+		console.log({mnemonic, password})
 		setMnemonic(mnemonic, password);
     }
 </script>
@@ -27,7 +28,7 @@ actress metal thrive wall`;
 			</div>
 			<div class="deposit_dot">Wallet Password</div>
             <div class="select-token_wrapper">
-                <input class="w-full ant-input ant-input-lg">
+                <input class="w-full ant-input ant-input-lg" bind:value={password}>
             </div>
             <div class="select-token_wrapper flex items-center gap-2">
                 <input type="checkbox" class="" id="confirm">

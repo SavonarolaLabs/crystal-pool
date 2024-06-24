@@ -1,16 +1,20 @@
 import CryptoJS from 'crypto-js';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 export const mnemonic = writable('');
 
 function encryptAndStoreMnemonic(m, password) {
-	const decryptedMnemonic = m;
+	const decryptedMnemonic = m.trim().replace(/\s+/g, ' ');;
 	mnemonic.set(decryptedMnemonic);
 	const encrypted = CryptoJS.AES.encrypt(decryptedMnemonic, password).toString();
 	localStorage.setItem('encryptedMnemonic', encrypted);
 }
 
-function decryptMnemonic(password) {
+export async function mnemonicRequiresDecryption() {
+	return !!localStorage.getItem('encryptedMnemonic') && !get(mnemonic);
+}
+
+function decryptLocalStorageMnemonic(password) {
 	const encryptedMnemonic = localStorage.getItem('encryptedMnemonic');
 	if (!encryptedMnemonic) {
 		throw new Error('No encrypted mnemonic found');
@@ -21,9 +25,11 @@ function decryptMnemonic(password) {
 
 export function onDecrypt(password) {
 	try {
-		const decryptedMnemonic = decryptMnemonic(password);
+		const decryptedMnemonic = decryptLocalStorageMnemonic(password);
+		if(!(decryptedMnemonic.split(' ').length == 12)){
+			return false;
+		}
 		mnemonic.set(decryptedMnemonic);
-		sessionStorage.setItem('decryptedMnemonic', decryptedMnemonic);
 
 		if (navigator.serviceWorker.controller) {
 			navigator.serviceWorker.controller.postMessage({
@@ -31,15 +37,15 @@ export function onDecrypt(password) {
 				mnemonic: decryptedMnemonic
 			});
 		}
+		return true;
 	} catch (error) {
-		console.error('Decryption failed:', error);
+		return false;
 	}
 }
 
-
 export async function setMnemonic(m: string, password: string): Promise<void> {
 	mnemonic.set(m);
-    encryptAndStoreMnemonic(m, password);
+	encryptAndStoreMnemonic(m, password);
 
 	const registration = await navigator.serviceWorker.ready;
 	const worker = registration.active;
@@ -72,7 +78,6 @@ async function getMnemonic(): Promise<string> {
 export async function initMnemonicWorker() {
 	await navigator.serviceWorker.register('/sw.js');
 	const m = await getMnemonic();
-	console.log('m', m);
 	if (m) {
 		mnemonic.set(m);
 	}
