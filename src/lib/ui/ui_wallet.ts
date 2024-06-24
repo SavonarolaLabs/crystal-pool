@@ -5,6 +5,25 @@ import { showToast } from './header/toaster';
 
 export const mnemonic = writable('');
 
+export async function deleteWallet(){
+	mnemonic.set('');
+	wallet_initialized.set(false);
+	localStorage.removeItem('encryptedMnemonic');
+	
+	showToast('Wallet successfully  deleted!');
+	const registration = await navigator.serviceWorker.ready;
+	const worker = registration.active;
+	if (worker) {
+		return new Promise<void>((resolve) => {
+			worker.postMessage({
+				type: 'STORE_MNEMONIC',
+				mnemonic: ''
+			});
+			resolve();
+		});
+	}
+}
+
 function encryptAndStoreMnemonic(m, password) {
 	const decryptedMnemonic = m.trim().replace(/\s+/g, ' ');;
 	mnemonic.set(decryptedMnemonic);
