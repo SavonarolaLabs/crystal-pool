@@ -83,7 +83,7 @@
 		tabindex="-1"
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class="balance text-xs" on:click={()=> goto('/assets')}>
+		<div class="balance text-xs" on:click={()=> $wallet_initialized ? goto('/assets') : goto('/wallet')}>
 			<div class="flex items-center gap-2">
 				Estimated Balance
 				<svg

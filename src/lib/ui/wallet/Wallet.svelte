@@ -1,56 +1,34 @@
 <script>
-	import { deleteWallet } from "../ui_wallet";
+	import { goto } from '$app/navigation';
+	import { wallet_initialized } from '../ui_state';
+	import { deleteWallet } from '../ui_wallet';
 
 </script>
 
 <div class="flex flex-col items-center">
 	<div class="page-header flex items-center">
-		<div class="title">Crystal Wallet</div>
+		<div class="title">Wallet</div>
 	</div>
-	<div class="deposit_container flex items-center">
-        <div class=" grow">
-            <div class="deposit_dot">Select Token</div>
-            <div class="select-token_wrapper">
-                <div class="select-token_selectMode">
-                    <div class="flex items-center gap-2">
-                        <img
-                            src="https://www.mexc.com/api/file/download/F20210514192151938ROhGjOFp2Fpgb7"
-                        /><span class="select-token_currency">rsBTC</span><label
-                            >RosenBridge Bitcoin</label
-                        >
-                    </div>
-                    <svg
-                        class="-mr-1 h-5 w-5 text-gray-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
-                </div>
-            </div>
-
-            <div class="deposit_dot">Enter Amount</div>
-            <div class="select-token_wrapper">
-                <input class="w-full ant-input ant-input-lg">
-            </div>
-
-            <div class="select-token_wrapper">
-                <button class="btn" on:click={deleteWallet}>DELETE WALLET</button>
-            </div>
-        </div>
-        <div class="grow flex justify-center">
-            <img style="background:white;max-width:300px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1920px-QR_code_for_mobile_English_Wikipedia.svg.png" alt="">
-        </div>
+	<div class="deposit_container flex items-center gap-4">
+		{#if !$wallet_initialized}
+			<div class="grow">
+				<div class="deposit_dot">New Crystal Wallet</div>
+				<button class="btn" on:click={()=>goto('/wallet/create')}>create</button>
+			</div>
+			<div class=" grow">
+				<div class="deposit_dot">Already have a Crystal Wallet?</div>
+				<button class="btn" on:click={()=>goto('/wallet/restore')}>restore</button>
+			</div>
+		{:else}
+			<div class="select-token_wrapper">
+				<button class="btn" on:click={deleteWallet}>DELETE WALLET</button>
+			</div>
+		{/if}
 	</div>
 </div>
 
 <style lang="postcss">
-    .btn {
+	.btn {
 		height: 48px;
 		width: 100%;
 		border: none;
@@ -58,11 +36,11 @@
 		border-radius: 4px;
 		cursor: pointer;
 		transition: all 0.16s ease-in;
-        background-color: #3b82f6;
+		background-color: #3b82f6;
 	}
 	.select-token_wrapper {
 		margin-bottom: 40px;
-        max-width: 500px;
+		max-width: 500px;
 	}
 	.select-token_currency {
 		ont-size: 14px;
