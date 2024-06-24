@@ -1,19 +1,26 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
-	import { showToast } from "../header/toaster";
-	import { setMnemonic } from "../ui_wallet";
+	import { showToast } from '../header/toaster';
+	import { setMnemonic } from '../ui_wallet';
 
+	let fillColor = 'var(--fill-opacity-container)';
 	let mnemonic = `project story magnet again
 rule trap holiday point
 actress metal thrive wall`;
 	let password = '';
+	let shake = false;
+	let checked=false;
 
-    function createWallet(){
-        showToast('Wallet created');
+	function createWallet() {
+		if(checked){
+			showToast('Wallet created');
 		//goto('/assets/deposit')
-		console.log({mnemonic, password})
+		console.log({ mnemonic, password });
 		setMnemonic(mnemonic, password);
-    }
+		}else{
+			shake = true;
+			setTimeout(() => (shake = false), 300);
+		}
+	}
 </script>
 
 <div class="flex flex-col items-center">
@@ -22,22 +29,40 @@ actress metal thrive wall`;
 		<div class="title">Create Wallet</div>
 	</div>
 	<div class="deposit_container">
-			<div class="deposit_dot">12 Word Mnemonic</div>
-			<div class="select-token_wrapper">
-				<textarea class="w-full ant-input" style="height:6em;resize: none; font-size:18px;" readonly={true}>{mnemonic}</textarea>
+		<div class="flex w-full">
+			<div class="grow">
+				<div class="deposit_dot">12 Word Mnemonic</div>
+				<div class="select-token_wrapper">
+					<textarea
+						class="w-full ant-input"
+						style="height:6em;resize: none; font-size:18px;"
+						readonly={true}>{mnemonic}</textarea
+					>
+				</div>
+				<div class="deposit_dot">Wallet Password</div>
+				<div class="select-token_wrapper">
+					<input class="w-full ant-input ant-input-lg" bind:value={password} />
+				</div>
+				<div class="select-token_wrapper flex items-center gap-2" class:shake>
+					<input type="checkbox" id="confirm" bind:checked={checked}/>
+					<label for="confirm" style="user-select: none;"
+						>I have written down my 12 magic words.</label
+					>
+				</div>
+
+				<div class="select-token_wrapper">
+					<button class="btn" on:click={createWallet}>Create</button>
+				</div>
 			</div>
-			<div class="deposit_dot">Wallet Password</div>
-            <div class="select-token_wrapper">
-                <input class="w-full ant-input ant-input-lg" bind:value={password}>
-            </div>
-            <div class="select-token_wrapper flex items-center gap-2">
-                <input type="checkbox" class="" id="confirm">
-                <label for="confirm" style="user-select: none;">I have written down my 12 magic words.</label>
-            </div> 
-            
-			<div class="select-token_wrapper">
-				<button class="btn" on:click={createWallet}>Create</button>
-			</div>
+			<div class="grow flex items-center justify-center">
+			<svg xmlns="http://www.w3.org/2000/svg" width="80%" viewBox="0 0 512 512">
+				<path
+					fill={fillColor}
+					d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"
+				/>
+			</svg>
+		</div>
+		</div>
 	</div>
 </div>
 
