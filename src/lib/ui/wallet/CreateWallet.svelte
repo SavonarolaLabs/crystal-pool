@@ -26,7 +26,7 @@ actress metal thrive wall`;
 
 <div class="flex flex-col items-center">
 	<div class="page-header flex items-center">
-		<div class="back-arrow">&#8592;</div>
+		<button class="back-arrow" on:click={()=>goto('/wallet')}>&#8592;</button>
 		<div class="title">Create Wallet</div>
 	</div>
 	<div class="deposit_container" style="height: 570px;">
@@ -66,7 +66,7 @@ actress metal thrive wall`;
 				</div>
 			{:else}
 				<div class="fade-in text-lg">
-					Your wallet is ready. <a href="/assets/deposit">Ready to Deposit?</a>
+					Your wallet is ready. <a href="/assets/deposit">Deposit Assets?</a>
 				</div>
 			{/if}
 		</div>

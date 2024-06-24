@@ -110,9 +110,18 @@
 		</div>
 		<!-- svelte-ignore a11y-invalid-attribute -->
 		<a
+			href="/wallet"
+			role="menuitem"
+			tabindex="-1"
+			on:click={() => {
+				menuOpen = false;
+			}}>Crystal Wallet</a
+		>
+		<a
 			href="#"
 			role="menuitem"
 			tabindex="-1"
+			style="display:none;"
 			on:click={() => {
 				menuOpen = false;
 			}}>Disconnect</a

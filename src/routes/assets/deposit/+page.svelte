@@ -1,6 +1,10 @@
+<script>
+	import { goto } from "$app/navigation";
+</script>
+
 <div class="flex flex-col items-center">
 	<div class="page-header flex items-center">
-		<div class="back-arrow">&#8592;</div>
+		<button class="back-arrow" on:click={()=>goto("/assets")}>&#8592;</button>
 		<div class="title">Deposit</div>
 	</div>
 	<div class="deposit_container flex items-center">
@@ -12,7 +16,7 @@
                         <img
                             src="https://www.mexc.com/api/file/download/F20210514192151938ROhGjOFp2Fpgb7"
                         /><span class="select-token_currency">rsBTC</span><label
-                            >Bitcoin on Steroids</label
+                            >RosenBridge Bitcoin</label
                         >
                     </div>
                     <svg
@@ -32,15 +36,6 @@
 
             <div class="deposit_dot">Enter Amount</div>
             <div class="select-token_wrapper">
-				<div>
-					<span class="actions_primaryText" style="margin-inline-end: 8px;"
-						>Available
-					</span><span
-						><span>
-							{0}
-						</span><span> rsBTC</span></span
-					>
-				</div>
                 <input class="w-full ant-input ant-input-lg">
             </div>
 
