@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { showToast } from '../header/toaster';
 	import { initMnemonicWorker, mnemonicRequiresDecryption, onDecrypt } from '../ui_wallet';
+	import { wallet_initialized } from '../ui_state';
 
 	let showDialog = false;
 	const closeDialog = () => (showDialog = false);
@@ -13,6 +14,7 @@
 		if (onDecrypt(password)) {
 			closeDialog();
 			showToast('Wallet unlocked.');
+			wallet_initialized.set(true);
 		} else {
 			shake = true;
 			setTimeout(() => (shake = false), 300);

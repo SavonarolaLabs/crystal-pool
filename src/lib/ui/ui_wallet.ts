@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import { get, writable } from 'svelte/store';
+import { wallet_initialized } from './ui_state';
 
 export const mnemonic = writable('');
 
@@ -46,6 +47,7 @@ export function onDecrypt(password) {
 export async function setMnemonic(m: string, password: string): Promise<void> {
 	mnemonic.set(m);
 	encryptAndStoreMnemonic(m, password);
+	wallet_initialized.set(true);
 
 	const registration = await navigator.serviceWorker.ready;
 	const worker = registration.active;
@@ -80,5 +82,6 @@ export async function initMnemonicWorker() {
 	const m = await getMnemonic();
 	if (m) {
 		mnemonic.set(m);
+		wallet_initialized.set(true);
 	}
 }

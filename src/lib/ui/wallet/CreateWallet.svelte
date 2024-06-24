@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { showToast } from '../header/toaster';
 	import { setMnemonic } from '../ui_wallet';
 
@@ -13,9 +14,8 @@ actress metal thrive wall`;
 	function createWallet() {
 		if(checked){
 			showToast('Wallet created');
-		//goto('/assets/deposit')
-		console.log({ mnemonic, password });
-		setMnemonic(mnemonic, password);
+			setMnemonic(mnemonic, password);
+			goto('/assets/deposit')
 		}else{
 			shake = true;
 			setTimeout(() => (shake = false), 300);
