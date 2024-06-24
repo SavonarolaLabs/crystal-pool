@@ -8,6 +8,25 @@ import { TOKEN } from '$lib/constants/tokens';
 
 export const isDarkMode = writable(true);
 
+export function toggleTheme() {
+	if (typeof document !== 'undefined') {
+		const currentTheme = document.documentElement.getAttribute('data-theme');
+		const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+		document.documentElement.setAttribute('data-theme', newTheme);
+		localStorage.setItem("ui_isDarkMode",newTheme);
+		isDarkMode.set(newTheme == 'dark')
+	}
+}
+
+export function loadUIState(){
+	const ui_isDarkMode = localStorage.getItem("ui_isDarkMode");
+	if(ui_isDarkMode == 'light'){
+		document.documentElement.setAttribute('data-theme', 'light');
+		isDarkMode.set(false);
+	}
+}
+
+
 // wallet_initialized
 export const wallet_initialized = writable(false);
 

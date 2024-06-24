@@ -1,17 +1,8 @@
 <script lang="ts">
 	import { DEPOSIT_ADDRESS } from "$lib/constants/addresses";
-	import { isDarkMode } from "../ui_state";
+	import { toggleTheme } from "../ui_state";
 	import { mnemonic } from "../ui_wallet";
 	import WalletDropdown from "../wallet/WalletDropdown.svelte";
-
-	function toggleTheme() {
-		if (typeof document !== 'undefined') {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			isDarkMode.set(newTheme == 'dark')
-		}
-	}
 </script>
 
 <div class="header">
