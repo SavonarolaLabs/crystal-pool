@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { showToast } from '../header/toaster';
 	import { initMnemonicWorker, mnemonicRequiresDecryption, onDecrypt } from '../ui_wallet';
-	import { wallet_initialized } from '../ui_state';
 
 	let showDialog = false;
 	const closeDialog = () => (showDialog = false);
@@ -36,6 +34,8 @@
 
 {#if showDialog}
 	<div class="dialog-overlay">
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div class="dialog-content shadow-s2-down" on:click|stopPropagation>
 			<button class="close-btn" on:click={closeDialog}>&times;</button>
 			<h2>Unlock Wallet</h2>
