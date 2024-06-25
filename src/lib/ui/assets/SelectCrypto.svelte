@@ -1,28 +1,67 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { createEventDispatcher } from 'svelte';
-	import { ergoTokens } from '$lib/constants/ergoTokens';
-	const dispatch = createEventDispatcher();
+    import { onMount, createEventDispatcher } from 'svelte';
+    import { ergoTokens } from '$lib/constants/ergoTokens';
+    const dispatch = createEventDispatcher();
 
-	export let showDialog = true;
-	const closeDialog = () => (showDialog = false);
+    export let showDialog = true;
+    const closeDialog = () => (showDialog = false);
 
-	function handleKeydown(event) {
-		if (event.key === 'Enter') {
-			closeDialog();
-		} else if (event.key === 'Escape') {
-			closeDialog();
-		}
-	}
+    function handleKeydown(event: KeyboardEvent) {
+        if (event.key === 'Enter' || event.key === 'Escape') {
+            closeDialog();
+        }
+    }
 
-	function selectCrypto(coin) {
-		dispatch('message', { coin });
-		closeDialog();
-	}
+    function selectCrypto(coin: string) {
+        dispatch('message', { coin });
+        closeDialog();
+    }
 
-	onMount(async () => {
-		document.addEventListener('keydown', handleKeydown);
-	});
+    onMount(() => {
+        document.addEventListener('keydown', handleKeydown);
+        return () => {
+            document.removeEventListener('keydown', handleKeydown);
+        };
+    });
+
+    let search = '';
+    function fuzzySearch(tokens: Record<string, any>, query: string): Record<string, any> {
+        if (query === "") {
+            return tokens;
+        }
+        const lowerQuery = query.toLowerCase();
+        return Object.entries(tokens).reduce((result, [key, value]) => {
+            // Only check attributes that exist and are strings
+            if ((value.name && value.name.toLowerCase().includes(lowerQuery)) ||
+                (value.ticker && value.ticker.toLowerCase().includes(lowerQuery)) ||
+                (value.description && value.description.toLowerCase().includes(lowerQuery)) ||
+                (value.project && value.project.toLowerCase().includes(lowerQuery))) {
+                result[key] = value;
+            }
+            return result;
+        }, {} as Record<string, any>);
+    }
+
+    function scoreMatch(text: string, query: string): number {
+        const maxLen = Math.max(text.length, query.length);
+        let score = 0;
+        let textIndex = 0;
+        let queryIndex = 0;
+
+        text = text.toLowerCase();
+
+        while (queryIndex < query.length && textIndex < text.length) {
+            if (text[textIndex] === query[queryIndex]) {
+                score++;
+                queryIndex++;
+            }
+            textIndex++;
+        }
+
+        return score / maxLen; // Normalizing the score
+    }
+
+    $: filteredTokens = fuzzySearch(ergoTokens, search);
 </script>
 
 {#if showDialog}
@@ -54,9 +93,33 @@
 				>
 			</div>
 
+			<div class="markets_searchBar mx-5 mb-2">
+				<div class="ant-input-affix-wrapper ant-input-affix-wrapper-lg">
+					<span class="ant-input-prefix"
+						><svg
+							class="svg-icon iconfont"
+							focusable="false"
+							width="1em"
+							height="1em"
+							fill="currentColor"
+							aria-hidden="true"
+							viewBox="0 0 16 16"
+							data-icon="SearchOutlined"
+							><path
+								fill-rule="evenodd"
+								clip-rule="evenodd"
+								d="M9.93186 10.8786C9.02879 11.5806 7.89393 11.9987 6.66146 11.9987C3.71594 11.9987 1.32812 9.6109 1.32812 6.66536C1.32812 3.71984 3.71594 1.33203 6.66146 1.33203C9.60699 1.33203 11.9948 3.71984 11.9948 6.66536C11.9948 7.89783 11.5767 9.0327 10.8747 9.93576L14.4662 13.5273C14.7265 13.7876 14.7265 14.2098 14.4662 14.4701C14.2059 14.7304 13.7837 14.7304 13.5234 14.4701L9.93186 10.8786ZM10.6615 6.66536C10.6615 8.8745 8.87059 10.6654 6.66146 10.6654C4.45232 10.6654 2.66146 8.8745 2.66146 6.66536C2.66146 4.45622 4.45232 2.66536 6.66146 2.66536C8.87059 2.66536 10.6615 4.45622 10.6615 6.66536Z"
+							></path></svg
+						></span
+					>
+		
+					<input placeholder="Search" class="ant-input" type="text" bind:value={search} />
+				</div>
+			</div>
+
 			<div class="scroll-container">
 				<div style="position:relative">
-					{#each  Object.keys(ergoTokens) as k}
+					{#each  Object.keys(filteredTokens) as k}
 						<div class="select-token" on:click={() => selectCrypto(k)}>
 							<div class="flex items-center gap-3">
 								<div>
