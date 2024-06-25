@@ -1,7 +1,18 @@
 <script>
 	import { goto } from "$app/navigation";
-</script>
+	import SelectCrypto from "$lib/ui/assets/SelectCrypto.svelte";
 
+	let coin = 'rsBTC';
+
+	let selectCryptoDialogOpen = false;
+	function selectCrypto(){
+		selectCryptoDialogOpen = true;
+	}
+	function handleMessage(event){
+		coin = event.detail.coin
+	}
+</script>
+<SelectCrypto bind:showDialog={selectCryptoDialogOpen} on:message={handleMessage}></SelectCrypto>
 <div class="flex flex-col items-center">
 	<div class="page-header flex items-center">
 		<button class="back-arrow" on:click={()=>goto("/assets")}>&#8592;</button>
@@ -9,15 +20,15 @@
 	</div>
 	<div class="deposit_container flex items-center">
         <div class=" grow">
-            <div class="deposit_dot">Select Token</div>
+            <div class="deposit_dot">Select Crypto</div>
             <div class="select-token_wrapper">
                 <div class="select-token_selectMode">
                     <div class="flex items-center gap-2">
                         <img
+						alt=""
                             src="https://www.mexc.com/api/file/download/F20210514192151938ROhGjOFp2Fpgb7"
-                        /><span class="select-token_currency">rsBTC</span><label
-                            >RosenBridge Bitcoin</label
-                        >
+                        /><span class="select-token_currency">{coin}</span><span class="label"
+                            >RosenBridge Bitcoin</span>
                     </div>
                     <svg
                         class="-mr-1 h-5 w-5 text-gray-400"
@@ -40,7 +51,7 @@
             </div>
 
             <div class="select-token_wrapper">
-                <button class="btn">Deposit</button>
+                <button class="btn" on:click={selectCrypto}>Deposit</button>
             </div>
         </div>
         <div class="grow flex justify-center">
@@ -48,6 +59,7 @@
         </div>
 	</div>
 </div>
+<SelectCrypto></SelectCrypto>
 
 <style lang="postcss">
     .btn {
@@ -73,7 +85,7 @@
 		height: 24px;
 		border-radius: 100%;
 	}
-	.select-token_wrapper label {
+	.select-token_wrapper .label {
 		font-size: 14px;
 		color: var(--text-secondary);
 		opacity: 0.6;
