@@ -27,10 +27,11 @@
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div class="select-token_selectMode" on:click={selectCrypto}>
                     <div class="flex items-center gap-2">
-                        <img
-							alt=""
-							src="/token/{tokenId}.svg"
-                        /><span class="select-token_currency">{ergoTokens[tokenId].ticker}</span><span class="label"
+						<img
+						style="width:32px;"
+						alt=""
+						src="{ergoTokens[tokenId].logoURI?ergoTokens[tokenId].logoURI:`/token/${tokenId}.svg`}"
+					/><span class="select-token_currency">{ergoTokens[tokenId].ticker}</span><span class="label"
                             >{ergoTokens[tokenId].name}</span>
                     </div>
                     <svg

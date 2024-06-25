@@ -116,17 +116,16 @@
 					<input placeholder="Search" class="ant-input" type="text" bind:value={search} />
 				</div>
 			</div>
-
 			<div class="scroll-container">
 				<div style="position:relative">
 					{#each  Object.keys(filteredTokens) as k}
 						<div class="select-token" on:click={() => selectCrypto(k)}>
 							<div class="flex items-center gap-3">
-								<div>
+								<div style="width:32px;">
 									<img
 										style="width:32px;"
 										alt=""
-										src="/token/{k}.svg"
+										src="{ergoTokens[k].logoURI?ergoTokens[k].logoURI:`/token/${k}.svg`}"
 									/>
 								</div>
 								<div>

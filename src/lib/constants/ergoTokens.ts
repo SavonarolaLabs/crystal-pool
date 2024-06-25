@@ -6,6 +6,26 @@ export const ergoTokens = {
 		project: 'Sigma USD',
 		description: 'Algorithmic stablecoin'
 	},
+	'8b08cdd5449a9592a9e79711d7d79249d7a03c535d17efaee83e216e80a44c4b': {
+		decimals: 3,
+		project: 'Rosen Bridge',
+		name: 'Rosen',
+		ticker: 'RSN'
+	},
+	e023c5f382b6e96fbd878f6811aac73345489032157ad5affb84aefd4956c297: {
+		decimals: 6,
+		project: 'Rosen Bridge',
+		name: 'rsADA',
+		ticker: 'rsADA',
+		logoURI:
+			'https://raw.githubusercontent.com/spectrum-finance/token-logos/2dee6788e99d2420a41447139db9afdc4b442948/logos/ergo/token-ada.svg'
+	},
+	'0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b': {
+		decimals: 0,
+		name: 'Comet',
+		ticker: 'COMET',
+		description: 'Memecoin of the Ergo ecosystem'
+	},
 	'003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0': {
 		decimals: 0,
 		name: 'SigmaUSD',
@@ -38,12 +58,6 @@ export const ergoTokens = {
 		ticker: 'EXLE',
 		description:
 			'A person-to-person (P2P) lending platform with easy to use tools to borrow and lend money'
-	},
-	'0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b': {
-		decimals: 0,
-		name: 'Comet',
-		ticker: 'COMET',
-		description: 'Memecoin of the Ergo ecosystem'
 	},
 	'02f31739e2e4937bb9afb552943753d1e3e9cdd1a5e5661949cb0cef93f907ea': {
 		decimals: 4,
@@ -187,26 +201,12 @@ export const ergoTokens = {
 		description:
 			'Auction Coin: A fair, decentralized, and free market token distribution protocol'
 	},
-	'8b08cdd5449a9592a9e79711d7d79249d7a03c535d17efaee83e216e80a44c4b': {
-		decimals: 3,
-		project: 'Rosen Bridge',
-		name: 'Rosen',
-		ticker: 'RSN'
-	},
 	'00b42b41cb438c41d0139aa8432eb5eeb70d5a02d3df891f880d5fe08670c365': {
 		decimals: 4,
 		project: 'Crux Finance',
 		name: 'Crux Finance',
 		ticker: 'CRUX',
 		description: 'Crux Finance Token'
-	},
-	e023c5f382b6e96fbd878f6811aac73345489032157ad5affb84aefd4956c297: {
-		decimals: 6,
-		project: 'Rosen Bridge',
-		name: 'rsADA',
-		ticker: 'rsADA',
-		logoURI:
-			'https://raw.githubusercontent.com/spectrum-finance/token-logos/2dee6788e99d2420a41447139db9afdc4b442948/logos/ergo/token-ada.svg'
 	},
 	'1465c9b9de602bd75f8f38df83118e2c8b1d5b2f5518514dd1438149053652a8': {
 		decimals: 6,
