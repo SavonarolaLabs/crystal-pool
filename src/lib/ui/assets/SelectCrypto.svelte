@@ -55,23 +55,31 @@
 
 			<div class="scroll-container">
 				<div style="position:relative">
-					<div class="select-token" on:click={() => selectCrypto('Ergo')}>
-						<div class="flex items-center gap-2">
-							<img
-							style="width:32px;"
-							alt=""
-								src="https://www.mexc.com/api/file/download/F20210514192151938ROhGjOFp2Fpgb7"
-							/><span class="select-token_currency">rsBTC</span><span class="label"
-								>RosenBridge Bitcoin</span>
+					{#each new Array(10).fill(0) as _}
+					<div class="select-token" on:click={() => selectCrypto('rsBTC')}>
+						<div class="flex items-center gap-3">
+							<div>
+								<img
+									style="width:32px;"
+									alt=""
+									src="https://www.mexc.com/api/file/download/F20210514192151938ROhGjOFp2Fpgb7"
+								/>
+							</div>
+							<div>
+								<div class="select-token_currency">rsBTC</div>
+								<div class="label"
+									>RosenBridge Bitcoin</div
+								>
+							</div>
 						</div>
 						<div class="amount">
-							<span style="margin-inline-end: 4px;">≈</span>
-							0</div>
+							<div>
+							0
+						</div>
+						<div class="label">≈ 0.00 USD</div>
+						</div>
 					</div>
-					<div class="select-token" on:click={() => selectCrypto('rsBTC')}>
-						<div class="coin">rsBTC</div>
-						<div class="amount">0</div>
-					</div>
+					{/each}
 				</div>
 			</div>
 		</div>
@@ -102,9 +110,16 @@
 		width: 100%;
 		overflow: hidden;
 	}
-	.select-token:hover{
+	.select-token:hover {
 		background-color: var(--fill-opacity-container);
 	}
+
+	.label {
+		font-size: 14px;
+		color: var(--text-secondary);
+		opacity: 0.6;
+	}
+
 	.scroll-container {
 		display: grid;
 		overflow: auto;

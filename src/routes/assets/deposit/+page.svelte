@@ -22,7 +22,7 @@
         <div class=" grow">
             <div class="deposit_dot">Select Crypto</div>
             <div class="select-token_wrapper">
-                <div class="select-token_selectMode">
+                <div class="select-token_selectMode" on:click={selectCrypto}>
                     <div class="flex items-center gap-2">
                         <img
 						alt=""
