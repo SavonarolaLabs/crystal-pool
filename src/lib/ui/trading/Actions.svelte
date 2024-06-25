@@ -5,12 +5,13 @@
 	import { b, signTxInput } from '$lib/wallet/multisig-client';
 	import { configureSwapTx, createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
-	import { user_address, user_mnemonic, user_tokens } from '../ui_state';
+	import { user_address, user_mnemonic, user_tokens, wallet_initialized } from '../ui_state';
 	import {
 		createAndMultisigSwapTx,
 		executeAndSignInputsSwapTx,
 		type SwapRequest
 	} from '../service/tradingService';
+	import { goto } from '$app/navigation';
 
 	let buyPriceInput = '69000';
 	let buyAmountInput = '0.1';
@@ -447,7 +448,13 @@
 					</div>
 				</div>
 
-				<button class="buySellButton buyButton" on:click={configureBuy}>Buy</button>
+				{#if $wallet_initialized}
+					<button class="buySellButton buyButton" on:click={configureBuy}>Buy</button>
+				{:else}
+					<button class="buySellButton buyButton" on:click={() => goto('/wallet')}>
+						Create/Restore Wallet
+					</button>
+				{/if}
 			</div>
 			<div class="actions_doWrapper">
 				<div class="actions_balance">
@@ -589,7 +596,15 @@
 						>
 					</div>
 				</div>
-				<button class="buySellButton sellButton" on:click={swapActionSell}>Sell</button>
+				{#if $wallet_initialized}
+					<button class="buySellButton sellButton" on:click={swapActionSell}>
+						Sell
+					</button>
+				{:else}
+					<button class="buySellButton sellButton" on:click={() => goto('/wallet')}>
+						Create/Restore Wallet
+					</button>
+				{/if}
 			</div>
 		</div>
 
