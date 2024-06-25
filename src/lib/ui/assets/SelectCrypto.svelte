@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { ergoTokens } from '$lib/constants/ergoTokens';
 	const dispatch = createEventDispatcher();
 
 	export let showDialog = true;
@@ -55,30 +56,26 @@
 
 			<div class="scroll-container">
 				<div style="position:relative">
-					{#each new Array(10).fill(0) as _}
-					<div class="select-token" on:click={() => selectCrypto('rsBTC')}>
-						<div class="flex items-center gap-3">
-							<div>
-								<img
-									style="width:32px;"
-									alt=""
-									src="https://www.mexc.com/api/file/download/F20210514192151938ROhGjOFp2Fpgb7"
-								/>
+					{#each  Object.keys(ergoTokens) as k}
+						<div class="select-token" on:click={() => selectCrypto(k)}>
+							<div class="flex items-center gap-3">
+								<div>
+									<img
+										style="width:32px;"
+										alt=""
+										src="/token/{k}.svg"
+									/>
+								</div>
+								<div>
+									<div class="select-token_currency">{ergoTokens[k].ticker}</div>
+									<div class="label">{ergoTokens[k].name}</div>
+								</div>
 							</div>
-							<div>
-								<div class="select-token_currency">rsBTC</div>
-								<div class="label"
-									>RosenBridge Bitcoin</div
-								>
+							<div class="amount pr-2">
+								<div>0</div>
+								<div class="label">≈ 0.00 USD</div>
 							</div>
 						</div>
-						<div class="amount">
-							<div>
-							0
-						</div>
-						<div class="label">≈ 0.00 USD</div>
-						</div>
-					</div>
 					{/each}
 				</div>
 			</div>
