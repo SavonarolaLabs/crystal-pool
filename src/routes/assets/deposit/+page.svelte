@@ -1,15 +1,16 @@
 <script>
 	import { goto } from "$app/navigation";
+	import { ergoTokens } from "$lib/constants/ergoTokens";
 	import SelectCrypto from "$lib/ui/assets/SelectCrypto.svelte";
 
-	let coin = 'rsBTC';
+	let tokenId = '03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
 
 	let selectCryptoDialogOpen = false;
 	function selectCrypto(){
 		selectCryptoDialogOpen = true;
 	}
 	function handleMessage(event){
-		coin = event.detail.coin
+		tokenId = event.detail.coin
 	}
 </script>
 <SelectCrypto bind:showDialog={selectCryptoDialogOpen} on:message={handleMessage}></SelectCrypto>
@@ -22,13 +23,15 @@
         <div class=" grow">
             <div class="deposit_dot">Select Crypto</div>
             <div class="select-token_wrapper">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div class="select-token_selectMode" on:click={selectCrypto}>
                     <div class="flex items-center gap-2">
                         <img
-						alt=""
-                            src="https://www.mexc.com/api/file/download/F20210514192151938ROhGjOFp2Fpgb7"
-                        /><span class="select-token_currency">{coin}</span><span class="label"
-                            >RosenBridge Bitcoin</span>
+							alt=""
+							src="/token/{tokenId}.svg"
+                        /><span class="select-token_currency">{ergoTokens[tokenId].ticker}</span><span class="label"
+                            >{ergoTokens[tokenId].name}</span>
                     </div>
                     <svg
                         class="-mr-1 h-5 w-5 text-gray-400"
