@@ -26,9 +26,9 @@
 	}
 
 	onMount(async () => {
-		document.addEventListener('keydown', handleKeydown);
-		await initMnemonicWorker();
-		showDialog = await mnemonicRequiresDecryption();
+		//document.addEventListener('keydown', handleKeydown);
+		//await initMnemonicWorker();
+		//showDialog = await mnemonicRequiresDecryption();
 	});
 </script>
 

@@ -98,7 +98,6 @@ export function deposit(
 		.sendChangeTo(changeAddress)
 		.payFee(RECOMMENDED_MIN_FEE_VALUE)
 		.build()
-		.toEIP12Object();
 
 	return unsignedTx;
 }
