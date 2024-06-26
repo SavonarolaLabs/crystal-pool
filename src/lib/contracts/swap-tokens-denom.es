@@ -6,7 +6,7 @@
 	def getBuyingTokenId(box: Box)         	= box.R6[(Coll[Byte],Coll[Byte])].getOrElse((Coll[Byte](),Coll[Byte]()))._2
 	def getRate(box: Box)                  	= box.R7[Long].get
 	def getSellerMultisigAddress(box: Box)  = box.R8[Coll[Byte]].get
-  def getDenom(box: Box)                  = box.R9[Long].get
+	def getDenom(box: Box)                  = box.R9[Long].get
 
 	def tokenId(box: Box) = box.tokens(0)._1
 	def tokenAmount(box: Box) = box.tokens(0)._2

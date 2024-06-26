@@ -5,6 +5,8 @@
 	def getTokenId(box: Box)               = box.R6[Coll[Byte]].getOrElse(Coll[Byte]()) 
 	def getSellRate(box: Box)              = box.R7[Long].get
 	def getSellerMultisigAddress(box: Box) = box.R8[Coll[Byte]].get
+	def getDenom(box: Box)                  = box.R9[Long].get
+
 
  	def tokenId(box: Box) = box.tokens(0)._1
 	def tokenAmount(box: Box) = box.tokens(0)._2
@@ -36,8 +38,17 @@
     	isSameMultisig(b) && 
     	isSameSeller(b) && 
     	isGreaterZeroRate(b)
-	}
-  
+	} //add 2 conditions 
+
+	val maxDenom: Long = INPUTS
+		.filter(isLegitInput)
+		.fold(0L, {(r:Long, box:Box) => {
+		if(r > getDenom(box)) r else getDenom(box)
+	}}) //LegitInput - LegitInputBox
+
+    def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) 
+
+
 	def isPaymentBox(box:Box) = {
 		isSameSeller(box) &&
     	isSameUnlockHeight(box) &&

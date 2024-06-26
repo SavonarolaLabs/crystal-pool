@@ -133,14 +133,14 @@ describe('limit sell order', () => {
 	let depositsAlice: Box[];
 
 	//To check basic contract
-	const tokenForSale0 = {
+	const tokenForSale = {
 		tokenId: TOKEN.rsBTC.tokenId,
 		price: '2',
 		amount: 1_000_000n
 	};
 
 	//To check R9 contract
-	const tokenForSale = {
+	const tokenForSale0 = {
 		tokenId: TOKEN.rsBTC.tokenId,
 		price: '0.02',
 		amount: 100_000_000n
