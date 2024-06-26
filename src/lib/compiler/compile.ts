@@ -1,10 +1,14 @@
+import { DEPOSIT_ADDRESS } from '$lib/constants/addresses';
 import { Network } from '@fleet-sdk/common';
 import { compile } from '@fleet-sdk/compiler';
+import { ErgoAddress } from '@fleet-sdk/core';
+import { SByte, SColl, SSigmaProp } from '@fleet-sdk/serializer';
 import fs from 'fs';
 import path from 'path';
 
-export function compileContract(contract: string) {
+export function compileContract(contract: string, map ={}) {
 	const tree = compile(contract, {
+		map,
 		version: 0,
 		includeSize: false
 	});
@@ -19,6 +23,12 @@ function compileContractFromFile(fileName: string) {
 
 export function compileDepositContract() {
 	return compileContractFromFile('deposit.es');
+}
+
+export function compileDepositProxyContract() {
+	const contractFile = path.join(__dirname, '../contracts', 'deposit-proxy.es');
+	const contract = fs.readFileSync(contractFile, 'utf-8');
+	return compileContract(contract, {_depositAddress: SColl(SByte, ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree).toHex()});
 }
 
 export function compileBuyContract() {

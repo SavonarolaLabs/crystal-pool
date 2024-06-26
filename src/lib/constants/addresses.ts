@@ -1,3 +1,5 @@
+import { ErgoAddress } from "@fleet-sdk/core";
+
 export const BOB_ADDRESS =
 	'9euvZDx78vhK5k1wBXsNvVFGc5cnoSasnXCzANpaawQveDCHLbU';
 export const SHADOWPOOL_ADDRESS =

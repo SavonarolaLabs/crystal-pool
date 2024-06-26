@@ -3,7 +3,8 @@ import {
     compileSwapContract,
     compileDepositContract,
     compileBuyContract,
-    compileSellContract
+    compileSellContract,
+    compileDepositProxyContract
 } from './compile';
 
 describe('Contract Compilation', () => {
@@ -26,4 +27,10 @@ describe('Contract Compilation', () => {
         const address = compileSellContract();
         expect(address).toMatch(/^[1-9A-HJ-NP-Za-km-z]{95,}$/);
     });
+
+    it.only('should produce a valid address for sell-token-for-erg.es', () => {
+        const address =  compileDepositProxyContract();
+        expect(address).toMatch(/^[1-9A-HJ-NP-Za-km-z]{95,}$/);
+    });
+   
 });
