@@ -13,10 +13,6 @@
     generateQRCode();
   }
 
-  function encodeURIComponent(str: string): string {
-    return encodeURIComponent(str).replace(/%20/g, '+');
-  }
-
   async function generateQRCode() {
     let uri = `ergo:${recipientAddress}?amount=${amount}&token-${tokenId}=${tokenAmount}`;
 
