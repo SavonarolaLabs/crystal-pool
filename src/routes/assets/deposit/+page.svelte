@@ -3,6 +3,11 @@
 	import { ergoTokens } from "$lib/constants/ergoTokens";
 	import SelectCrypto from "$lib/ui/assets/SelectCrypto.svelte";
 
+	import ErgoPaymentQR from './ErgoPaymentQR.svelte';
+			  
+	let address = '9g2hgnrfmsRjruxdyhD96UfWnQB4NmqmiovVPVETy4AHeTPpBkW';
+	let amount = '0.001';
+	let tokenAmount = '1000';
 	let tokenId = '03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
 
 	let selectCryptoDialogOpen = false;
@@ -51,19 +56,23 @@
 
             <div class="deposit_dot">Enter Amount</div>
             <div class="select-token_wrapper">
-                <input class="w-full ant-input ant-input-lg">
+                <input class="w-full ant-input ant-input-lg" bind:value={tokenAmount}>
             </div>
 
             <div class="select-token_wrapper">
                 <button class="btn" on:click={selectCrypto}>Deposit</button>
             </div>
         </div>
-        <div class="grow flex justify-center">
-            <img style="background:white;max-width:300px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1920px-QR_code_for_mobile_English_Wikipedia.svg.png" alt="">
+        <div class="grow flex justify-center">			  
+			<ErgoPaymentQR 
+				recipientAddress={address}
+				tokenId={tokenId}
+				amount={amount}
+				tokenAmount={tokenAmount}
+			/>
         </div>
 	</div>
 </div>
-<SelectCrypto></SelectCrypto>
 
 <style lang="postcss">
     .btn {
