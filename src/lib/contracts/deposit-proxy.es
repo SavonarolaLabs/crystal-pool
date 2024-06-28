@@ -39,12 +39,12 @@
   }
 
   sigmaProp(allOf(Coll(
-    //sentToDepositContract,
-    //userPKset,
-    //poolPKset,
+    sentToDepositContract,
+    userPKset,
+    poolPKset,
     unlockHeightSet,
-    //ergForwarded ,
-    //tokensForwarded,
-    //validMinerFee
+    ergForwarded ,
+    tokensForwarded,
+    validMinerFee
   )))
 }

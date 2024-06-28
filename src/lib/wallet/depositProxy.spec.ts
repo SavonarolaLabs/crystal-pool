@@ -1,6 +1,6 @@
 import { compileDepositProxyContract } from '$lib/compiler/compile';
 import { BOB_ADDRESS } from '$lib/constants/addresses';
-import { BOB_MNEMONIC } from '$lib/constants/mnemonics';
+import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { TOKEN } from '$lib/constants/tokens';
 import { utxos } from '$lib/data/utxos';
 import { fetchHeight } from '$lib/external/height';
@@ -20,7 +20,7 @@ describe('deposit contract', () => {
 		currentHeight = await fetchHeight();
 	});
 
-	it('forwards tokens', async() => {
+	it('works', async() => {
         const tokens = [{ tokenId: TOKEN.rsBTC.tokenId, amount: 100_000_000n.toString() }];
 		const tx = sendToDepositProxy(
 			PROXY,
@@ -47,7 +47,71 @@ describe('deposit contract', () => {
 			tokens,
 			(10_000_000n-RECOMMENDED_MIN_FEE_VALUE).toString()
 		);
-        const signed2 = await signTx(depositUTx, BOB_MNEMONIC);
+        const signed2 = await signTx(depositUTx, ALICE_MNEMONIC);
         expect(signed2).toBeDefined();
+	});
+
+	it('fails on underpaiment', async() => {
+        const tokens = [{ 
+            tokenId: TOKEN.rsBTC.tokenId,   
+            amount: 100_000_000n.toString() }];
+		const tx = sendToDepositProxy(
+			PROXY,
+			currentHeight,
+			utxos[BOB_ADDRESS],
+			BOB_ADDRESS,
+			BOB_ADDRESS,
+			unlockHeight,
+			tokens,
+            (10_000_000).toString(),
+		);
+        const signed = await signTx(tx, BOB_MNEMONIC);
+        expect(signed).toBeDefined();
+        expect(boxesAtAddress(signed, PROXY).length).toBe(1);
+        expect(boxAtAddress(signed, PROXY).assets).toStrictEqual(tokens);
+
+        const proxyBox = boxAtAddress(signed, PROXY)
+        const depositUTx = deposit(
+			currentHeight,
+			[proxyBox],
+			BOB_ADDRESS,
+			BOB_ADDRESS,
+			unlockHeight,
+			tokens,
+		    (10_000_000n-RECOMMENDED_MIN_FEE_VALUE-1n).toString()
+		);
+        await expect(signTx(depositUTx, BOB_MNEMONIC)).rejects.toThrow();
+	});
+
+    it('fails on wrong unlock height', async() => {
+        const tokens = [{ 
+            tokenId: TOKEN.rsBTC.tokenId, 
+            amount: 100_000_000n.toString() }];
+		const tx = sendToDepositProxy(
+			PROXY,
+			currentHeight,
+			utxos[BOB_ADDRESS],
+			BOB_ADDRESS,
+			BOB_ADDRESS,
+			unlockHeight,
+			tokens,
+            (10_000_000).toString(),
+		);
+        const signed = await signTx(tx, BOB_MNEMONIC);
+        expect(signed).toBeDefined();
+        expect(boxesAtAddress(signed, PROXY).length).toBe(1);
+        expect(boxAtAddress(signed, PROXY).assets).toStrictEqual(tokens);
+
+        const proxyBox = boxAtAddress(signed, PROXY)
+        const depositUTx = deposit(
+			currentHeight,
+			[proxyBox],
+			BOB_ADDRESS,
+			BOB_ADDRESS,
+			unlockHeight+1,
+			tokens,
+		    (10_000_000n-RECOMMENDED_MIN_FEE_VALUE).toString()
+		);
+        await expect(signTx(depositUTx, BOB_MNEMONIC)).rejects.toThrow();
 	});
 });
