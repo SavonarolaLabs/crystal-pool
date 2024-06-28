@@ -2,12 +2,7 @@
   val sentToDepositContract  = OUTPUTS(0).propositionBytes == _depositAddress
   val userPKset              = OUTPUTS(0).R4[Coll[SigmaProp]].get(0).propBytes == _userPk
   val poolPKset              = OUTPUTS(0).R4[Coll[SigmaProp]].get(1).propBytes == _poolPk
-  val unlockHeightSet = {
-    val maxUnlockPeriod   = 64801 // Approximately 3 months in blocks
-    val unlockHeightValid = _unlockHeight <= (HEIGHT + maxUnlockPeriod)
-    val outputRegisterSet = OUTPUTS(0).R5[Int].get == _unlockHeight
-    unlockHeightValid && outputRegisterSet
-  }        
+  val unlockHeightSet        = OUTPUTS(0).R5[Int].get == _unlockHeight  
   
   val ergForwarded        = OUTPUTS(0).value == INPUTS.fold(0L, {(acc: Long, input: Box) => acc + input.value}) - _minerFee
  
@@ -44,12 +39,12 @@
   }
 
   sigmaProp(allOf(Coll(
-    sentToDepositContract,
-    userPKset,
-    poolPKset,
+    //sentToDepositContract,
+    //userPKset,
+    //poolPKset,
     unlockHeightSet,
-    ergForwarded ,
-    tokensForwarded,
-    validMinerFee
+    //ergForwarded ,
+    //tokensForwarded,
+    //validMinerFee
   )))
 }

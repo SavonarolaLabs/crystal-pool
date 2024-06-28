@@ -1,9 +1,8 @@
-import { BOB_ADDRESS, DEPOSIT_ADDRESS, SHADOWPOOL_ADDRESS } from '$lib/constants/addresses';
-import { SAFE_MIN_FEE_VALUE } from '$lib/constants/ergo';
-import { first, Network } from '@fleet-sdk/common';
+import { DEPOSIT_ADDRESS, SHADOWPOOL_ADDRESS } from '$lib/constants/addresses';
+import { Network } from '@fleet-sdk/common';
 import { compile } from '@fleet-sdk/compiler';
-import { ErgoAddress } from '@fleet-sdk/core';
-import { SByte, SColl, SGroupElement, SInt, SLong, SSigmaProp } from '@fleet-sdk/serializer';
+import { ErgoAddress, RECOMMENDED_MIN_FEE_VALUE } from '@fleet-sdk/core';
+import { SByte, SColl, SInt, SLong } from '@fleet-sdk/serializer';
 import fs from 'fs';
 import path from 'path';
 
@@ -26,7 +25,11 @@ export function compileDepositContract() {
 	return compileContractFromFile('deposit.es');
 }
 
-export function compileDepositProxyContract(userPk, unlockHeight, minerFee = SAFE_MIN_FEE_VALUE) {
+export function compileDepositProxyContract(
+	userPk,
+	unlockHeight,
+	minerFee = RECOMMENDED_MIN_FEE_VALUE
+) {
 	const contractFile = path.join(__dirname, '../contracts', 'deposit-proxy.es');
 	const contract = fs.readFileSync(contractFile, 'utf-8');
 	return compileContract(contract, {
@@ -34,7 +37,7 @@ export function compileDepositProxyContract(userPk, unlockHeight, minerFee = SAF
 		_userPk: SColl(SByte, ErgoAddress.fromBase58(userPk).ergoTree).toHex(),
 		_poolPk: SColl(SByte, ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).ergoTree).toHex(),
 		_unlockHeight: SInt(unlockHeight).toHex(),
-		_minerFee: SLong(unlockHeight).toHex()
+		_minerFee: SLong(minerFee).toHex()
 	});
 }
 
