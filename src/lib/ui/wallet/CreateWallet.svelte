@@ -3,11 +3,11 @@
 	import { showToast } from '../header/toaster';
 	import { wallet_initialized } from '../ui_state';
 	import { persistMnemonic } from '../ui_wallet';
+	import { generateMnemonic } from '@scure/bip39';
+	import { wordlist } from '@scure/bip39/wordlists/english';
 
 	let fillColor = 'var(--fill-opacity-container)';
-	let mnemonic = `project story magnet again
-rule trap holiday point
-actress metal thrive wall`;
+	let mnemonic = generateMnemonic(wordlist);
 	let password = '';
 	let shake = false;
 	let checked = false;
