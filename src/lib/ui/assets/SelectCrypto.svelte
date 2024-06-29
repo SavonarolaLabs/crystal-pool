@@ -3,7 +3,7 @@
     import { ergoTokens } from '$lib/constants/ergoTokens';
     const dispatch = createEventDispatcher();
 
-    export let showDialog = true;
+    export let showDialog = false;
     const closeDialog = () => (showDialog = false);
 
     function handleKeydown(event: KeyboardEvent) {
