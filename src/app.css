@@ -139,7 +139,3 @@ input:not(:checked) + label:hover {
 	transition-timing-function: var(--ease, ease);
 	outline: 2px solid transparent;
 }
-
-.tabs:has(:focus-visible)::after {
-	outline-color: red;
-}
