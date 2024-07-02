@@ -23,6 +23,8 @@ const CONTRACT_FOR_TEST = `{
 	def getTokenId(box: Box)               = box.R6[Coll[Byte]].getOrElse(Coll[Byte]()) 
 	def getSellRate(box: Box)              = box.R7[Long].get
 	def getSellerMultisigAddress(box: Box) = box.R8[Coll[Byte]].get
+	def getDenom(box: Box)                 = box.R9[Long].get //add getDenom
+
 
  	def tokenId(box: Box) = box.tokens(0)._1
 	def tokenAmount(box: Box) = box.tokens(0)._2
@@ -31,9 +33,9 @@ const CONTRACT_FOR_TEST = `{
 		box.propositionBytes == SELF.propositionBytes
   
 	def isSameToken(box: Box)    = 
-	  	getTokenId(SELF) == getTokenId(box) &&
-	  	box.tokens.size > 0 &&
-		getTokenId(SELF) == tokenId(box)
+	  	getTokenId(SELF) == getTokenId(box) && 	// R6 
+	  	box.tokens.size > 0 &&				
+		getTokenId(SELF) == tokenId(box) 		// first token 
 
   	def isGreaterZeroRate(box:Box) =
     	getSellRate(box) > 0
@@ -53,9 +55,10 @@ const CONTRACT_FOR_TEST = `{
     	isSameToken(b) && 
     	isSameMultisig(b) && 
     	isSameSeller(b) && 
-    	isGreaterZeroRate(b)
-	}
-  
+    	isGreaterZeroRate(b) &&
+		isSameUnlockHeight(b)
+	} 
+
 	def isPaymentBox(box:Box) = {
 		isSameSeller(box) &&
     	isSameUnlockHeight(box) &&
@@ -66,62 +69,78 @@ const CONTRACT_FOR_TEST = `{
 	def sumTokensIn(boxes: Coll[Box]): Long = boxes
 		.filter(isLegitInputBox) 
 		.fold(0L, {(a:Long, b: Box) => a + b.tokens(0)._2})
+
+	def sumTokensValueIn(boxes: Coll[Box]): Long = boxes
+	.filter(isLegitInputBox) 
+	.fold(0L, {(a:Long, b: Box) => a + getSellRate(b)*b.tokens(0)._2/getDenom(b)})
   
-	val tokensIn: Long = sumTokensIn(INPUTS)
-  
-	val avgRateInputs: Long = INPUTS
-    	.filter(isLegitInputBox)
-    	.fold(0L, {(a:Long, b: Box) => {
-    	  a + getSellRate(b)*tokenAmount(b)
-    	}}) / tokensIn 
-	
+	val tokensValueIn: Long = sumTokensValueIn(INPUTS)
+
+
+	//------------------ MAX SELL BLOCK ------------------
+	val maxDenom: Long = INPUTS
+		.filter(isLegitInputBox)
+		.fold(0L, {(r:Long, box:Box) => {
+		if(r > getDenom(box)) r else getDenom(box)
+	}}) //LegitInput - LegitInputBox
+
+    def getRateInMaxDenom(box:Box) = getSellRate(box)*maxDenom/getDenom(box) 
+
 	val maxSellRate = INPUTS
     	.filter(isLegitInputBox)
     	.fold(0L, {(r:Long, box:Box) => {
-		    if(r > getSellRate(box)) r else getSellRate(box)
+		    if(r > getRateInMaxDenom(box)) r else getRateInMaxDenom(box)
 		}})
-  
+	
+	def hasMaxSellRate(box: Box) =
+    getSellRate(box)*maxDenom==getDenom(box)*maxSellRate 
+
 	def sumTokensInAtMaxRate(boxes: Coll[Box]): Long = boxes
 		.filter(isLegitInputBox)
-		.filter({(b: Box)=> getSellRate(b) == maxSellRate})
+		.filter(hasMaxSellRate)
 		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)})
   
+
 	def isMaxRateChangeBox(box: Box) = {
 		isSameSeller(box) &&
 		isSameUnlockHeight(box) &&
 		isSameToken(box) &&
-		maxSellRate == getSellRate(box) &&
+		hasMaxSellRate (box) &&  
 		isSameMultisig(box) &&
 		isSameContract(box)
 	}
+	//------------------ MAX SELL BLOCK ------------------
+
   
 	def tokensRemaining(boxes: Coll[Box]): Long = boxes
 		.filter(isMaxRateChangeBox)
 		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)}) 
 	
-	val tokensBack: Long = tokensRemaining(OUTPUTS)
-	val tokensSold: Long = tokensIn - tokensBack
-  
+	def valueRemaining(boxes: Coll[Box]): Long = boxes
+		.filter(isMaxRateChangeBox)
+		.fold(0L, {(a:Long, b: Box) => a + getSellRate(b)*tokenAmount(b)/getDenom(b)}) //TODO: CHECK 1.6 / 0.6 / 0.1 ...
+	
+	val tokensBack: Long = tokensRemaining(OUTPUTS)		
+	val tokensValueOut: Long = valueRemaining(OUTPUTS)
+	val soldValue: Long = tokensValueIn - tokensValueOut 
+
 	val nanoErgsPaid: Long = OUTPUTS
 		.filter(isPaymentBox)
 		.fold(0L, {(a:Long, b: Box) => a + b.value})
   
-  	val valueOfSoldTokens: Long  = tokensIn * avgRateInputs - tokensBack * maxSellRate
-  	val amountOfSoldTokens: Long = tokensIn - tokensBack
-	val avgTokenPrice: Long =  valueOfSoldTokens / amountOfSoldTokens
-
 	val tokensInputAtMaxRate = sumTokensInAtMaxRate(INPUTS) 
-	val sellOrderChangeBoxIsFine = tokensInputAtMaxRate > tokensBack 
-	val sellerPaid: Boolen = tokensSold * avgTokenPrice <= nanoErgsPaid
-  
-	val orderFilled = sellerPaid && sellOrderChangeBoxIsFine
-  
+	val sellOrderChangeBoxIsFine = tokensInputAtMaxRate > tokensBack	
+	val sellerPaid: Boolen = soldValue <= nanoErgsPaid  
+
+	val orderFilled = sellerPaid && sellOrderChangeBoxIsFine  			
+
 	if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)
 	}else{
 		getSellerPk(SELF) && getPoolPk(SELF) || sigmaProp(orderFilled) && getPoolPk(SELF)
 	}
 }`;
+
 const CONTRACT_FOR_TEST_OLD = `{	
 	def getSellerPk(box: Box)              = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
 	def getPoolPk(box: Box)                = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(1)
@@ -329,14 +348,14 @@ describe('limit sell order - NEW', () => {
 	let depositsAlice: Box[];
 
 	//To check basic contract
-	const tokenForSale = {
+	const tokenForSale0 = {
 		tokenId: TOKEN.rsBTC.tokenId,
 		price: '2',
 		amount: 1_000_000n
 	};
 
 	//To check R9 contract
-	const tokenForSale0 = {
+	const tokenForSale = {
 		tokenId: TOKEN.rsBTC.tokenId,
 		price: '0.02',
 		amount: 100_000_000n

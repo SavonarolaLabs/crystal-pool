@@ -37,20 +37,9 @@
     	isSameToken(b) && 
     	isSameMultisig(b) && 
     	isSameSeller(b) && 
-    	isGreaterZeroRate(b)
-	} //add 2 conditions 
-		//isSameUnlockHeight(box)
-		//hasSellingToken(box) 
-
-
-	val maxDenom: Long = INPUTS
-		.filter(isLegitInput)
-		.fold(0L, {(r:Long, box:Box) => {
-		if(r > getDenom(box)) r else getDenom(box)
-	}}) //LegitInput - LegitInputBox
-
-    def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) 
-
+    	isGreaterZeroRate(b) &&
+		isSameUnlockHeight(b)
+	} 
 
 	def isPaymentBox(box:Box) = {
 		isSameSeller(box) &&
@@ -62,60 +51,71 @@
 	def sumTokensIn(boxes: Coll[Box]): Long = boxes
 		.filter(isLegitInputBox) 
 		.fold(0L, {(a:Long, b: Box) => a + b.tokens(0)._2})
+
+	def sumTokensValueIn(boxes: Coll[Box]): Long = boxes
+	.filter(isLegitInputBox) 
+	.fold(0L, {(a:Long, b: Box) => a + getSellRate(b)*b.tokens(0)._2/getDenom(b)})
   
-	val tokensIn: Long = sumTokensIn(INPUTS)
-  
-	val avgRateInputs: Long = INPUTS
-    	.filter(isLegitInputBox)
-    	.fold(0L, {(a:Long, b: Box) => {
-    	  a + getSellRate(b)*tokenAmount(b)
-    	}}) / tokensIn 													// AVERAGE RATE ??? 
-	
+	val tokensValueIn: Long = sumTokensValueIn(INPUTS)
+
+
+	//------------------ MAX SELL BLOCK ------------------
+	val maxDenom: Long = INPUTS
+		.filter(isLegitInputBox)
+		.fold(0L, {(r:Long, box:Box) => {
+		if(r > getDenom(box)) r else getDenom(box)
+	}}) //LegitInput - LegitInputBox
+
+    def getRateInMaxDenom(box:Box) = getSellRate(box)*maxDenom/getDenom(box) 
+
 	val maxSellRate = INPUTS
     	.filter(isLegitInputBox)
     	.fold(0L, {(r:Long, box:Box) => {
-		    if(r > getSellRate(box)) r else getSellRate(box)
+		    if(r > getRateInMaxDenom(box)) r else getRateInMaxDenom(box)
 		}})
-  
+	
+	def hasMaxSellRate(box: Box) =
+    getSellRate(box)*maxDenom==getDenom(box)*maxSellRate 
+
 	def sumTokensInAtMaxRate(boxes: Coll[Box]): Long = boxes
 		.filter(isLegitInputBox)
-		.filter({(b: Box)=> getSellRate(b) == maxSellRate})
+		.filter(hasMaxSellRate)
 		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)})
   
+
 	def isMaxRateChangeBox(box: Box) = {
 		isSameSeller(box) &&
 		isSameUnlockHeight(box) &&
 		isSameToken(box) &&
-		maxSellRate == getSellRate(box) &&
+		hasMaxSellRate (box) &&  
 		isSameMultisig(box) &&
 		isSameContract(box)
 	}
+	//------------------ MAX SELL BLOCK ------------------
 
   
 	def tokensRemaining(boxes: Coll[Box]): Long = boxes
 		.filter(isMaxRateChangeBox)
 		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)}) 
 	
-	val tokensBack: Long = tokensRemaining(OUTPUTS)
-	val tokensSold: Long = tokensIn - tokensBack 							// SOLD =  All legit Inputs - MaxRateChangeBoxes Output (Legit + maxSellRate + UnlockHeight)
-  
+	def valueRemaining(boxes: Coll[Box]): Long = boxes
+		.filter(isMaxRateChangeBox)
+		.fold(0L, {(a:Long, b: Box) => a + getSellRate(b)*tokenAmount(b)/getDenom(b)}) //TODO: CHECK 1.6 / 0.6 / 0.1 ...
+	
+	val tokensBack: Long = tokensRemaining(OUTPUTS)		
+	val tokensValueOut: Long = valueRemaining(OUTPUTS)
+	val soldValue: Long = tokensValueIn - tokensValueOut 
+
 	val nanoErgsPaid: Long = OUTPUTS
 		.filter(isPaymentBox)
 		.fold(0L, {(a:Long, b: Box) => a + b.value})
   
-  	val valueOfSoldTokens: Long  = tokensIn * avgRateInputs - tokensBack * maxSellRate
-  	val amountOfSoldTokens: Long = tokensIn - tokensBack
-	val avgTokenPrice: Long =  valueOfSoldTokens / amountOfSoldTokens
-
 	val tokensInputAtMaxRate = sumTokensInAtMaxRate(INPUTS) 
-	val sellOrderChangeBoxIsFine = tokensInputAtMaxRate > tokensBack		// Sell box 
-	val sellerPaid: Boolen = tokensSold * avgTokenPrice <= nanoErgsPaid   	// Paid -- TODO: CHANGE -> VALUE PAID <= nanoErgsPaid
-	// Take legit boxes - accumulate value in tokens (in denoms)
-  
+	val sellOrderChangeBoxIsFine = tokensInputAtMaxRate > tokensBack	
+	val sellerPaid: Boolen = soldValue <= nanoErgsPaid  
 
-	val orderFilled = sellerPaid && sellOrderChangeBoxIsFine  				// Sell box + Paid
-  
-  
+	val orderFilled = sellerPaid && sellOrderChangeBoxIsFine  			
+
 	if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)
 	}else{
