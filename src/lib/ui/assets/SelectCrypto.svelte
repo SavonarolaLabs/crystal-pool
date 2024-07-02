@@ -70,7 +70,7 @@
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div class="dialog-content shadow-s2-down" on:click|stopPropagation>
 			<div class="w-full flex justify-between items-center" style="height:60px;">
-				<h2>Select Crypto to Deposit</h2>
+				<h2>Select Asset</h2>
 				<button
 					type="button"
 					on:click={closeDialog}
