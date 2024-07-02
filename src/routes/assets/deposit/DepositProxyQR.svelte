@@ -6,7 +6,7 @@
   let qrCodeDataUrl = '';
 
   function generateQRCode() {
-    const ergoPayUrl = `ergopay:${address}`;
+    const ergoPayUrl = `ergo:${address}`;
 
     QRCode.toDataURL(ergoPayUrl, {
       width: 300,

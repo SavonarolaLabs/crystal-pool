@@ -33,13 +33,6 @@ export const ergoTokens = {
 		project: 'Sigma USD',
 		description: 'Reserve token for Sigma USD'
 	},
-	'472c3d4ecaa08fb7392ff041ee2e6af75f4a558810a74b28600549d5392810e8': {
-		decimals: 6,
-		name: 'NETA token',
-		ticker: 'NETA',
-		project: 'anetaBTC',
-		description: 'Governance token of wrapped BTC project anetaBTC'
-	},
 	d71693c49a84fbbecd4908c94813b46514b18b67a99952dc1e6e4791556de413: {
 		decimals: 2,
 		name: 'ergopad',

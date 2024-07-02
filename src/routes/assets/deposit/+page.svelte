@@ -31,6 +31,14 @@
 		selectedTokens = selectedTokens.filter((t) => t.tokenId != tokenId)
 	}
 
+	function onDepositClick(){
+		if(selectedTokens.length == 0){
+			selectCrypto()
+		}else{
+			console.log("onDepositClick")
+		}
+	}
+
 	//let selectedWallet = 'mobile';
 	let selectedWallet = 'web3wallet';
 </script>
@@ -151,7 +159,7 @@
 					</div>
 
 					<div class="select-token_wrapper">
-						<button class="btn deposit">Deposit</button>
+						<button class="btn deposit" on:click={onDepositClick}>Deposit</button>
 					</div>
 				</div>
 			</div>
