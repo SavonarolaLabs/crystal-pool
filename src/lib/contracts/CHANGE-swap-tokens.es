@@ -51,11 +51,6 @@
 		isGreaterZeroRate(box) &&
 		isSameMultisig(box)
 
-  val maxDenom: Long = INPUTS
-		.filter(isLegitInput)
-		.fold(0L, {(r:Long, box:Box) => {
-			if(r > getDenom(box)) r else getDenom(box)
-		}}) 
   
     def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) 
 
@@ -108,7 +103,7 @@
     val sellTokensXRate = inSellTokensXRate.toBigInt - outSellTokensXRate.toBigInt  
     val expectedRate = sellTokensXRate.toBigInt / tokensSold.toBigInt  
 
-    val isPaidAtFairRate = maxDenom.toBigInt*tokensPaid.toBigInt/tokensSold.toBigInt >= expectedRate.toBigInt  
+    val isPaidAtFairRate = maxDenom.toBigInt*tokensPaid.toBigInt/tokensSold.toBigInt >= expectedRate.toBigInt  //Paid only 
  
 	if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)

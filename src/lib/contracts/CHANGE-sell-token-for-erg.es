@@ -69,7 +69,7 @@
     	.filter(isLegitInputBox)
     	.fold(0L, {(a:Long, b: Box) => {
     	  a + getSellRate(b)*tokenAmount(b)
-    	}}) / tokensIn 
+    	}}) / tokensIn 													// AVERAGE RATE ??? 
 	
 	val maxSellRate = INPUTS
     	.filter(isLegitInputBox)
@@ -90,13 +90,14 @@
 		isSameMultisig(box) &&
 		isSameContract(box)
 	}
+
   
 	def tokensRemaining(boxes: Coll[Box]): Long = boxes
 		.filter(isMaxRateChangeBox)
 		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)}) 
 	
 	val tokensBack: Long = tokensRemaining(OUTPUTS)
-	val tokensSold: Long = tokensIn - tokensBack
+	val tokensSold: Long = tokensIn - tokensBack 							// SOLD =  All legit Inputs - MaxRateChangeBoxes Output (Legit + maxSellRate + UnlockHeight)
   
 	val nanoErgsPaid: Long = OUTPUTS
 		.filter(isPaymentBox)
@@ -107,11 +108,13 @@
 	val avgTokenPrice: Long =  valueOfSoldTokens / amountOfSoldTokens
 
 	val tokensInputAtMaxRate = sumTokensInAtMaxRate(INPUTS) 
-	val sellOrderChangeBoxIsFine = tokensInputAtMaxRate > tokensBack 
-	val sellerPaid: Boolen = tokensSold * avgTokenPrice <= nanoErgsPaid
+	val sellOrderChangeBoxIsFine = tokensInputAtMaxRate > tokensBack		// Sell box 
+	val sellerPaid: Boolen = tokensSold * avgTokenPrice <= nanoErgsPaid   	// Paid -- TODO: CHANGE -> VALUE PAID <= nanoErgsPaid
+	// Take legit boxes - accumulate value in tokens (in denoms)
   
+
+	val orderFilled = sellerPaid && sellOrderChangeBoxIsFine  				// Sell box + Paid
   
-	val orderFilled = sellerPaid && sellOrderChangeBoxIsFine
   
 	if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)
