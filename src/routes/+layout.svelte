@@ -9,9 +9,9 @@
 	import WalletUnlock from '$lib/ui/wallet/WalletUnlock.svelte';
 	import { loadUIState } from '$lib/ui/ui_state';
 
-	onMount(()=>{
+	onMount(async()=>{
 		(window as any).Buffer = Buffer;
-		loadUIState();
+		await loadUIState();
 	})
 </script>
 

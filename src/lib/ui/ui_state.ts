@@ -6,6 +6,70 @@ import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
 
+
+export const web3wallet_connected = writable(false);
+export const web3wallet_wallet_name = writable("");
+export const web3wallet_available_wallets = writable([]);
+export const web3wallet_confirmedTokens = writable([]);
+
+export async function loadWeb3WalletTokens(){
+	try{
+		const utxo = await ergo.get_utxos();
+		const tokens = utxo.flatMap((box) => box.assets).reduce(sumAssets, []);
+		web3wallet_confirmedTokens.set(tokens);
+	}catch(e){
+		showToast(`Failed to load ${get(web3wallet_wallet_name)} balance.`,'warning')
+	}
+}
+
+export async function initWeb3WalletState(){
+	const name = localStorage.getItem("ui_web3wallet_wallet_name");
+	if(name){
+		web3wallet_wallet_name.set(name);
+	}
+	if(window.ergoConnector){
+		web3wallet_available_wallets.set(Object.keys(window.ergoConnector))
+		if(get(web3wallet_wallet_name)){
+			if(window.ergoConnector[get(web3wallet_wallet_name)]?.isConnected){
+				await window.ergoConnector[get(web3wallet_wallet_name)]?.connect();
+				web3wallet_connected.set(true);
+				await loadWeb3WalletTokens();
+			}
+		}else{
+			const connected = await window.ergoConnector[get(web3wallet_wallet_name)]?.connect()
+			if(connected){
+				web3wallet_connected.set(true);
+				await loadWeb3WalletTokens();
+			}else{
+				showToast('Wallet reconnect failed', 'warning')
+			}
+		}
+	}
+}
+
+export async function disconnectWeb3Wallet(){
+	await window.ergoConnector[get(web3wallet_wallet_name)].disconnect();
+	web3wallet_connected.set(false);
+	web3wallet_wallet_name.set("");
+	localStorage.removeItem("ui_web3wallet_wallet_name");
+}
+
+export async function connectWeb3Wallet(walletname =""){
+	const wallets = window.ergoConnector ? Object.keys(window.ergoConnector): []
+	if(wallets.length > 0){
+		let connected = await window.ergoConnector[wallets[0]].connect();
+		if(connected){
+			web3wallet_connected.set(true);
+			web3wallet_wallet_name.set(wallets[0]);
+			localStorage.setItem("ui_web3wallet_wallet_name",wallets[0]);
+			showToast(`Wallet connected.`);
+			await loadWeb3WalletTokens();
+		}else{
+			showToast(`Connecting ${wallets[0]} failed.`, 'warning');
+		}
+	}
+}
+
 export const isDarkMode = writable(true);
 
 export function toggleTheme() {
@@ -18,12 +82,13 @@ export function toggleTheme() {
 	}
 }
 
-export function loadUIState(){
+export async function loadUIState(){
 	const ui_isDarkMode = localStorage.getItem("ui_isDarkMode");
 	if(ui_isDarkMode == 'light'){
 		document.documentElement.setAttribute('data-theme', 'light');
 		isDarkMode.set(false);
 	}
+	await initWeb3WalletState();
 }
 
 
@@ -162,11 +227,9 @@ export const user_tokens = writable([
 ]);
 
 export async function fetchBalance() {
-	console.log('refetching balance', get(user_name));
 	const address = get(user_address);
 	if (address) {
 		const boxes = await userBoxes(address);
-		console.log(boxes);
 		const updatedTokens = boxes
 			.flatMap((row: { box: { assets: any } }) => row.box.assets)
 			.reduce(sumAssets, []);

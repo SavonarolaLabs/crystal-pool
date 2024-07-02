@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { wallet_initialized } from '../ui_state';
+	import { connectWeb3Wallet, disconnectWeb3Wallet, wallet_initialized, web3wallet_available_wallets, web3wallet_connected, web3wallet_wallet_name } from '../ui_state';
 	let menuOpen = false;
 	let hoverTimeout: NodeJS.Timeout;
 
@@ -109,23 +109,30 @@
 			{/if}
 		</div>
 		<!-- svelte-ignore a11y-invalid-attribute -->
-		<a
-			href="/wallet"
-			role="menuitem"
-			tabindex="-1"
-			on:click={() => {
-				menuOpen = false;
-			}}>Crystal Wallet</a
-		>
-		<a
-			href="#"
-			role="menuitem"
-			tabindex="-1"
-			style="display:none;"
-			on:click={() => {
-				menuOpen = false;
-			}}>Disconnect</a
-		>
+		{#if $web3wallet_connected}
+			<a
+				href="#"
+				role="menuitem"
+				tabindex="-1"
+				style=""
+				on:click={() => {
+					disconnectWeb3Wallet();
+				}}>Disconnect {$web3wallet_wallet_name}</a
+			>
+		{:else if $web3wallet_available_wallets.length}
+			{#each  $web3wallet_available_wallets as wallet}
+				<a
+					href="#"
+					class="text-center"
+					role="menuitem"
+					tabindex="-1"
+					style=""
+					on:click={() => {
+						connectWeb3Wallet(wallet);
+					}}>Connect {wallet}</a
+				>
+			{/each}
+		{/if}
 	</div>
 </div>
 
