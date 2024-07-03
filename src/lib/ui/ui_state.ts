@@ -11,6 +11,8 @@ export const web3wallet_connected = writable(false);
 export const web3wallet_wallet_name = writable("");
 export const web3wallet_available_wallets = writable([]);
 export const web3wallet_confirmedTokens = writable([]);
+export const has_pending_transactions = writable(false);
+//export const has_pending_transactions = writable(true);
 
 export async function loadWeb3WalletTokens(){
 	try{

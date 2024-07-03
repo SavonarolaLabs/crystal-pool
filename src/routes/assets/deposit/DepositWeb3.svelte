@@ -4,6 +4,7 @@
 	import { showToast } from '$lib/ui/header/toaster';
 	import {
 		connectWeb3Wallet,
+		has_pending_transactions,
 		loadUIState,
 		loadWeb3WalletTokens,
 		web3wallet_confirmedTokens,
@@ -42,7 +43,10 @@
 	}
 
 	async function onDepositClick() {
-        showToast('Preparing deposit Transaction.')
+		if(selectedTokens.length == 0){
+			selectCrypto();
+			return;
+		}
         const blockchainHeight = await ergo.get_current_height();
         const inputBoxes = await ergo.get_utxos();
         const changeAddress = await ergo.get_change_address();
@@ -61,7 +65,7 @@
         )
         const transaction = await ergo.sign_tx(tx);
         console.log(transaction);
-        showToast('Broadcasting Deposit Transaction...')
+		has_pending_transactions.set(true)
 	}
 
 	function scrollToBottom() {

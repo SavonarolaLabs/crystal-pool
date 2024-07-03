@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { DEPOSIT_ADDRESS } from "$lib/constants/addresses";
-	import { toggleTheme } from "../ui_state";
+	import { has_pending_transactions, toggleTheme } from "../ui_state";
 	import { mnemonic } from "../ui_wallet";
 	import PendingTransactions from "../wallet/PendingTransactions.svelte";
 	import WalletDropdown from "../wallet/WalletDropdown.svelte";
@@ -61,7 +61,9 @@
 					<!-- <WalletBalanceBar></WalletBalanceBar> -->
 				</div>
 				<div class="header_navItem">
-					<PendingTransactions></PendingTransactions>
+					{#if $has_pending_transactions}
+						<PendingTransactions></PendingTransactions>
+					{/if}
 				</div>
 				<div class="header_navItem">
 					<WalletDropdown></WalletDropdown>

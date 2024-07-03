@@ -1,9 +1,21 @@
 <script>
+	import { onMount } from 'svelte';
+
+	let element;
+	let spinnyLoader;
+
+	onMount(() => {
+		spinnyLoader.style.opacity = '0';
+		setTimeout(() => {
+			spinnyLoader.style.opacity = '1';
+            element.classList.remove("blink");
+		}, 1800 * 1.5);
+	});
 </script>
 
-<div class="flex justify-center border rounded-md p-2">
+<div bind:this={element} class="flex justify-center border rounded-md p-2 blink">
 	+1 deposit
-	<div class="spinny-loader">
+	<div bind:this={spinnyLoader} class="spinny-loader fade-in">
 		<div class="spinny-circle"></div>
 	</div>
 </div>
@@ -13,12 +25,26 @@
 		--icon-size: 24px;
 	}
 
+	.blink {
+		animation: double-blink 1.8s infinite ease-out;
+	}
+
+	@keyframes double-blink {
+		0%, 50%, 100% {
+			opacity: 1;
+		}
+		25%, 75% {
+			opacity: 0;
+		}
+	}
+
 	.spinny-loader {
 		display: inline-block;
 		position: relative;
 		width: var(--icon-size);
 		height: var(--icon-size);
 		margin: 0 10px;
+		transition: opacity 0.5s ease-in;
 	}
 
 	.spinny-loader > div {
