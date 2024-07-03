@@ -2,6 +2,7 @@
 	import { DEPOSIT_ADDRESS } from "$lib/constants/addresses";
 	import { toggleTheme } from "../ui_state";
 	import { mnemonic } from "../ui_wallet";
+	import PendingTransactions from "../wallet/PendingTransactions.svelte";
 	import WalletDropdown from "../wallet/WalletDropdown.svelte";
 </script>
 
@@ -58,6 +59,9 @@
 			<div class="header_leftMenu">
 				<div class="balance">
 					<!-- <WalletBalanceBar></WalletBalanceBar> -->
+				</div>
+				<div class="header_navItem">
+					<PendingTransactions></PendingTransactions>
 				</div>
 				<div class="header_navItem">
 					<WalletDropdown></WalletDropdown>
