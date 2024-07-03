@@ -4,6 +4,7 @@ import { wallet_initialized } from './ui_state';
 import { showToast } from './header/toaster';
 
 export const mnemonic = writable('');
+export const pk = writable('');
 
 export async function deleteWallet(){
 	mnemonic.set('');

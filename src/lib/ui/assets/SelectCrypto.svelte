@@ -135,7 +135,7 @@
 								</div>
 							</div>
 							<div class="amount pr-2">
-								<div>0</div>
+								<div>{$web3wallet_confirmedTokens.find(ct => ct.tokenId == k)?.amount ?? 0}</div>
 								<div class="label">≈ 0.00 USD</div>
 							</div>
 						</div>
