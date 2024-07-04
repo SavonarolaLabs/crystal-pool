@@ -62,11 +62,8 @@
 				</div>
 				<div class="header_navItem">
 					{#if $has_pending_transactions}
-						<PendingTransactions></PendingTransactions>
+						<PendingTransactionsDropdown></PendingTransactionsDropdown>
 					{/if}
-				</div>
-				<div class="header_navItem">
-					<PendingTransactionsDropdown></PendingTransactionsDropdown>
 				</div>
 				<div class="header_navItem">
 					<WalletDropdown></WalletDropdown>
