@@ -137,46 +137,6 @@
 </div>
 
 <style>
-	.dropdown {
-		background-color: var(--bg-level-secondary);
-		color: var(--text-color);
-		border-radius: 0.5rem;
-		padding: 1rem;
-		width: 250px;
-		opacity: 0;
-		visibility: hidden;
-		transform: translateY(-10px);
-		transition:
-			opacity 0.3s ease,
-			transform 0.3s ease,
-			visibility 0.3s ease;
-		position: absolute;
-		right: 0;
-		z-index: 10;
-		margin-top: 0.5rem;
-	}
-
-	.dropdown.show {
-		opacity: 1;
-		visibility: visible;
-		transform: translateY(0);
-	}
-
-	.dropdown a,
-	.dropdown button {
-		display: block;
-		padding: 0.5rem 1rem;
-		color: var(--text-color);
-		text-decoration: none;
-		border-radius: 0.25rem;
-		transition: background-color 0.2s;
-	}
-
-	.dropdown a:hover,
-	.dropdown button:hover {
-		background-color: var(--fill-container);
-	}
-
 	.balance {
 		margin-bottom: 0.5rem;
 		padding: 1em;

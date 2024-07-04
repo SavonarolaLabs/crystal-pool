@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { DEPOSIT_ADDRESS } from "$lib/constants/addresses";
 	import { has_pending_transactions, toggleTheme } from "../ui_state";
-	import { mnemonic } from "../ui_wallet";
-	import PendingTransactions from "../wallet/PendingTransactions.svelte";
+	import PendingTransactions from "./PendingTransactions.svelte";
 	import WalletDropdown from "../wallet/WalletDropdown.svelte";
+	import PendingTransactionsDropdown from "./PendingTransactionsDropdown.svelte";
 </script>
 
 <div class="header">
@@ -64,6 +64,9 @@
 					{#if $has_pending_transactions}
 						<PendingTransactions></PendingTransactions>
 					{/if}
+				</div>
+				<div class="header_navItem">
+					<PendingTransactionsDropdown></PendingTransactionsDropdown>
 				</div>
 				<div class="header_navItem">
 					<WalletDropdown></WalletDropdown>
