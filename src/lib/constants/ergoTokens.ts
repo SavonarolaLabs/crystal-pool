@@ -93,7 +93,7 @@ export const ergoTokens = {
 		decimals: 0,
 		name: 'Walrus DAO',
 		ticker: 'WALRUS',
-		logoURI: 'https://gateway.pinata.cloud/ipfs/QmZkB935jDaHrBnCtzSAiX8zgt9LaxGcLtLSQfYs2tCqbB',
+		logoURI: 'https://i.ibb.co/cFGhM52/download.pnghttps://i.ibb.co/2qfT5TQ/walrus.png',
 		project: 'Walrus DAO',
 		description: 'Memecoin of the Ergo ecosystem'
 	},
@@ -108,8 +108,6 @@ export const ergoTokens = {
 		decimals: 4,
 		name: 'CyberVerse',
 		ticker: 'CYPX',
-		logoURI:
-			'https://ipfs.io/ipfs/QmUqD3Rd1RVjCwCAHaNv8fiJ59N6Fz2tNPRe7nTpT33Mq5/01dce8a5632d19799950ff90bca3b5d0ca3ebfa8aaafd06f0cc6dd1e97150e7f.svg',
 		description: 'CyberVerse is a pixel-based, open-world game.'
 	},
 	'9a06d9e545a41fd51eeffc5e20d818073bf820c635e2a9d922269913e0de369d': {
@@ -130,7 +128,7 @@ export const ergoTokens = {
 		decimals: 6,
 		name: 'ProxiesNFT',
 		ticker: '$PROXIE',
-		logoURI: 'https://gateway.pinata.cloud/ipfs/QmZn2uqqSG6CvJB2s3Qz22FrnfEqFVCMePb5m72ySxzgs6',
+		logoURI: 'https://i.ibb.co/vv6ybcJ/proxy.png',
 		project: 'ProxiesNFT',
 		description: 'test'
 	},
