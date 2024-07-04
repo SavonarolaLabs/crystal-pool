@@ -191,7 +191,7 @@
 	</div>
 </div>
 
-<SelectCrypto bind:showDialog={selectCryptoDialogOpen} on:message={handleMessage}></SelectCrypto>
+<SelectCrypto bind:showDialog={selectCryptoDialogOpen} on:message={handleMessage} web3filter={true}></SelectCrypto>
 
 <style lang="postcss">
 	input {

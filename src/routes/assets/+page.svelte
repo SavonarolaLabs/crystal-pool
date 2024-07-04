@@ -1,5 +1,6 @@
 <script>
 	import { ergoTokens } from "$lib/constants/ergoTokens";
+	import { crystalwallet_tokens } from "$lib/ui/ui_state";
 </script>
 
 <div class="flex flex-col items-center">
@@ -40,11 +41,11 @@
                 </div>
             </div>
             <div class="amount pr-2" style="width:120px;">
-                <div>{0}</div>
+                <div>{$crystalwallet_tokens.find(t => t.tokenId == k)?.amount??0}</div>
                 <div class="label">≈ 0.00 USD</div>
             </div>
             <div class="amount pr-2" style="width:120px;">
-                <div>{0}</div>
+                <div>{$crystalwallet_tokens.find(t => t.tokenId == k)?.amount??0}</div>
                 <div class="label">≈ 0.00 USD</div>
             </div>
             <div class="amount pr-2" style="width:120px;">

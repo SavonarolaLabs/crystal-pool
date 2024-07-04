@@ -4,6 +4,7 @@
 	import { showToast } from '$lib/ui/header/toaster';
 	import {
 		connectWeb3Wallet,
+		crystalwallet_tokens,
 		has_pending_transactions,
 		loadUIState,
 		loadWeb3WalletTokens,
@@ -81,7 +82,7 @@
 	function setMaxTokenValue(id) {
 		let token = selectedTokens.find((t) => t.tokenId == id);
 		if (token) {
-			token.amount = $web3wallet_confirmedTokens.find((x) => x.tokenId == id)?.amount ?? 0;
+			token.amount = $crystalwallet_tokens.some(t => t.tokenId == id)?.amount ?? 0;
 			selectedTokens = selectedTokens;
 		}
 	}
@@ -136,7 +137,7 @@
 						</div>
 						<div class="flex justify-between px-3 pb-2">
 							<div style="color: var(--primary-text);">
-								Available: {$web3wallet_confirmedTokens.find(
+								Available: {$crystalwallet_tokens.find(
 									(ct) => ct.tokenId == t.tokenId
 								)?.amount ?? 0}
 							</div>

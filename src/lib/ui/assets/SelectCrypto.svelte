@@ -1,9 +1,10 @@
 <script lang="ts">
     import { onMount, createEventDispatcher } from 'svelte';
     import { ergoTokens } from '$lib/constants/ergoTokens';
-	import { web3wallet_confirmedTokens } from '../ui_state';
+	import { crystalwallet_tokens, web3wallet_confirmedTokens } from '../ui_state';
     const dispatch = createEventDispatcher();
 
+	export let web3filter = false;
     export let showDialog = false;
     const closeDialog = () => (showDialog = false);
 
@@ -119,7 +120,7 @@
 			</div>
 			<div class="scroll-container">
 				<div style="position:relative">
-					{#each  Object.keys(filteredTokens).filter(tokenId => $web3wallet_confirmedTokens.some(t => t.tokenId == tokenId)) as k}
+					{#each  Object.keys(filteredTokens).filter(tokenId => web3filter?$web3wallet_confirmedTokens.some(t => t.tokenId == tokenId):$crystalwallet_tokens.some(t => t.tokenId == tokenId)) as k}
 						<div class="select-token" on:click={() => selectCrypto(k)}>
 							<div class="flex items-center gap-3">
 								<div style="width:32px;">
@@ -135,7 +136,7 @@
 								</div>
 							</div>
 							<div class="amount pr-2">
-								<div>{$web3wallet_confirmedTokens.find(ct => ct.tokenId == k)?.amount ?? 0}</div>
+								<div>{web3filter?($web3wallet_confirmedTokens.find(ct => ct.tokenId == k)?.amount?? 0):$crystalwallet_tokens.some(t => t.tokenId == k)?.amount ?? 0}</div>
 								<div class="label">≈ 0.00 USD</div>
 							</div>
 						</div>

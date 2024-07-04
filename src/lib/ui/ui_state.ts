@@ -13,6 +13,10 @@ export const web3wallet_available_wallets = writable([]);
 export const web3wallet_confirmedTokens = writable([]);
 export const has_pending_transactions = writable(false);
 //export const has_pending_transactions = writable(true);
+export const crystalwallet_tokens = writable([{
+	tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b", //tokenId
+	amount: 322
+}]);
 
 export const pending_transactions = writable([{
 	counter : 55,

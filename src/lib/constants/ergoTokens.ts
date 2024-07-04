@@ -56,8 +56,6 @@ export const ergoTokens = {
 		decimals: 4,
 		name: 'Swamp Audio',
 		ticker: 'Terahertz',
-		logoURI:
-			'https://raw.githubusercontent.com/ergolabs/ergo-dex-asset-icons/master/light/02f31739e2e4937bb9afb552943753d1e3e9cdd1a5e5661949cb0cef93f907ea.svg',
 		description:
 			'A layer 1 on chain royalty management platform and DAO media publisher whose main focus is building better tools to connect fans and artists globally.'
 	},
