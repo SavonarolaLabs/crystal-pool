@@ -114,7 +114,10 @@
 	.select-token_wrapper label {
 		font-size: 14px;
 		color: var(--text-secondary);
-		opacity: 0.6;
+	}
+	label:hover{
+		background: initial;
+		cursor: pointer;
 	}
 
 	.select-token_selectMode {
