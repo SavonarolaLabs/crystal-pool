@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import { pending_transactions } from '../ui_state';
 	let element;
 	let spinnyLoader;
 
@@ -13,7 +14,7 @@
 </script>
 
 <div bind:this={element} class="flex justify-center border rounded-md p-2 blink">
-	+1 deposit
+	+{$pending_transactions.length} deposit{$pending_transactions.length>1?'s':''}
 	<div bind:this={spinnyLoader} class="spinny-loader fade-in">
 		<div class="spinny-circle"></div>
 	</div>

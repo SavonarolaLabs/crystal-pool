@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { wallet_initialized } from '../ui_state';
+	import { pending_transactions, wallet_initialized } from '../ui_state';
 	import PendingTransactions from './PendingTransactions.svelte';
-	let menuOpen = true;
+	let menuOpen = false;
 	let hoverTimeout;
 
 	function handleMouseEnter() {
 		clearTimeout(hoverTimeout);
 		menuOpen = true;
+		setZIndexTo10();
 	}
 
 	function handleMouseLeave() {
@@ -25,23 +26,28 @@
 			goto('/wallet/create');
 		}
 	}
-	// for each tx values
-	let counter = 0;
-	let value = 0;
-	let assetCount = 1;
-	let txId = 'd1c3ddf35d140f1155d5997edc48564145905bc57cef8ec728bed2135332adbc';
+	let element
+	function setZIndexTo10() {
+		const elements = document.querySelectorAll('.zfix');
+		elements.forEach(element => {
+			element.style.zIndex = '10';
+		});
+		element.style.zIndex = '11';
+	}
 
+	let seconds = 0;
 
 	onMount(()=>{
 		setInterval(()=>{
-			counter += 1
+			seconds += 1
 		}, 1000)
 	})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="relative inline-block text-left"
+	bind:this={element}
+	class="zfix relative inline-block text-left"
 	on:mouseenter={handleMouseEnter}
 	on:mouseleave={handleMouseLeave}
 >
@@ -58,25 +64,25 @@
 	</div>
 
 	<div
+		style="margin-top: -4px;"
 		class={`shadow-s2-down dropdown ${menuOpen ? 'show' : ''}`}
 		role="menu"
 		aria-orientation="vertical"
 		aria-labelledby="menu-button"
 		tabindex="-1"
 	>
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
+	{#each $pending_transactions as tx}
 		<div
 			class="balance text-xs"
-			on:click={() => ($wallet_initialized ? goto('/assets') : goto('/wallet'))}
 		>
 			<a
 				target="_blank"
-				href="https://explorer.ergoplatform.com/en/transactions/{txId}"
+				href="https://explorer.ergoplatform.com/en/transactions/{tx.txId}"
 				style=""
 			>
 				<div class="flex justify-between">
 					<div class="flex items-center gap-2">
-						TX::{txId.slice(0, 3)}...{txId.slice(-4)}
+						TX::{tx.txId.slice(0, 3)}...{tx.txId.slice(-4)}
 						<svg
 							fill="currentColor"
 							height="1em"
@@ -87,11 +93,12 @@
 							/></svg
 						>
 					</div>
-					<div>{String(Math.floor(counter / 60)).padStart(2, '0')}:{String(counter % 60).padStart(2, '0')}</div>
+					<div>{String(Math.floor((tx.counter+seconds) / 60)).padStart(2, '0')}:{String((tx.counter+seconds) % 60).padStart(2, '0')}</div>
 				</div>
 			</a>
-			<div class="w-full text-end balance-total text-xl py-2 pulse-text">{value} ERG +{assetCount}</div>
+			<div class="w-full text-end balance-total text-xl py-2 pulse-text">{tx.value} ERG {#if tx.assetCount}+{tx.assetCount}{/if}</div>
 		</div>
+		{/each}
 	</div>
 </div>
 

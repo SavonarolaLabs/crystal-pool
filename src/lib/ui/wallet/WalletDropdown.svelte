@@ -7,6 +7,7 @@
 	function handleMouseEnter() {
 		clearTimeout(hoverTimeout);
 		menuOpen = true;
+		setZIndexTo10();
 	}
 
 	function handleMouseLeave() {
@@ -43,11 +44,21 @@
 		menuOpen = false;
 		goto('/wallet/restore');
 	}
+
+	let element
+	function setZIndexTo10() {
+		const elements = document.querySelectorAll('.zfix');
+		elements.forEach(element => {
+			element.style.zIndex = '10';
+		});
+		element.style.zIndex = '11';
+	}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="relative inline-block text-left"
+	bind:this={element}
+	class="zfix relative inline-block text-left"
 	on:mouseenter={handleMouseEnter}
 	on:mouseleave={handleMouseLeave}
 >

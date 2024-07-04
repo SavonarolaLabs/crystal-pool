@@ -14,6 +14,18 @@ export const web3wallet_confirmedTokens = writable([]);
 export const has_pending_transactions = writable(false);
 //export const has_pending_transactions = writable(true);
 
+export const pending_transactions = writable([{
+	counter : 55,
+	value : 0,
+	assetCount : 1,
+	txId : 'd1c3ddf35d140f1155d5997edc48564145905bc57cef8ec728bed2135332adbc',
+},{
+	counter : 0,
+	value : 100,
+	assetCount : 0,
+	txId : 'f54150801685b1cd77120625c28a00bcdef7952711ab980d66f0f37d810f9666',
+},]);
+
 export async function loadWeb3WalletTokens(){
 	try{
 		const utxo = await ergo.get_utxos();
