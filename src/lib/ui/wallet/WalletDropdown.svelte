@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { connectWeb3Wallet, disconnectWeb3Wallet, wallet_initialized, web3wallet_available_wallets, web3wallet_connected, web3wallet_wallet_name } from '../ui_state';
 	let menuOpen = false;
-	let hoverTimeout: NodeJS.Timeout;
+	let hoverTimeout;
 
 	function handleMouseEnter() {
 		clearTimeout(hoverTimeout);
