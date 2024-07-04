@@ -52,8 +52,8 @@
                 <div class="label">≈ 0.00 USD</div>
             </div>
             <div class="flex gap-2">
-                <a href="/">deposit</a>
-                <a href="/">withdraw</a>
+                <a href="/assets/deposit">deposit</a>
+                <a href="/assets/withdraw">withdraw</a>
                 <a href="/">trade</a>
             </div>
         </div>
