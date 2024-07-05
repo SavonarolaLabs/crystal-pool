@@ -10,7 +10,7 @@
 		user_deposit_boxes,
 		web3wallet_connected
 	} from '$lib/ui/ui_state';
-	import { crystalwallet_pk } from '$lib/ui/ui_wallet';
+	import { crystalwallet_address } from '$lib/ui/ui_wallet';
 	import { asBigInt } from '$lib/utils/helper';
 	import { createWithdrawTx } from '$lib/wallet/deposit';
 	import { onMount } from 'svelte';
@@ -42,7 +42,7 @@
 
 	async function onWithdrawClick() {
 		let currentHeight = await fetchHeight();
-		const tx = createWithdrawTx($crystalwallet_pk, $user_deposit_boxes, currentHeight);
+		const tx = createWithdrawTx($crystalwallet_address, $user_deposit_boxes, currentHeight);
 		console.log(tx);
 	}
 

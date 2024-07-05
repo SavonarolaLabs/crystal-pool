@@ -118,7 +118,11 @@ export async function initMnemonicWorker() {
 	const {mnemonic, changeAddress} = await getMnemonic();
 	if (mnemonic) {
 		crystalwallet_mnemonic.set(mnemonic);
-		crystalwallet_address.set(changeAddress);
+		if(changeAddress){
+			crystalwallet_address.set(changeAddress);
+		}else{
+			crystalwallet_address.set(await getChangeAddress(mnemonic)??"");
+		}
 		wallet_initialized.set(true);
 	}
 }
