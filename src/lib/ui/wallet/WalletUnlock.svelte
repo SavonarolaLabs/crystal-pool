@@ -8,8 +8,8 @@
 	let password = '';
 	let shake = false;
 
-	function unlockWallet() {
-		if (onDecrypt(password)) {
+	async function unlockWallet() {
+		if (await onDecrypt(password)) {
 			closeDialog();
 		} else {
 			shake = true;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { getChangeAddress } from '$lib/wallet/wallet';
 	import { showToast } from '../header/toaster';
 	import { wallet_initialized } from '../ui_state';
 	import { persistMnemonic } from '../ui_wallet';
@@ -12,10 +13,13 @@
 	let shake = false;
 	let checked = false;
 
-	function createWallet() {
+	async function createWallet() {
+		
 		if (checked) {
+			let changeAddress = await getChangeAddress(mnemonic);
+			persistMnemonic(mnemonic,changeAddress, password);
 			showToast('Wallet created');
-			persistMnemonic(mnemonic, password);
+
 			goto('/assets/deposit');
 		} else {
 			shake = true;

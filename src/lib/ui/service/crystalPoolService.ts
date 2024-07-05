@@ -1,3 +1,4 @@
+import type { BoxRow } from '$lib/types/boxRow';
 import type { SwapRequest } from './tradingService';
 
 const CRYSTALPOOL_URL = 'http://127.0.0.1:3000';
@@ -63,6 +64,6 @@ export async function orderBook(pair: string): Promise<any> {
 	return await get(ORDER_BOOK + pair);
 }
 
-export async function userBoxes(address: string): Promise<any> {
+export async function userBoxes(address: string): Promise<BoxRow[]> {
 	return await get(USER_BOXES + address);
 }
