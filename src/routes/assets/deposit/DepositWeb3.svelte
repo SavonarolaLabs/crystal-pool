@@ -1,17 +1,13 @@
 <script lang="ts">
 	import { ergoTokens } from '$lib/constants/ergoTokens';
 	import SelectCrypto from '$lib/ui/assets/SelectCrypto.svelte';
-	import { showToast } from '$lib/ui/header/toaster';
 	import {
 		connectWeb3Wallet,
 		has_pending_transactions,
 		loadUIState,
-		loadWeb3WalletTokens,
 		web3wallet_confirmedTokens,
-		web3wallet_connected,
-		web3wallet_wallet_name
+		web3wallet_connected
 	} from '$lib/ui/ui_state';
-	import { pk } from '$lib/ui/ui_wallet';
 	import { asBigInt } from '$lib/utils/helper';
 	import { deposit } from '$lib/wallet/deposit';
 	import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
@@ -43,29 +39,29 @@
 	}
 
 	async function onDepositClick() {
-		if(selectedTokens.length == 0){
+		if (selectedTokens.length == 0) {
 			selectCrypto();
 			return;
 		}
-        const blockchainHeight = await ergo.get_current_height();
-        const inputBoxes = await ergo.get_utxos();
-        const changeAddress = await ergo.get_change_address();
-        //const userPk = $crystalwallet_pk;
-        const userPk = changeAddress;
-        const unlockHeight = 1_400_000;
-        const nanoErg = SAFE_MIN_BOX_VALUE;
-        const tx = deposit(
-            blockchainHeight,
-            inputBoxes,
-            changeAddress,
-            userPk,
-            unlockHeight,
-            selectedTokens,
-            nanoErg
-        )
-        const transaction = await ergo.sign_tx(tx);
-        console.log(transaction);
-		has_pending_transactions.set(true)
+		const blockchainHeight = await ergo.get_current_height();
+		const inputBoxes = await ergo.get_utxos();
+		const changeAddress = await ergo.get_change_address();
+		//const userPk = $crystalwallet_pk;
+		const userPk = changeAddress;
+		const unlockHeight = 1_400_000;
+		const nanoErg = SAFE_MIN_BOX_VALUE;
+		const tx = deposit(
+			blockchainHeight,
+			inputBoxes,
+			changeAddress,
+			userPk,
+			unlockHeight,
+			selectedTokens,
+			nanoErg
+		);
+		const transaction = await ergo.sign_tx(tx);
+		console.log(transaction);
+		has_pending_transactions.set(true);
 	}
 
 	function scrollToBottom() {
@@ -191,7 +187,8 @@
 	</div>
 </div>
 
-<SelectCrypto bind:showDialog={selectCryptoDialogOpen} on:message={handleMessage} web3filter={true}></SelectCrypto>
+<SelectCrypto bind:showDialog={selectCryptoDialogOpen} on:message={handleMessage} web3filter={true}
+></SelectCrypto>
 
 <style lang="postcss">
 	input {
