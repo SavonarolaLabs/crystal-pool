@@ -53,8 +53,8 @@
                 <div class="label">≈ 0.00 USD</div>
             </div>
             <div class="flex gap-2">
-                <a href="/assets/deposit">deposit</a>
-                <a href="/assets/withdraw">withdraw</a>
+                <a href="/assets/deposit?token={ergoTokens[k].ticker}">deposit</a>
+                <a href="/assets/withdraw?token={ergoTokens[k].ticker}">withdraw</a>
                 <a href="/">trade</a>
             </div>
         </div>

@@ -7,7 +7,7 @@
 		<button class="back-arrow" on:click={() => goto('/assets')}>&#8592;</button>
 		<div class="title">Withdraw</div>
 	</div>
-	<div class="page_container">
+	<div class="page_container flex items-center justify-center">
 			<WithdrawWidget></WithdrawWidget>
 	</div>
 </div>

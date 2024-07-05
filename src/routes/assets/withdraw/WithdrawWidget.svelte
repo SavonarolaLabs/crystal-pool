@@ -1,23 +1,20 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { ergoTokens } from '$lib/constants/ergoTokens';
 	import SelectCrypto from '$lib/ui/assets/SelectCrypto.svelte';
-	import { showToast } from '$lib/ui/header/toaster';
 	import {
 		connectWeb3Wallet,
 		crystalwallet_tokens,
 		has_pending_transactions,
 		loadUIState,
-		loadWeb3WalletTokens,
-		web3wallet_confirmedTokens,
-		web3wallet_connected,
-		web3wallet_wallet_name
+		web3wallet_connected
 	} from '$lib/ui/ui_state';
 	import { asBigInt } from '$lib/utils/helper';
 	import { deposit } from '$lib/wallet/deposit';
 	import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-
+	
 	let tokenId = '03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
 	let selectedTokens = [];
 
@@ -43,29 +40,7 @@
 	}
 
 	async function onWithdrawClick() {
-		if(selectedTokens.length == 0){
-			selectCrypto();
-			return;
-		}
-        const blockchainHeight = await ergo.get_current_height();
-        const inputBoxes = await ergo.get_utxos();
-        const changeAddress = await ergo.get_change_address();
-        //const userPk = $pk;
-        const userPk = changeAddress;
-        const unlockHeight = 1_400_000;
-        const nanoErg = SAFE_MIN_BOX_VALUE;
-        const tx = deposit(
-            blockchainHeight,
-            inputBoxes,
-            changeAddress,
-            userPk,
-            unlockHeight,
-            selectedTokens,
-            nanoErg
-        )
-        const transaction = await ergo.sign_tx(tx);
-        console.log(transaction);
-		has_pending_transactions.set(true)
+		console.log("withdraw");
 	}
 
 	function scrollToBottom() {
@@ -82,7 +57,7 @@
 	function setMaxTokenValue(id) {
 		let token = selectedTokens.find((t) => t.tokenId == id);
 		if (token) {
-			token.amount = $crystalwallet_tokens.some(t => t.tokenId == id)?.amount ?? 0;
+			token.amount = $crystalwallet_tokens.find((t) => t.tokenId == id)?.amount ?? 0;
 			selectedTokens = selectedTokens;
 		}
 	}
@@ -97,9 +72,23 @@
 		return acc;
 	}
 
+
+	let token = '';
+
+	// React to changes in the page store
+	$: {
+		const query = $page.url.searchParams;
+		token = query.get('token') || '';
+	}
+
 	onMount(async () => {
 		if ($web3wallet_connected) {
 			await loadUIState();
+			if (token) {
+				tokenId = Object.keys(ergoTokens).find((t) => ergoTokens[t].ticker == token) ?? '';
+				clickAdd();
+				setMaxTokenValue(tokenId);
+			}
 		}
 	});
 </script>
@@ -183,7 +172,7 @@
 	</div>
 
 	<div class="select-token_wrapper">
-			<button class="btn" on:click={onWithdrawClick}>Withdraw</button>
+		<button class="btn" on:click={onWithdrawClick}>Withdraw</button>
 	</div>
 </div>
 
