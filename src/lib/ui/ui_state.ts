@@ -5,6 +5,7 @@ import { sumAssets } from '$lib/utils/helper';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
+import type { Box } from '@fleet-sdk/common';
 
 
 export const web3wallet_connected = writable(false);
@@ -211,6 +212,7 @@ export async function setOrderBook(book: any) {
 export const user_name = writable('Bob');
 export const user_mnemonic = writable(BOB_MNEMONIC);
 export const user_address = writable(BOB_ADDRESS);
+export const user_deposit_boxes: Writable<Box[]> = writable([]);
 
 export function setUserAlice() {
 	user_name.set('Alice');
@@ -248,6 +250,8 @@ export async function fetchBalance() {
 	const address = get(user_address);
 	if (address) {
 		const boxes = await userBoxes(address);
+		user_deposit_boxes.set(boxes.filter(row => row.contract == 'DEPOSIT').map(r => r.box));
+
 		const updatedTokens = boxes
 			.flatMap((row: { box: { assets: any } }) => row.box.assets)
 			.reduce(sumAssets, []);

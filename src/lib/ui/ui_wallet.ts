@@ -4,7 +4,7 @@ import { wallet_initialized } from './ui_state';
 import { showToast } from './header/toaster';
 
 export const mnemonic = writable('');
-export const pk = writable('');
+export const crystalwallet_pk = writable('9fSBXH9DG92rnvYXDgjXkwFzQusQZjus5DMVE63Hfs3y3gUQS6h');
 
 export async function deleteWallet(){
 	mnemonic.set('');

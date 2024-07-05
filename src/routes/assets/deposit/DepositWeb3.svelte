@@ -50,7 +50,7 @@
         const blockchainHeight = await ergo.get_current_height();
         const inputBoxes = await ergo.get_utxos();
         const changeAddress = await ergo.get_change_address();
-        //const userPk = $pk;
+        //const userPk = $crystalwallet_pk;
         const userPk = changeAddress;
         const unlockHeight = 1_400_000;
         const nanoErg = SAFE_MIN_BOX_VALUE;
@@ -104,7 +104,7 @@
 	});
 </script>
 
-<div class="flex flex-col" style="max-width:500px; width:100%">
+<div class="flex flex-col justify-center grow" style="max-width:500px; width:100%">
 	<div
 		class="scroll-container mb-10 rounded-md border-2"
 		style="border-color: var(--fill-opacity-container);"
@@ -182,7 +182,7 @@
 		{/if}
 	</div>
 
-	<div class="select-token_wrapper">
+	<div class="">
 		{#if $web3wallet_connected}
 			<button class="btn" on:click={onDepositClick}>Deposit</button>
 		{:else}

@@ -2,12 +2,12 @@
 	import { goto } from '$app/navigation';
 	import DepositWeb3 from './DepositWeb3.svelte';
 	import MobileDeposit from './MobileDeposit.svelte';
-	
+
 	//let selectedWallet = 'mobile';
 	let selectedWallet = 'web3wallet';
 </script>
 
-<div class="flex flex-col items-center">
+<div class="h-full flex flex-col items-center">
 	<div class="page-header flex items-center">
 		<button class="back-arrow" on:click={() => goto('/assets')}>&#8592;</button>
 		<div class="title">Deposit</div>
@@ -34,18 +34,18 @@
 				<label for="web3wallet">Web3 Wallet</label>
 			</div>
 		</div>
-		<div class="w-full flex justify-center">
-		{#if selectedWallet == 'mobile'}
-			<MobileDeposit></MobileDeposit>
-		{:else}
-			<DepositWeb3></DepositWeb3>
-		{/if}
-	</div>
+		<div class="w-full flex justify-center grow">
+			{#if selectedWallet == 'mobile'}
+				<MobileDeposit></MobileDeposit>
+			{:else}
+				<DepositWeb3></DepositWeb3>
+			{/if}
+		</div>
 	</div>
 </div>
 
 <style lang="postcss">
-	input{
+	input {
 		max-width: 500px;
 	}
 	.deposit_dot {
@@ -55,4 +55,3 @@
 		line-height: 28px;
 	}
 </style>
-

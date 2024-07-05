@@ -226,6 +226,8 @@ input:not(:checked) + label:hover {
 	padding: 40px;
 	border-radius: 8px;
 	min-height: 750px;
+	display: flex;
+	flex-direction: column;
 }
 @media (max-width: 1240px) {
 	.page-header {
