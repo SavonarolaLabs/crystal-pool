@@ -170,7 +170,7 @@ export const ergoTokens = {
 		name: 'hodlERG3',
 		ticker: 'hodlERG3',
 		logoURI:
-			'https://media.discordapp.net/attachments/1138798943803809792/1139177368704008222/HODL-8-1.png',
+			'https://raw.githubusercontent.com/nautls/nautilus-wallet/ab217de394d435b339135e95c1a8ad26e5049027/public/icons/assets/hodlerg3.svg',
 		project: 'hodlERG 3%'
 	},
 	'7ba2a85fdb302a181578b1f64cb4a533d89b3f8de4159efece75da41041537f9': {
