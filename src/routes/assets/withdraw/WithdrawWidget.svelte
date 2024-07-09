@@ -12,7 +12,7 @@
 		user_mnemonic,
 		web3wallet_connected
 	} from '$lib/ui/ui_state';
-	import { crystalwallet_address, crystalwallet_mnemonic } from '$lib/ui/ui_wallet';
+	import { user_address, user_mnemonic } from '$lib/ui/ui_wallet';
 	import { asBigInt } from '$lib/utils/helper';
 	import { b } from '$lib/wallet/multisig-client';
 	import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
@@ -46,14 +46,14 @@
 
 	async function onWithdrawClick() {
 		const completed: boolean = await withdraw({
-			address: $crystalwallet_address,
+			address: $user_address,
 			withdrawAddress,
 			tokens: selectedTokens,
 			value: SAFE_MIN_BOX_VALUE
 		},
 		b,
-		$crystalwallet_mnemonic,
-		$crystalwallet_address);
+		$user_mnemonic,
+		$user_address);
 		if (completed) {
 			console.log('withdraw success ', { selectedTokens });
 		} else {

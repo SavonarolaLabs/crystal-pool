@@ -146,12 +146,10 @@ export function addRecentTrades(recentTrades: Array<MarketTrade>) {
 			value: (trade.price * trade.amount).toFixed(2),
 			side: trade.side
 		});
-		if (get(user_name) == 'Bob') {
-			showToast(
-				`order filled: ${trade.amount}rsBTC for $${(trade.price * trade.amount).toFixed(2)}`,
-				'success'
-			);
-		}
+		showToast(
+			`order filled: ${trade.amount}rsBTC for $${(trade.price * trade.amount).toFixed(2)}`,
+			'success'
+		);
 	});
 }
 
@@ -209,27 +207,9 @@ export async function setOrderBook(book: any) {
 }
 
 // wallet balance
-export const user_name = writable('Bob');
-export const user_mnemonic = writable(BOB_MNEMONIC);
-export const user_address = writable(BOB_ADDRESS);
+export const user_mnemonic = writable('');
+export const user_address = writable('');
 export const user_deposit_boxes: Writable<Box[]> = writable([]);
-
-export function setUserAlice() {
-	user_name.set('Alice');
-	user_mnemonic.set(ALICE_MNEMONIC);
-	user_address.set(ALICE_ADDRESS);
-}
-
-export function setUserBob() {
-	user_name.set('Bob');
-	user_mnemonic.set(BOB_MNEMONIC);
-	user_address.set(BOB_ADDRESS);
-}
-
-export function toggleWallet() {
-	get(user_name) == 'Bob' ? setUserAlice() : setUserBob();
-	fetchBalance();
-}
 
 export const user_tokens = writable([
 	{

@@ -1,15 +1,12 @@
 import CryptoJS from 'crypto-js';
 import { get, writable } from 'svelte/store';
-import { wallet_initialized } from './ui_state';
+import { user_mnemonic, wallet_initialized } from './ui_state';
 import { showToast } from './header/toaster';
 import { getChangeAddress } from '$lib/wallet/wallet';
 
-export const crystalwallet_mnemonic = writable('');
-export const crystalwallet_address = writable('');
-
 export async function deleteWallet(){
-	crystalwallet_mnemonic.set('');
-	crystalwallet_address.set('');
+	user_mnemonic.set('');
+	user_address.set('');
 	wallet_initialized.set(false);
 	localStorage.removeItem('encryptedMnemonic');
 	localStorage.removeItem('changeAddress');
@@ -31,15 +28,15 @@ export async function deleteWallet(){
 
 function encryptAndStoreMnemonic(mnemonic:string, changeAddress:string, password:string) {
 	const decryptedMnemonic = mnemonic.trim().replace(/\s+/g, ' ');;
-	crystalwallet_mnemonic.set(decryptedMnemonic);
-	crystalwallet_address.set(changeAddress);
+	user_mnemonic.set(decryptedMnemonic);
+	user_address.set(changeAddress);
 	const encrypted = CryptoJS.AES.encrypt(decryptedMnemonic, password).toString();
 	localStorage.setItem('encryptedMnemonic', encrypted);
 	localStorage.setItem('changeAddress', encrypted);
 }
 
 export async function mnemonicRequiresDecryption() {
-	return !!localStorage.getItem('encryptedMnemonic') && !get(crystalwallet_mnemonic);
+	return !!localStorage.getItem('encryptedMnemonic') && !get(user_mnemonic);
 }
 
 function decryptLocalStorageMnemonic(password) {
@@ -62,8 +59,8 @@ export async function onDecrypt(password) {
 			changeAddress = await getChangeAddress(decryptedMnemonic);
 		}
 		showToast('Wallet unlocked.');
-		crystalwallet_mnemonic.set(decryptedMnemonic);
-		crystalwallet_address.set(changeAddress);
+		user_mnemonic.set(decryptedMnemonic);
+		user_address.set(changeAddress);
 		wallet_initialized.set(true);
 
 		if (navigator.serviceWorker.controller) {
@@ -117,11 +114,11 @@ export async function initMnemonicWorker() {
 	await navigator.serviceWorker.register('/sw.js');
 	const {mnemonic, changeAddress} = await getMnemonic();
 	if (mnemonic) {
-		crystalwallet_mnemonic.set(mnemonic);
+		user_mnemonic.set(mnemonic);
 		if(changeAddress){
-			crystalwallet_address.set(changeAddress);
+			user_address.set(changeAddress);
 		}else{
-			crystalwallet_address.set(await getChangeAddress(mnemonic)??"");
+			user_address.set(await getChangeAddress(mnemonic)??"");
 		}
 		wallet_initialized.set(true);
 	}
