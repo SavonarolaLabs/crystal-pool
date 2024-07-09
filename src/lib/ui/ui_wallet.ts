@@ -51,7 +51,7 @@ function decryptLocalStorageMnemonic(password) {
 export async function onDecrypt(password) {
 	try {
 		const decryptedMnemonic = decryptLocalStorageMnemonic(password);
-		if(!(decryptedMnemonic.split(' ').length < 12)){
+		if(decryptedMnemonic.split(' ').length < 12){
 			return false;
 		}
 		let changeAddress = localStorage.getItem("changeAddress") ?? "";
