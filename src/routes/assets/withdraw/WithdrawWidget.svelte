@@ -3,6 +3,7 @@
 	import { ergoTokens } from '$lib/constants/ergoTokens';
 	import { fetchHeight } from '$lib/external/height';
 	import SelectCrypto from '$lib/ui/assets/SelectCrypto.svelte';
+	import { withdraw } from '$lib/ui/service/walletService';
 	import {
 		connectWeb3Wallet,
 		crystalwallet_tokens,
@@ -12,11 +13,11 @@
 	} from '$lib/ui/ui_state';
 	import { crystalwallet_address } from '$lib/ui/ui_wallet';
 	import { asBigInt } from '$lib/utils/helper';
-	import { createWithdrawTx } from '$lib/wallet/deposit';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	
+
 	let tokenId = '03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04';
+	let withdrawAddress = '';
 	let selectedTokens = [];
 
 	let selectCryptoDialogOpen = false;
@@ -41,9 +42,16 @@
 	}
 
 	async function onWithdrawClick() {
-		let currentHeight = await fetchHeight();
-		const tx = createWithdrawTx($crystalwallet_address, $user_deposit_boxes, currentHeight);
-		console.log(tx);
+		const completed: boolean = await withdraw({
+			address: $crystalwallet_address,
+			withdrawAddress,
+			tokens: selectedTokens
+		});
+		if (completed) {
+			console.log('withdraw success ', { selectedTokens });
+		} else {
+			console.error('withdraw failed ', { selectedTokens });
+		}
 	}
 
 	function scrollToBottom() {
@@ -51,10 +59,6 @@
 		if (scrollDiv) {
 			scrollDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
 		}
-	}
-
-	async function connectWeb3() {
-		await connectWeb3Wallet();
 	}
 
 	function setMaxTokenValue(id) {
@@ -74,7 +78,6 @@
 		}
 		return acc;
 	}
-
 
 	let token = '';
 

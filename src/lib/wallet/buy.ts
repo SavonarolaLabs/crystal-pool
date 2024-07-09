@@ -78,7 +78,7 @@ export function buy(
 			]).toHex(),
 			R5: SInt(unlockHeight).toHex()
 		})
-		.addTokens(calcTokenChange(inputBoxes, token));
+		.addTokens(calcTokenChange(inputBoxes, [token]));
 
 	const uTx = new TransactionBuilder(blockchainHeight)
 		.from(inputBoxes)

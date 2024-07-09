@@ -7,11 +7,33 @@ import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
 import { SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
 import { Transaction, UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
 import type { SwapRequest } from '$lib/ui/service/tradingService';
+import { createWithdrawToAddressTx } from '$lib/wallet/deposit';
+import { fetchHeight } from '$lib/external/height';
+import type { WithdrawRequestParams } from '$lib/types/request';
 
 export type TxWithCommits = {
 	unsignedTx: EIP12UnsignedTransaction;
 	publicCommitsPool: JSONTransactionHintsBag;
 };
+
+
+// WITHDRAW
+
+export async function withdrawTxWithCommits(
+	withdrawParams: WithdrawRequestParams,
+	db: BoxDB
+): Promise<TxWithCommits> {
+	const height = await fetchHeight();
+	const depositInputs: any = db_depositBoxes(withdrawParams.address, db);
+
+	const unsignedTx = createWithdrawToAddressTx(withdrawParams, depositInputs, height);
+
+	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
+	return { unsignedTx, publicCommitsPool };
+}
+
+
+// SWAP ORDER
 
 export async function swapOrderTxWithCommits(
 	swapParams: SwapRequest,

@@ -72,7 +72,7 @@ export function createSwapOrderTxR9(
 			R5: inputBoxes[0].additionalRegisters.R5
 		})
 		// @ts-ignore
-		.addTokens(calcTokenChange([...inputBoxes], token));
+		.addTokens(calcTokenChange([...inputBoxes], [token]));
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
 		// @ts-ignore
@@ -127,7 +127,7 @@ export function executeSwap(
 			R5: paymentInputBoxes[0].additionalRegisters.R5
 		})
 		.addTokens(
-			calcTokenChange([...swapOrderInputBoxes, ...paymentInputBoxes], tokensAsPayment)
+			calcTokenChange([...swapOrderInputBoxes, ...paymentInputBoxes], [tokensAsPayment])
 		);
 
 	const uTx = new TransactionBuilder(blockchainHeight)

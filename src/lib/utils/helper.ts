@@ -36,13 +36,13 @@ export function sumNanoErg(boxes: Box<Amount>[]): bigint {
 
 export function calcTokenChange(
 	utxosIn: Box[],
-	tokensOut: TokenAmount<Amount>
+	tokensOut: TokenAmount<Amount>[]
 ): TokenAmount<Amount>[] {
 	let inputCopy: Box[] = JSON.parse(JSON.stringify(utxosIn));
 	const inputTokens = inputCopy
 		.flatMap((box) => box.assets)
 		.reduce(sumAssets, []);
-	return _subtractAssets(inputTokens, [tokensOut]);
+	return _subtractAssets(inputTokens, tokensOut);
 }
 
 export function sumAssetsFromBoxes(boxes: Box[]) {

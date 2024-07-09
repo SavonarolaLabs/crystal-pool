@@ -14,6 +14,7 @@ import {
 import { initDb, db_initDepositUtxo } from './db/db';
 import { createOrderBook } from './db/orderBookUtils';
 import { getOrderBookByTradingPair } from './routes/orderBooks';
+import { createWithdrawTx } from './routes/withdraw';
 
 const app = express();
 const server = http.createServer(app);
@@ -54,6 +55,8 @@ createSwapOrder(app, io, db);
 signSwapOrder(app, io, db);
 executeSwap(app, io, db);
 signExecuteSwap(app, io, db);
+
+createWithdrawTx(app, io, db);
 
 // WebSocket connection
 io.on('connection', (socket) => {
