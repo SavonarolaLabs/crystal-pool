@@ -1,5 +1,5 @@
 import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
-import { db_depositBoxes, db_storeSignedSwapTx, type BoxDB } from './db/db';
+import { db_depositBoxes, db_storeSignedSwapTx, db_storeSignedWithdrawTx, type BoxDB } from './db/db';
 import { a, c, signTxInput, type JSONTransactionHintsBag } from '$lib/wallet/multisig-server';
 import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swap';
 import { ErgoAddress } from '@fleet-sdk/core';
@@ -63,6 +63,14 @@ export async function signSwap(unsignedTx, hints, db) {
 	const signedTxWasm = await c(unsignedTx, privateCommitsPool, hints);
 	const signedTx = signedTxWasm.to_js_eip12();
 	db_storeSignedSwapTx(signedTx, db);
+	return signedTx;
+}
+
+export async function signWithdraw(unsignedTx, hints, db) {
+	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);
+	const signedTxWasm = await c(unsignedTx, privateCommitsPool, hints);
+	const signedTx = signedTxWasm.to_js_eip12();
+	db_storeSignedWithdrawTx(signedTx, db);
 	return signedTx;
 }
 

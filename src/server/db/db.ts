@@ -315,6 +315,16 @@ export function db_storeSignedSwapTx(signedTx: SignedTransaction, db: BoxDB) {
 	db_addBoxes(db, [...boxes1, ...boxes2]);
 }
 
+export function db_storeSignedWithdrawTx(signedTx: SignedTransaction, db: BoxDB) {
+	db_removeBoxesByBoxIds(
+		db,
+		signedTx.inputs.map((box) => box.boxId)
+	);
+
+	const deposits = boxesAtAddress(signedTx, DEPOSIT_ADDRESS);
+	db_addBoxes(db, deposits);
+}
+
 // serialization functinos
 export function db_getBoxesString(db: BoxDB) {
 	const serializedData = serializeBigInt(db.boxRows);

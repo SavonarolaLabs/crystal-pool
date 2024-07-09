@@ -11,6 +11,7 @@ const NEW_SWAP_SIGN = '/swap-order/sign';
 const ORDER_BOOK = '/order-book/';
 const USER_BOXES = '/boxes/';
 const WITHDRAW_CREATE_TX = '/withdraw';
+const WITHDRAW_SIGN_TX = '/withdraw/sign';
 
 export async function get(address: string) {
 	let res = await fetch(CRYSTALPOOL_URL + address, {
@@ -72,4 +73,11 @@ export async function userBoxes(address: string): Promise<BoxRow[]> {
 
 export async function createWithdrawTx(params: WithdrawRequestParams){
 	return await post(WITHDRAW_CREATE_TX, params);
+}
+
+export async function signWithdrawTx(extractedHints: any, unsignedTx: any): Promise<any> {
+	return await post(WITHDRAW_SIGN_TX, {
+		extractedHints,
+		unsignedTx
+	});
 }

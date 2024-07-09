@@ -9,10 +9,13 @@
 		crystalwallet_tokens,
 		loadUIState,
 		user_deposit_boxes,
+		user_mnemonic,
 		web3wallet_connected
 	} from '$lib/ui/ui_state';
-	import { crystalwallet_address } from '$lib/ui/ui_wallet';
+	import { crystalwallet_address, crystalwallet_mnemonic } from '$lib/ui/ui_wallet';
 	import { asBigInt } from '$lib/utils/helper';
+	import { b } from '$lib/wallet/multisig-client';
+	import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
@@ -45,8 +48,12 @@
 		const completed: boolean = await withdraw({
 			address: $crystalwallet_address,
 			withdrawAddress,
-			tokens: selectedTokens
-		});
+			tokens: selectedTokens,
+			value: SAFE_MIN_BOX_VALUE
+		},
+		b,
+		$crystalwallet_mnemonic,
+		$crystalwallet_address);
 		if (completed) {
 			console.log('withdraw success ', { selectedTokens });
 		} else {
