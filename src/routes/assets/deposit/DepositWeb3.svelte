@@ -195,9 +195,6 @@
 <style lang="postcss">
 	input {
 	}
-	.token-row:hover {
-		background-color: var(--fill-opacity-container);
-	}
 	.btn {
 		height: 48px;
 		width: 100%;
@@ -211,30 +208,7 @@
 	.btn:hover {
 		background-color: #2563eb;
 	}
-	/* .deposit {
-		background-color: #1f2937;
-		color: white;
-	}
-	.deposit:hover {
-		background-color: #374151;
-	} */
-	.select-token_wrapper {
-		margin-bottom: 40px;
-	}
-	.select-token_currency {
-		font-size: 14px;
-		font-weight: 600;
-	}
-	.select-token_wrapper img {
-		width: 24px;
-		height: 24px;
-		border-radius: 100%;
-	}
-	.select-token_wrapper .label {
-		font-size: 14px;
-		color: var(--text-secondary);
-		opacity: 0.6;
-	}
+
 	.select-token_selectMode {
 		height: 48px;
 		border-radius: 4px;
@@ -246,73 +220,6 @@
 		background-color: var(--fill-opacity-container);
 		border: 1px solid transparent;
 	}
-	.deposit_dot {
-		font-size: 20px;
-		font-weight: 600;
-		margin-bottom: 24px;
-		line-height: 28px;
-	}
-	.page-header {
-		width: 1200px;
-		@apply py-6 flex items-center;
-	}
-	.deposit_container {
-		width: 1200px;
-		background-color: var(--bg-level-secondary);
-		margin: 0 auto 28px;
-		padding: 40px;
-		border-radius: 8px;
-		min-height: 750px;
-	}
-	@media (max-width: 1240px) {
-		.page-header {
-			max-width: 100%;
-		}
-		.deposit_container {
-			max-width: 100%;
-		}
-	}
-	.title {
-		margin-right: var(--margin-sm);
-		margin-bottom: 0;
-		color: var(--heading-color);
-		font-weight: 600;
-		font-size: 24px;
-		line-height: var(--height-base);
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-	}
-	.back-arrow {
-		margin-right: 10px;
-		font-size: 18px;
-		cursor: pointer;
-		width: 32px;
-		height: 32px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		border: 2px solid var(--text-primary);
-		border-radius: 50%;
-		transition:
-			color 0.2s,
-			border-color 0.2s;
-	}
-	.back-arrow:hover {
-		color: var(--primary-base);
-		border-color: var(--primary-base);
-	}
-	.token-row {
-		height: 72px;
-		margin-top: -2px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0 16px 0 24px;
-		overflow: hidden;
-		width: 100%;
-	}
-
 	.scroll-container {
 		display: grid;
 		overflow: auto;
