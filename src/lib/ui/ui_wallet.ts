@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 import { get, writable } from 'svelte/store';
-import { user_mnemonic, wallet_initialized } from './ui_state';
+import { user_address, user_mnemonic, wallet_initialized } from './ui_state';
 import { showToast } from './header/toaster';
 import { getChangeAddress } from '$lib/wallet/wallet';
 

@@ -10,7 +10,7 @@
 	} from '$lib/ui/ui_state';
 	import { asBigInt } from '$lib/utils/helper';
 	import { deposit } from '$lib/wallet/deposit';
-	import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
+	import { RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
@@ -49,7 +49,8 @@
 		//const userPk = $crystalwallet_pk;
 		const userPk = changeAddress;
 		const unlockHeight = 1_400_000;
-		const nanoErg = SAFE_MIN_BOX_VALUE;
+		const depositNanoErg = SAFE_MIN_BOX_VALUE;
+		const minGasForWithdrawal = SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE;
 		const tx = deposit(
 			blockchainHeight,
 			inputBoxes,
@@ -57,7 +58,7 @@
 			userPk,
 			unlockHeight,
 			selectedTokens,
-			nanoErg
+			depositNanoErg + minGasForWithdrawal
 		);
 		const transaction = await ergo.sign_tx(tx);
 		console.log(transaction);

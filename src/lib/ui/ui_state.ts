@@ -14,6 +14,7 @@ export const web3wallet_available_wallets = writable([]);
 export const web3wallet_confirmedTokens = writable([]);
 export const has_pending_transactions = writable(false);
 //export const has_pending_transactions = writable(true);
+/*
 export const crystalwallet_tokens = writable([{
 	tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b", //tokenId
 	amount: 322
@@ -30,6 +31,9 @@ export const pending_transactions = writable([{
 	assetCount : 0,
 	txId : 'f54150801685b1cd77120625c28a00bcdef7952711ab980d66f0f37d810f9666',
 },]);
+*/
+export const crystalwallet_tokens = writable([]);
+export const pending_transactions = writable([]);
 
 export async function loadWeb3WalletTokens(){
 	try{
