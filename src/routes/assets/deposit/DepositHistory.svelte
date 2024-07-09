@@ -9,7 +9,7 @@
 				<div class="orders_cell ">
 					Time
 				</div>
-				<div class="orders_cell ">Transaction</div>
+				<div class="orders_cell ">TxId</div>
 				<div class="orders_cell ">Status</div>
 			</div>
 		</section>
@@ -19,7 +19,7 @@
 				<div class="table-row">
 					<div class="orders_cell_data ">12 ERG, 3000 Commet</div>
 					<div class="orders_cell_data ">20:32:12</div>
-					<div class="orders_cell_data ">0%</div>
+					<div class="orders_cell_data "></div>
 					<div class="orders_cell_data ">mempool</div>
 				</div>
 			{/each}
