@@ -5,14 +5,12 @@
 	import SelectCrypto from '$lib/ui/assets/SelectCrypto.svelte';
 	import { withdraw } from '$lib/ui/service/walletService';
 	import {
-		connectWeb3Wallet,
 		crystalwallet_tokens,
 		loadUIState,
-		user_deposit_boxes,
+		user_address,
 		user_mnemonic,
 		web3wallet_connected
 	} from '$lib/ui/ui_state';
-	import { user_address, user_mnemonic } from '$lib/ui/ui_wallet';
 	import { asBigInt } from '$lib/utils/helper';
 	import { b } from '$lib/wallet/multisig-client';
 	import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';

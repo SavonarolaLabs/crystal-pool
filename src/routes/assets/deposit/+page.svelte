@@ -13,7 +13,7 @@
 		<button class="back-arrow" on:click={() => goto('/assets')}>&#8592;</button>
 		<div class="title">Deposit</div>
 	</div>
-	<div class="page_container">
+	<div class="page_container" style="margin-bottom:5px;">
 		<div>
 			<div class="deposit_dot">Select Wallet</div>
 			<div class="tabs select-token_wrapper">

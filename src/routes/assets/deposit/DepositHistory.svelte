@@ -1,29 +1,30 @@
-<div class="w-full exchange_ordersWrapper">
+<div class="w-full exchange_ordersWrapper page_container" style="padding: 0;min-height: unset;">
 	<section class="orders_tableWrapper">
 		<div class="orders_header">
 			<div class="orders_tab orders_tab-active">Deposits</div>
 		</div>
 		<section class="orders_listBodyContent">
-			<div class="orders_tableHeader">
-				<div class="orders_cell ">Tokens</div>
-				<div class="orders_cell ">
-					Time
-				</div>
-				<div class="orders_cell ">TxId</div>
-				<div class="orders_cell ">Status</div>
-			</div>
+			<table>
+				<thead>
+					<tr>
+						<th class=" text-left">Tokens</th>
+						<th class="">Time</th>
+						<th class="">TxId</th>
+						<th class="">Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each new Array(7) as i}
+						<tr class="">
+							<td>12 ERG, 3000 Commet</td>
+							<td>20:32:12</td>
+							<td>x</td>
+							<td>mempool</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
 		</section>
-
-		<div class="table-content">
-			{#each new Array(7) as i}
-				<div class="table-row">
-					<div class="orders_cell_data ">12 ERG, 3000 Commet</div>
-					<div class="orders_cell_data ">20:32:12</div>
-					<div class="orders_cell_data "></div>
-					<div class="orders_cell_data ">mempool</div>
-				</div>
-			{/each}
-		</div>
 	</section>
 </div>
 
@@ -31,11 +32,6 @@
 	.table-content {
 		padding-inline-start: 16px;
 		padding-inline-end: 16px;
-	}
-	.table-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
 	}
 	.exchange_ordersWrapper {
 		grid-column: 1/4;
@@ -92,7 +88,11 @@
 		flex-flow: column nowrap;
 		height: 100%;
 	}
-	.orders_tableHeader {
+	.orders_table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	thead {
 		height: 36px;
 		padding-top: 14px;
 		color: var(--text-secondary);
@@ -105,23 +105,19 @@
 		padding-inline-start: 16px;
 		padding-inline-end: 16px;
 		border-bottom: 1px solid var(--divider);
-		flex-shrink: 0;
-		display: flex;
+		text-align: left;
 	}
-
-	.orders_cell {
+	.orders_table th,
+	.orders_table td {
+		padding-inline-end: 4px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+	.orders_table th {
 		cursor: pointer;
-		padding-inline-end: 4px;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
 	}
-
-	.orders_cell_data {
-		padding-inline-end: 4px;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+	.orders_table td {
+		padding: 8px 16px;
 	}
-
 </style>
