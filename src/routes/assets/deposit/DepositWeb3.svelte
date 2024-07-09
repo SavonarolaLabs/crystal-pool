@@ -61,7 +61,8 @@
 			depositNanoErg + minGasForWithdrawal
 		);
 		const transaction = await ergo.sign_tx(tx);
-		console.log(transaction);
+		//console.log(transaction);
+		
 		has_pending_transactions.set(true);
 	}
 

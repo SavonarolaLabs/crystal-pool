@@ -1,6 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import DepositWeb3 from './DepositWeb3.svelte';
+	import DepositHistory from './DepositHistory.svelte';
 	import MobileDeposit from './MobileDeposit.svelte';
 
 	//let selectedWallet = 'mobile';
@@ -42,6 +43,7 @@
 			{/if}
 		</div>
 	</div>
+	<DepositHistory></DepositHistory>
 </div>
 
 <style lang="postcss">
