@@ -1,21 +1,21 @@
-<div class="w-full exchange_ordersWrapper page_container" style="padding: 0;min-height: unset;">
+<div class="exchange_ordersWrapper page_container" style="padding: 0;min-height: unset;">
 	<section class="orders_tableWrapper">
 		<div class="orders_header">
 			<div class="orders_tab orders_tab-active">Deposits</div>
 		</div>
 		<section class="orders_listBodyContent">
-			<table>
+			<table class="orders_table">
 				<thead>
 					<tr>
-						<th class=" text-left">Tokens</th>
-						<th class="">Time</th>
-						<th class="">TxId</th>
-						<th class="">Status</th>
+						<th>Tokens</th>
+						<th>Time</th>
+						<th>TxId</th>
+						<th>Status</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each new Array(7) as i}
-						<tr class="">
+						<tr>
 							<td>12 ERG, 3000 Commet</td>
 							<td>20:32:12</td>
 							<td>x</td>
@@ -29,10 +29,6 @@
 </div>
 
 <style lang="postcss">
-	.table-content {
-		padding-inline-start: 16px;
-		padding-inline-end: 16px;
-	}
 	.exchange_ordersWrapper {
 		grid-column: 1/4;
 		grid-row: 4/5;
@@ -94,9 +90,7 @@
 	}
 	thead {
 		height: 36px;
-		padding-top: 14px;
 		color: var(--text-secondary);
-		padding-bottom: 2px;
 		position: sticky;
 		top: 0;
 		z-index: 1;
@@ -114,10 +108,12 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
-	.orders_table th {
-		cursor: pointer;
-	}
-	.orders_table td {
+	.orders_table td{
 		padding: 8px 16px;
+	}
+	.orders_table th {
+		padding: 0px 16px;
+		padding-top: 16px;
+		padding-bottom: 2px;
 	}
 </style>
