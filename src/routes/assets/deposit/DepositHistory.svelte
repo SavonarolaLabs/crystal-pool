@@ -16,7 +16,7 @@
 				<tbody>
 					{#each new Array(7) as i}
 						<tr>
-							<td>12 ERG, 3000 Commet</td>
+							<td>12 ERG, 3000 COMET</td>
 							<td>20:32:12</td>
 							<td>x</td>
 							<td>mempool</td>
