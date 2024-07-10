@@ -1,8 +1,6 @@
-import { ALICE_ADDRESS, BOB_ADDRESS } from '$lib/constants/addresses';
 import { get, writable, type Writable } from 'svelte/store';
 import { userBoxes } from './service/crystalPoolService';
 import { sumAssets } from '$lib/utils/helper';
-import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
 import type { Amount, Box, SignedTransaction, TokenAmount } from '@fleet-sdk/common';
@@ -52,6 +50,23 @@ export async function addWeb3WalletDepositTx(tx: SignedTransaction, value:bigint
 		a.push(txEntry);
 		return a;
 	})
+	persistTxHistory();
+}
+
+export function persistTxHistory() {
+	localStorage.setItem('tx_history', JSON.stringify(get(tx_history)));
+}
+
+export function loadTxHistory() {
+    const storedHistory = localStorage.getItem('tx_history');
+    if (storedHistory) {
+        try {
+            const parsedHistory: TxHistoryEntry[] = JSON.parse(storedHistory);
+            tx_history.set(parsedHistory);
+        } catch (error) {
+            console.error('Failed to parse transaction history from local storage', error);
+        }
+    }
 }
 
 // tx history end
@@ -133,6 +148,7 @@ export async function loadUIState(){
 		isDarkMode.set(false);
 	}
 	await initWeb3WalletState();
+	loadTxHistory();
 }
 
 
