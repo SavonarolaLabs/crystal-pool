@@ -1,4 +1,5 @@
-import { decodeR7, decodeTokenIdPairFromR6, parseBox, type BoxDB } from '../db/db';
+import { type BoxDB } from '../db/db';
+import {decodeR7, decodeTokenIdPairFromR6, parseBox} from '../db/boxParser'
 import type { Request, Response, Express } from 'express';
 import type { Server } from 'socket.io';
 import {
@@ -6,11 +7,11 @@ import {
 	signExecuteSwapOrder,
 	signSwap,
 	swapOrderTxWithCommits,
-	type SwapParams
 } from '../crystalPool';
 import { broadcastOrderBook, broadcastSwapExecute } from '../ioSocket';
 import { sellAmount, sellPrice, buyPrice, buyAmount } from '../db/orderBookUtils';
 import { serializeBigInt } from '../db/serializeBigInt';
+import type { SwapParams } from '$lib/types/boxRow';
 
 export function configureSwapOrder(app: Express, io: Server, db: BoxDB) {
 	app.post('/swap-order/configure', async (req: Request, res: Response) => {

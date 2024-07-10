@@ -8,7 +8,7 @@ import {
 	decodeR8,
 	decodeTokenIdPairFromR6,
 	parseBox
-} from './db';
+} from './boxParser';
 import { SAFE_MIN_BOX_VALUE, type Box } from '@fleet-sdk/core';
 import { PRINTER_ADDRESS, PRINTER_MNEMONIC, PRINTER_UTXO } from '../../lib/constants/fakeUtxos';
 import {

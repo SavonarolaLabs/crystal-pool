@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import { db_getBoxesByAddressString, db_getBoxesByContract, db_getBoxesString, type BoxDB } from '../db/db';
+import { db_getBoxesByAddressString, db_getBoxesByContractString, db_getBoxesString, type BoxDB } from '../db/db';
 import { sendJSON } from './utils';
 
 export function getBoxes(app: Express, db: BoxDB) {
@@ -17,7 +17,7 @@ export function getBoxesByAddress(app: Express, db: BoxDB) {
 
 export function getSwapContractBoxes(app: Express, db: BoxDB) {
 	app.get('/swap-contract/boxes', (req: Request, res: Response) => {
-    const boxes = db_getBoxesByContract(db, 'SWAP');
+    const boxes = db_getBoxesByContractString(db, 'SWAP');
     sendJSON(res, boxes);
 	});
 }

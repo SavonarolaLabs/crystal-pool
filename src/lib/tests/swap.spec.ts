@@ -8,21 +8,19 @@ import {
 	SHADOWPOOL_ADDRESS,
 	SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
-import { ALICE_MNEMONIC, BOB_MNEMONIC, SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
-import { utxos } from '$lib/data/utxos';
-import { boxesAtAddress, boxesAtAddressUnsigned } from '$lib/utils/test-helper';
-import { a, arrayToProposition, bInput, c, cInput, signMultisigEIP12, signTx, signTxInput, signTxMulti } from '$lib/wallet/multisig-server';
-import { ErgoAddress, ErgoTree, SAFE_MIN_BOX_VALUE, type Box } from '@fleet-sdk/core';
-import * as wasm from 'ergo-lib-wasm-nodejs';
-import { describe, expect, it } from 'vitest';
-import { createSwapOrderTxR9, executeSwap, createSwapOrderTx } from '../wallet/swap';
-import { TOKEN } from '$lib/constants/tokens';
-import { sumAssetsFromBoxes } from '$lib/utils/helper';
-import { parseBox } from '../../server/db/db';
-import type { BoxParameters, ContractType } from '$lib/types/boxRow';
-import { deposit } from '$lib/wallet/deposit';
-import { ErgoBoxes, extract_hints, Transaction, UnsignedTransaction, type Input } from 'ergo-lib-wasm-nodejs';
 import { fakeContextX } from '$lib/constants/fakeContext';
+import { ALICE_MNEMONIC, BOB_MNEMONIC, SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
+import { TOKEN } from '$lib/constants/tokens';
+import { utxos } from '$lib/data/utxos';
+import type { BoxParameters, ContractType } from '$lib/types/boxRow';
+import { boxesAtAddress, boxesAtAddressUnsigned } from '$lib/utils/test-helper';
+import { deposit } from '$lib/wallet/deposit';
+import { a, arrayToProposition, bInput, cInput, signTx, signTxInput, signTxMulti } from '$lib/wallet/multisig-server';
+import { ErgoAddress, ErgoTree, SAFE_MIN_BOX_VALUE, type Box } from '@fleet-sdk/core';
+import { ErgoBoxes, extract_hints, Transaction, UnsignedTransaction, type Input } from 'ergo-lib-wasm-nodejs';
+import { describe, expect, it } from 'vitest';
+import { parseBox } from '../../server/db/boxParser';
+import { createSwapOrderTxR9, executeSwap } from '../wallet/swap';
 
 const CONTRACT_FOR_TEST = `{	
 	def getSellerPk(box: Box)              	= box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { initDb, db_initDepositUtxo, db_clearDB, decodeR4, parseBox } from './db/db';
+import { initDb, db_initDepositUtxo, db_clearDB, } from './db/db';
+import {decodeR4, parseBox } from './db/boxParser'
 import {
 	createExecuteSwapOrderTx,
 	signExecuteSwapOrder,
