@@ -5,6 +5,7 @@ import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
 import type { Amount, Box, SignedTransaction, TokenAmount } from '@fleet-sdk/common';
 import type { TxHistoryEntry } from '$lib/types/txHistory';
+import { serializeBigInt } from '../../server/db/serializeBigInt';
 
 
 export const web3wallet_connected = writable(false);
@@ -55,7 +56,7 @@ export async function addWeb3WalletDepositTx(tx: SignedTransaction, value:bigint
 }
 
 export function persistTxHistory() {
-	localStorage.setItem('tx_history', JSON.stringify(get(tx_history)));
+	localStorage.setItem('tx_history', serializeBigInt(get(tx_history)));
 }
 
 export function loadTxHistory() {
