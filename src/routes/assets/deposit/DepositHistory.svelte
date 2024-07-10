@@ -1,3 +1,8 @@
+<script>
+	import { ergoTokens } from '$lib/constants/ergoTokens';
+	import { tx_history } from '$lib/ui/ui_state';
+</script>
+
 <div class="exchange_ordersWrapper page_container" style="padding: 0;min-height: unset;">
 	<section class="orders_tableWrapper">
 		<div class="orders_header">
@@ -14,12 +19,30 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each new Array(7) as i}
+					{#each $tx_history as tx}
 						<tr>
-							<td>12 ERG, 3000 COMET</td>
-							<td>20:32:12</td>
-							<td>x</td>
-							<td>mempool</td>
+							<td
+								>{Number(tx.value) / 10 ** 9} ERG
+								{#each tx.tokens as token}
+									, {token.amount} {ergoTokens[token.tokenId]?.ticker ?? '???'}
+								{/each}
+							</td>
+							<td>{new Date(tx.timestamp).toLocaleString()}</td>
+							<td>
+								<a
+									href="https://explorer.ergoplatform.com/en/transactions/{tx.txId}"
+									>{tx.txId}</a
+								>
+							</td>
+							{#if tx.phase == 'MEMPOOL'}
+								<td
+									><a href="https://explorer.ergoplatform.com/en/mempool"
+										>mempool</a
+									></td
+								>
+							{:else}
+								<td>SUCCESS</td>
+							{/if}
 						</tr>
 					{/each}
 				</tbody>
@@ -108,7 +131,7 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
-	.orders_table td{
+	.orders_table td {
 		padding: 8px 16px;
 	}
 	.orders_table th {

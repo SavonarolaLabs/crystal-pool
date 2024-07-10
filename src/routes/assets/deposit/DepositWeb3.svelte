@@ -2,6 +2,7 @@
 	import { ergoTokens } from '$lib/constants/ergoTokens';
 	import SelectCrypto from '$lib/ui/assets/SelectCrypto.svelte';
 	import {
+	addWeb3WalletDepositTx,
 		connectWeb3Wallet,
 		has_pending_deposits,
 		loadUIState,
@@ -10,6 +11,7 @@
 	} from '$lib/ui/ui_state';
 	import { asBigInt } from '$lib/utils/helper';
 	import { deposit } from '$lib/wallet/deposit';
+	import type { SignedTransaction } from '@fleet-sdk/common';
 	import { RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -31,7 +33,7 @@
 	function clickAdd() {
 		const newToken = { tokenId: tokenId, amount: 0 };
 		selectedTokens = [...selectedTokens.filter((t) => t.tokenId != tokenId), newToken];
-		setTimeout(scrollToBottom, 100);
+		//setTimeout(scrollToBottom, 100);
 	}
 
 	function removeFromDeposit(tokenId) {
@@ -51,6 +53,7 @@
 		const unlockHeight = 1_400_000;
 		const depositNanoErg = SAFE_MIN_BOX_VALUE;
 		const minGasForWithdrawal = SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE;
+		const depositTotal = depositNanoErg + minGasForWithdrawal;
 		const tx = deposit(
 			blockchainHeight,
 			inputBoxes,
@@ -58,12 +61,10 @@
 			userPk,
 			unlockHeight,
 			selectedTokens,
-			depositNanoErg + minGasForWithdrawal
+			depositTotal
 		);
-		const transaction = await ergo.sign_tx(tx);
-		//console.log(transaction);
-		
-		has_pending_deposits.set(true);
+		const transaction : SignedTransaction = await ergo.sign_tx(tx);
+		addWeb3WalletDepositTx(transaction, depositTotal, selectedTokens);
 	}
 
 	function scrollToBottom() {

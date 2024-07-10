@@ -50,6 +50,7 @@ export async function addWeb3WalletDepositTx(tx: SignedTransaction, value:bigint
 		a.push(txEntry);
 		return a;
 	})
+	//has_pending_deposits.set(true);
 	persistTxHistory();
 }
 
