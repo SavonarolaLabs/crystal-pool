@@ -1,26 +1,20 @@
+import { boxesAtAddress } from '$lib/utils/test-helper';
 import { type Box, type EIP12UnsignedTransaction, type SignedTransaction } from '@fleet-sdk/common';
-import type { ContractType, BoxParameters, BoxRow } from '../../lib/types/boxRow';
-import type { TxRow } from '../../lib/types/txRow';
-import { ErgoAddress, ErgoTree } from '@fleet-sdk/core';
 import {
-	BUY_ORDER_ADDRESS,
 	DEPOSIT_ADDRESS,
-	SELL_ORDER_ADDRESS,
 	SWAP_ORDER_ADDRESS
 } from '../../lib/constants/addresses';
-import { parse } from '@fleet-sdk/serializer';
-import { tradingPairs } from '../../lib/constants/tokens';
-import {
-	persistBox,
-	persistMultipleBoxes,
-	loadBoxRows,
-	deleteMultipleBoxes,
-	deleteAllBoxes
-} from './sqlDb';
 import { initDeposits } from '../../lib/server-agent/simulator';
-import { serializeBigInt } from './serializeBigInt';
-import { boxesAtAddress } from '$lib/utils/test-helper';
+import type { BoxRow, ContractType } from '../../lib/types/boxRow';
+import type { TxRow } from '../../lib/types/txRow';
 import { parseBox } from './boxParser';
+import { serializeBigInt } from './serializeBigInt';
+import {
+	deleteAllBoxes,
+	deleteMultipleBoxes,
+	loadBoxRows,
+	persistBox
+} from './sqlDb';
 
 interface HasId {
 	id: number;
