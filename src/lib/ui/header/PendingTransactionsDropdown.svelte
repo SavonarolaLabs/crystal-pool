@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { pending_transactions, wallet_initialized } from '../ui_state';
+	import { pending_deposits, wallet_initialized } from '../ui_state';
 	import PendingTransactions from './PendingTransactions.svelte';
 	let menuOpen = false;
 	let hoverTimeout;
@@ -71,7 +71,7 @@
 		aria-labelledby="menu-button"
 		tabindex="-1"
 	>
-	{#each $pending_transactions as tx}
+	{#each $pending_deposits as tx}
 		<div
 			class="balance text-xs"
 		>

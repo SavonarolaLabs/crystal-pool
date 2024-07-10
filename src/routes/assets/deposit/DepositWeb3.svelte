@@ -3,7 +3,7 @@
 	import SelectCrypto from '$lib/ui/assets/SelectCrypto.svelte';
 	import {
 		connectWeb3Wallet,
-		has_pending_transactions,
+		has_pending_deposits,
 		loadUIState,
 		web3wallet_confirmedTokens,
 		web3wallet_connected
@@ -63,7 +63,7 @@
 		const transaction = await ergo.sign_tx(tx);
 		//console.log(transaction);
 		
-		has_pending_transactions.set(true);
+		has_pending_deposits.set(true);
 	}
 
 	function scrollToBottom() {

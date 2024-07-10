@@ -5,22 +5,23 @@ import { sumAssets } from '$lib/utils/helper';
 import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
 import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
-import type { Box } from '@fleet-sdk/common';
+import type { Amount, Box, SignedTransaction, TokenAmount } from '@fleet-sdk/common';
+import type { TxHistoryEntry } from '$lib/types/txHistory';
 
 
 export const web3wallet_connected = writable(false);
 export const web3wallet_wallet_name = writable("");
 export const web3wallet_available_wallets = writable([]);
 export const web3wallet_confirmedTokens = writable([]);
-export const has_pending_transactions = writable(false);
-//export const has_pending_transactions = writable(true);
+export const has_pending_deposits = writable(false);
+//export const has_pending_deposits = writable(true);
 /*
 export const crystalwallet_tokens = writable([{
 	tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b", //tokenId
 	amount: 322
 }]);
 
-export const pending_transactions = writable([{
+export const pending_deposits = writable([{
 	counter : 55,
 	value : 0,
 	assetCount : 1,
@@ -33,7 +34,27 @@ export const pending_transactions = writable([{
 },]);
 */
 export const crystalwallet_tokens = writable([]);
-export const pending_transactions = writable([]);
+export const pending_deposits = writable([]);
+
+// tx history start
+export const tx_history: Writable<TxHistoryEntry[]> = writable([]);
+
+export async function addWeb3WalletDepositTx(tx: SignedTransaction, value:bigint, tokens:TokenAmount<Amount>[]){
+	const txEntry:TxHistoryEntry = {
+		timestamp: Date.now(),
+		phase: 'MEMPOOL',
+		action: 'DEPOSIT',
+		txId: tx.id,
+		value,
+		tokens
+	};
+	tx_history.update(a => {
+		a.push(txEntry);
+		return a;
+	})
+}
+
+// tx history end
 
 export async function loadWeb3WalletTokens(){
 	try{
