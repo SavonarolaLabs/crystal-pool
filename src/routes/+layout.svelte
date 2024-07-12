@@ -8,10 +8,13 @@
 	import { Toaster } from 'svelte-french-toast';
 	import WalletUnlock from '$lib/ui/wallet/WalletUnlock.svelte';
 	import { loadUIState } from '$lib/ui/ui_state';
+	import { initSocket } from '$lib/ui/service/crystalPoolSocket';
 
 	onMount(async()=>{
 		(window as any).Buffer = Buffer;
 		await loadUIState();
+		await initSocket();
+		//await fetchBalance();
 	})
 </script>
 

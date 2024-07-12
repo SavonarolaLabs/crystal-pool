@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { writable } from 'svelte/store';
 import type { DefaultEventsMap } from '@socket.io/component-emitter';
-import { addRecentTrades, fetchBalance, setOrderBook } from '$lib/ui/ui_state';
+import { addRecentTrades, fetchBalance, mempool_size, setOrderBook } from '$lib/ui/ui_state';
 
 export const receivedDataList = writable<any[]>([]);
 
@@ -30,6 +30,15 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
       //Gotta catch 'em all!
     }
   });
+
+  socket.on('mempoolSize', (data) => {
+    try{
+      console.log("new data", data);
+      mempool_size.set(data);
+    }catch(e){
+      //Gotta catch 'em all!
+    }
+  })
 
   return socket;
 }

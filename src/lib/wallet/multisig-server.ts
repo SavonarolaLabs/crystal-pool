@@ -1,4 +1,4 @@
-import { fakeContext, fakeContextX } from '../constants/fakeContext';
+import { fakeContextX } from '../constants/fakeContext';
 
 import {
 	ErgoBox,
@@ -362,7 +362,7 @@ export async function signTxByAddress(
 	});
 
 	const signedTx = prover.sign_transaction(
-		fakeContext(wasm),
+		//fakeContext(wasm),
 		wasm.UnsignedTransaction.from_json(JSON.stringify(tx)),
 		boxes_to_spend,
 		ErgoBoxes.empty()

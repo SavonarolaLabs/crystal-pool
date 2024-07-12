@@ -5,36 +5,37 @@ import { json } from 'body-parser';
 import cors from 'cors';
 import { getBoxes, getBoxesByAddress, getSwapContractBoxes } from './routes/boxes';
 import {
-	configureSwapOrder,
-	createSwapOrder,
-	executeSwap,
-	signExecuteSwap,
-	signSwapOrder
+    configureSwapOrder,
+    createSwapOrder,
+    executeSwap,
+    signExecuteSwap,
+    signSwapOrder
 } from './routes/swapOrder';
 import { initDb, db_initDepositUtxo } from './db/db';
 import { createOrderBook } from './db/orderBookUtils';
 import { getOrderBookByTradingPair } from './routes/orderBooks';
 import { createWithdrawTx } from './routes/withdraw';
+import { run } from './mempoolMonitor';
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-	cors: {
-		origin: '*',
-		methods: ['GET', 'POST']
-	}
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST']
+    }
 });
 
 app.use(
-	cors({
-		origin: '*',
-		methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
-		allowedHeaders: ['Content-Type', 'Authorization'],
-		exposedHeaders: ['Content-Type', 'Authorization'],
-		credentials: true,
-		preflightContinue: false,
-		optionsSuccessStatus: 204
-	})
+    cors({
+        origin: '*',
+        methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        exposedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
+        preflightContinue: false,
+        optionsSuccessStatus: 204
+    })
 );
 
 // Middleware
@@ -60,23 +61,28 @@ createWithdrawTx(app, io, db);
 
 // WebSocket connection
 io.on('connection', (socket) => {
-	console.log('A client connected:', socket.id);
-	const orderbook = createOrderBook('rsBTC_sigUSD', db);
-	io.emit('orderbook', orderbook);
+    console.log('A client connected:', socket.id);
+    const orderbook = createOrderBook('rsBTC_sigUSD', db);
+    io.emit('orderbook', orderbook);
 
-	socket.on('disconnect', () => {
-		console.log('Client disconnected:', socket.id);
-	});
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+    });
 
-	// Example: Emit an update to all clients
-	socket.on('exampleEvent', (data) => {
-		console.log('Received exampleEvent:', data);
-		io.emit('orderbook', { buy: [], sell: [] });
-	});
+    // Example: Emit an update to all clients
+    socket.on('exampleEvent', (data) => {
+        console.log('Received exampleEvent:', data);
+        io.emit('orderbook', { buy: [], sell: [] });
+    });
 });
 
 // Start the server
 const PORT = 3000;
 server.listen(PORT, () => {
-	console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Server running at http://localhost:${PORT}`);
+});
+
+// ZMQ Subscriber to listen to events
+run(io).catch(err => {
+    console.error('ZMQ Error occurred:', err);
 });

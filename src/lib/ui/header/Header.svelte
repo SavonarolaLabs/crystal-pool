@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { DEPOSIT_ADDRESS } from "$lib/constants/addresses";
 	import { has_pending_deposits, toggleTheme } from "../ui_state";
-	import PendingTransactions from "./PendingTransactions.svelte";
+	import MempoolCapacity from "./MempoolCapacity.svelte"
 	import WalletDropdown from "../wallet/WalletDropdown.svelte";
 	import PendingTransactionsDropdown from "./PendingTransactionsDropdown.svelte";
 </script>
@@ -39,18 +39,20 @@
 			
 			<div class="header_leftMenu">
 				<a
-					class="header_navItem"
+					class="header_navItem flex flex-col"
 					target="_blank"
 					href="https://explorer.ergoplatform.com/en/mempool"
 				>
-					Mempool
+				Mempool
+				<MempoolCapacity></MempoolCapacity>
 				</a>
 				<a
-					class="header_navItem"
+					style="display:none"
+					class="header_navItem "
 					target="_blank"
 					href={`https://explorer.ergoplatform.com/en/addresses/${DEPOSIT_ADDRESS}`}
 				>
-					Total Deposits
+					Deposits
 				</a>
 			</div>
 		</div>

@@ -38,6 +38,8 @@ export const pending_deposits = writable([]);
 // tx history start
 export const tx_history: Writable<TxHistoryEntry[]> = writable([]);
 
+export const mempool_size: Writable<Number> = writable(0);
+
 export async function addWeb3WalletDepositTx(tx: SignedTransaction, value:bigint, tokens:TokenAmount<Amount>[]){
 	const txEntry:TxHistoryEntry = {
 		timestamp: Date.now(),

@@ -1,5 +1,5 @@
 import { DEPOSIT_ADDRESS } from '$lib/constants/addresses';
-import { decodeR4 } from '../../server/db/db';
+import { decodeR4 } from '../../server/db/boxParser';
 import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
 import { ErgoAddress } from '@fleet-sdk/core';
 
