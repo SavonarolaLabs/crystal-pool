@@ -23,20 +23,26 @@ interface HasId {
 export type BoxDB = {
 	boxRows: BoxRow[];
 	txes: TxRow[];
+	depositTxIds: string[];
+	mempoolTxIds: Set<string>;
 };
 
 export async function initDb(): Promise<BoxDB> {
 	const boxRows: BoxRow[] = (await loadBoxRows()) ?? [];
 	return {
 		boxRows,
-		txes: []
+		txes: [],
+		depositTxIds: [],
+		mempoolTxIds: new Set(),
 	};
 }
 
 export async function db_clearDB(db: BoxDB) {
 	await deleteAllBoxes();
-	db.boxRows.length == 0;
-	db.boxRows = [];
+	db.boxRows.length = 0;
+	db.txes = [];
+	db.depositTxIds = [];
+	db.mempoolTxIds = new Set();
 }
 
 export async function db_initDepositUtxo(db: BoxDB) {
@@ -119,6 +125,18 @@ export function db_storeSignedWithdrawTx(signedTx: SignedTransaction, db: BoxDB)
 
 	const deposits = boxesAtAddress(signedTx, DEPOSIT_ADDRESS);
 	db_addBoxes(db, deposits);
+}
+
+export function db_addDepositTxId(db: BoxDB, txId:string){
+	db.depositTxIds.push(txId);
+}
+
+export function db_setMempoolTxIds(db: BoxDB, txIds: string[]){
+	db.mempoolTxIds = new Set(...txIds);
+}
+
+export function db_addMempoolTxId(db: BoxDB, txId: string){
+	db.mempoolTxIds.add(txId);
 }
 
 // serialization functinos

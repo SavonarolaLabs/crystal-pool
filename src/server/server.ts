@@ -14,7 +14,7 @@ import {
 import { initDb, db_initDepositUtxo } from './db/db';
 import { createOrderBook } from './db/orderBookUtils';
 import { getOrderBookByTradingPair } from './routes/orderBooks';
-import { createWithdrawTx } from './routes/withdraw';
+import { createWithdrawTx, signWithdrawTx } from './routes/withdraw';
 import { run } from './mempoolMonitor';
 
 const app = express();
@@ -58,6 +58,7 @@ executeSwap(app, io, db);
 signExecuteSwap(app, io, db);
 
 createWithdrawTx(app, io, db);
+signWithdrawTx(app, io, db);
 
 // WebSocket connection
 io.on('connection', (socket) => {
@@ -82,7 +83,7 @@ server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
 
-// ZMQ Subscriber to listen to events
-run(io).catch(err => {
-    console.error('ZMQ Error occurred:', err);
+// Mempool Monitor
+run(io, db).catch(err => {
+    console.error('MempoolMonitor Error occurred:', err);
 });

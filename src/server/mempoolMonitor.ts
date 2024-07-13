@@ -1,11 +1,9 @@
 import WebSocket from 'ws';
+import { db_addMempoolTxId, db_setMempoolTxIds, type BoxDB } from './db/db';
 
 interface Transaction {
   id: string;
-  // Add other properties as needed
 }
-
-const transactionSet: Set<string> = new Set();
 
 async function fetchMempoolTransactions(offset: number = 0): Promise<Transaction[]> {
   try {
@@ -20,36 +18,36 @@ async function fetchMempoolTransactions(offset: number = 0): Promise<Transaction
   }
 }
 
-async function populateInitialSet(): Promise<void> {
+async function populateInitialSet(db:BoxDB): Promise<void> {
   let offset = 0;
   let transactions: Transaction[];
+  let txIds: string[] = [];
   do {
     transactions = await fetchMempoolTransactions(offset);
-    transactions.forEach(tx => transactionSet.add(tx.id));
+    txIds = [...txIds, ...transactions.map(tx =>tx.id)];
     offset += 100;
   } while (transactions.length === 100);
 
-  console.log(`Initial mempool size: ${transactionSet.size}`);
+  db_setMempoolTxIds(db, txIds);
+  console.log(`Initial mempool size: ${getMempoolSize(db)}`);
 }
 
-async function handleNewBlock(): Promise<void>  {
-  transactionSet.clear();
+async function handleNewBlock(db:BoxDB): Promise<void>  {
   console.log('New block');
-  await populateInitialSet();
-  console.log(`Mempool size changed: ${transactionSet.size}`);
+  await populateInitialSet(db);
 }
 
-function handleNewTransaction(txId: string): void {
-  transactionSet.add(txId);
-  console.log(`Mempool size changed: ${transactionSet.size}`);
+function handleNewTransaction(db:BoxDB, txId: string): void {
+  db_addMempoolTxId(db, txId);
+  console.log(`Mempool size changed: ${getMempoolSize(db)}`);
 }
 
-function getMempoolSize(): number {
-  return transactionSet.size;
+function getMempoolSize(db:BoxDB): number {
+  return db.mempoolTxIds.size;
 }
 
-export async function run(io): Promise<void> {
-  await populateInitialSet();
+export async function run(io, db:BoxDB): Promise<void> {
+  await populateInitialSet(db);
 
   const ws = new WebSocket('ws://localhost:9060');
   ws.on('open', () => {
@@ -60,15 +58,11 @@ export async function run(io): Promise<void> {
     const [topic, msgStr] = message.toString().split(' ');
 
     if (topic === 'newBlock') {
-      handleNewBlock();
+      handleNewBlock(db);
     } else if (topic === 'mempool') {
-      handleNewTransaction(msgStr);
+      handleNewTransaction(db,msgStr);
     }
 
-    // Emit the current mempool size
-    io.emit('mempoolSize', getMempoolSize());
-
-    // Also emit the original WebSocket message
-    // io.emit('websocket', { topic, message: msgStr });
+    io.emit('mempoolSize', getMempoolSize(db));
   });
 }

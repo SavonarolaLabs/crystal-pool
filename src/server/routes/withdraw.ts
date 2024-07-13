@@ -13,7 +13,7 @@ export function createWithdrawTx(app: Express, io: Server, db: BoxDB) {
 	});
 }
 
-export function signSwapOrder(app: Express, io: Server, db: BoxDB) {
+export function signWithdrawTx(app: Express, io: Server, db: BoxDB) {
 	app.post('/withdraw/sign', async (req: Request, res: Response) => {
 		const { unsignedTx, extractedHints } = req.body;
 		const signedTx = await signWithdraw(unsignedTx, extractedHints, db);
