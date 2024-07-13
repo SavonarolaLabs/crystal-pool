@@ -7,6 +7,7 @@ import type { TxRow } from '../../lib/types/txRow';
 import { parseBox } from './boxParser';
 import { serializeBigInt } from './serializeBigInt';
 import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, persistBox } from './sqlDb';
+import type { ExplorerTransaction } from '$lib/types/explorer';
 
 interface HasId {
 	id: number;
@@ -49,7 +50,7 @@ function nextId(table: HasId[]): number {
 	return maxId;
 }
 
-export function db_addBox(db: BoxDB, box: Box) {
+export function db_addBox(db: BoxDB, box: Box): BoxRow | undefined {
 	const boxParams = parseBox(box);
 	if (boxParams) {
 		const newRow: BoxRow = {
@@ -61,6 +62,7 @@ export function db_addBox(db: BoxDB, box: Box) {
 		};
 		db.boxRows.push(newRow);
 		persistBox(newRow); // Insert into database
+		return newRow;
 	} else {
 		console.error('db_addBox() invalid box: ', JSON.stringify(box));
 	}
@@ -77,10 +79,13 @@ export function db_removeBoxesByBoxIds(db: BoxDB, removeBoxIds: string[]) {
 	}
 }
 
-export function db_addBoxes(db: BoxDB, boxRows: Box[]) {
+export function db_addBoxes(db: BoxDB, boxRows: Box[]): BoxRow[] {
+	const insertedBoxes: Array<BoxRow | undefined> = [];
 	for (let i = 0; i < boxRows.length; i++) {
-		db_addBox(db, boxRows[i]);
+		const row = db_addBox(db, boxRows[i]);
+		insertedBoxes.push(row);
 	}
+	return insertedBoxes.filter((x) => x) as BoxRow[];
 }
 
 export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
@@ -121,6 +126,14 @@ export function db_storeSignedWithdrawTx(signedTx: SignedTransaction, db: BoxDB)
 
 export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
 	db.unprocessedDepositTxIds.push(txId);
+}
+
+export function db_addMempoolDepositTx(db: BoxDB, tx: ExplorerTransaction): BoxRow[] {
+	db.unprocessedDepositTxIds = db.unprocessedDepositTxIds.filter((id) => id != tx.id);
+	// TODO persist deposit tx somewhere: Task /db function db_storeDepositTx(tx)
+	// TODO fix: Task/ server boxesAtAdress works with ExplorerTransaction
+	const deposits = boxesAtAddress(tx as any, DEPOSIT_ADDRESS);
+	return db_addBoxes(db, deposits);
 }
 
 export function db_setMempoolTxIds(db: BoxDB, txIds: string[]) {
