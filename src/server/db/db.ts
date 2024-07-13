@@ -8,6 +8,7 @@ import { parseBox } from './boxParser';
 import { serializeBigInt } from './serializeBigInt';
 import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, persistBox } from './sqlDb';
 import type { ExplorerTransaction } from '$lib/types/explorer';
+import type { FallibleTxRow, TxPurpose } from '$lib/types/fallibleTxRow';
 
 interface HasId {
 	id: number;
@@ -15,27 +16,30 @@ interface HasId {
 
 export type BoxDB = {
 	boxRows: BoxRow[];
-	txes: TxRow[];
+	unsignedTxs: TxRow[];
 	unprocessedDepositTxIds: string[];
 	mempoolTxIds: Set<string>;
+	fallibleTxs: FallibleTxRow[];
 };
 
 export async function initDb(): Promise<BoxDB> {
 	const boxRows: BoxRow[] = (await loadBoxRows()) ?? [];
 	return {
 		boxRows,
-		txes: [],
+		unsignedTxs: [],
 		unprocessedDepositTxIds: [],
-		mempoolTxIds: new Set()
+		mempoolTxIds: new Set(),
+		fallibleTxs: []
 	};
 }
 
 export async function db_clearDB(db: BoxDB) {
 	await deleteAllBoxes();
 	db.boxRows.length = 0;
-	db.txes = [];
+	db.unsignedTxs = [];
 	db.unprocessedDepositTxIds = [];
 	db.mempoolTxIds = new Set();
+	db.fallibleTxs = [];
 }
 
 export async function db_initDepositUtxo(db: BoxDB) {
@@ -90,12 +94,21 @@ export function db_addBoxes(db: BoxDB, boxRows: Box[]): BoxRow[] {
 
 export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
 	const newRow: TxRow = {
-		id: nextId(db.txes),
+		id: nextId(db.unsignedTxs),
 		unsignedTx: tx,
 		commitments: [],
 		hintbags: []
 	};
-	db.txes.push(newRow);
+	db.unsignedTxs.push(newRow);
+}
+
+export function db_addFallibleTx(db: BoxDB, tx: ExplorerTransaction, purpose: TxPurpose) {
+	const newRow: FallibleTxRow = {
+		id: nextId(db.fallibleTxs),
+		tx: tx,
+		purpose
+	};
+	db.fallibleTxs.push(newRow);
 }
 
 // helper functions
@@ -130,8 +143,7 @@ export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
 
 export function db_addMempoolDepositTx(db: BoxDB, tx: ExplorerTransaction): BoxRow[] {
 	db.unprocessedDepositTxIds = db.unprocessedDepositTxIds.filter((id) => id != tx.id);
-	// TODO persist deposit tx somewhere: Task /db function db_storeDepositTx(tx)
-	// TODO fix: Task/ server boxesAtAdress works with ExplorerTransaction
+	db_addFallibleTx(db, tx, 'DEPOSIT');
 	const deposits = boxesAtAddress(tx, DEPOSIT_ADDRESS);
 	return db_addBoxes(db, deposits);
 }
