@@ -1,20 +1,12 @@
 import { boxesAtAddress } from '$lib/utils/test-helper';
 import { type Box, type EIP12UnsignedTransaction, type SignedTransaction } from '@fleet-sdk/common';
-import {
-	DEPOSIT_ADDRESS,
-	SWAP_ORDER_ADDRESS
-} from '../../lib/constants/addresses';
+import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '../../lib/constants/addresses';
 import { initDeposits } from '../../lib/server-agent/simulator';
 import type { BoxRow, ContractType } from '../../lib/types/boxRow';
 import type { TxRow } from '../../lib/types/txRow';
 import { parseBox } from './boxParser';
 import { serializeBigInt } from './serializeBigInt';
-import {
-	deleteAllBoxes,
-	deleteMultipleBoxes,
-	loadBoxRows,
-	persistBox
-} from './sqlDb';
+import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, persistBox } from './sqlDb';
 
 interface HasId {
 	id: number;
@@ -23,7 +15,7 @@ interface HasId {
 export type BoxDB = {
 	boxRows: BoxRow[];
 	txes: TxRow[];
-	depositTxIds: string[];
+	unprocessedDepositTxIds: string[];
 	mempoolTxIds: Set<string>;
 };
 
@@ -32,8 +24,8 @@ export async function initDb(): Promise<BoxDB> {
 	return {
 		boxRows,
 		txes: [],
-		depositTxIds: [],
-		mempoolTxIds: new Set(),
+		unprocessedDepositTxIds: [],
+		mempoolTxIds: new Set()
 	};
 }
 
@@ -41,7 +33,7 @@ export async function db_clearDB(db: BoxDB) {
 	await deleteAllBoxes();
 	db.boxRows.length = 0;
 	db.txes = [];
-	db.depositTxIds = [];
+	db.unprocessedDepositTxIds = [];
 	db.mempoolTxIds = new Set();
 }
 
@@ -127,15 +119,15 @@ export function db_storeSignedWithdrawTx(signedTx: SignedTransaction, db: BoxDB)
 	db_addBoxes(db, deposits);
 }
 
-export function db_addDepositTxId(db: BoxDB, txId:string){
-	db.depositTxIds.push(txId);
+export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
+	db.unprocessedDepositTxIds.push(txId);
 }
 
-export function db_setMempoolTxIds(db: BoxDB, txIds: string[]){
+export function db_setMempoolTxIds(db: BoxDB, txIds: string[]) {
 	db.mempoolTxIds = new Set(...txIds);
 }
 
-export function db_addMempoolTxId(db: BoxDB, txId: string){
+export function db_addMempoolTxId(db: BoxDB, txId: string) {
 	db.mempoolTxIds.add(txId);
 }
 
