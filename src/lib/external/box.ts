@@ -14,7 +14,7 @@ export async function getBoxById(boxId: string): Promise<any> {
 	return nautilusBox(box);
 }
 
-function nautilusBox(box: any): any {
+export function nautilusBox(box: any): any {
 	box.value = '' + box.value;
 	box.assets?.forEach((a) => {
 		a.amount = '' + a.amount;

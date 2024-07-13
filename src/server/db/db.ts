@@ -132,7 +132,7 @@ export function db_addMempoolDepositTx(db: BoxDB, tx: ExplorerTransaction): BoxR
 	db.unprocessedDepositTxIds = db.unprocessedDepositTxIds.filter((id) => id != tx.id);
 	// TODO persist deposit tx somewhere: Task /db function db_storeDepositTx(tx)
 	// TODO fix: Task/ server boxesAtAdress works with ExplorerTransaction
-	const deposits = boxesAtAddress(tx as any, DEPOSIT_ADDRESS);
+	const deposits = boxesAtAddress(tx, DEPOSIT_ADDRESS);
 	return db_addBoxes(db, deposits);
 }
 

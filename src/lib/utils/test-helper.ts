@@ -1,4 +1,5 @@
 import { DEPOSIT_ADDRESS } from '$lib/constants/addresses';
+import type { ExplorerTransaction } from '$lib/types/explorer';
 import { decodeR4 } from '../../server/db/boxParser';
 import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
 import { ErgoAddress } from '@fleet-sdk/core';
@@ -7,7 +8,10 @@ export function boxAtAddress(tx: SignedTransaction, address: string): Box {
 	return tx.outputs.find((o) => o.ergoTree == ErgoAddress.fromBase58(address).ergoTree)!;
 }
 
-export function boxesAtAddress(tx: SignedTransaction|EIP12UnsignedTransaction, address: string): Box[] {
+export function boxesAtAddress(
+	tx: SignedTransaction | EIP12UnsignedTransaction | ExplorerTransaction,
+	address: string
+): Box[] {
 	// @ts-ignore
 	return tx.outputs.filter((o) => o.ergoTree == ErgoAddress.fromBase58(address).ergoTree);
 }
