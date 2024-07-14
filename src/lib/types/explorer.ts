@@ -1,4 +1,4 @@
-type ExplorerAsset = {
+type Asset = {
 	tokenId: string;
 	index: number;
 	amount: number;
@@ -7,10 +7,21 @@ type ExplorerAsset = {
 	type: string;
 };
 
-export type ExplorerInput = {
+type CommonInput = {
 	boxId: string;
 	value: number;
 	index: number;
+	ergoTree: string;
+	ergoTreeConstants: string;
+	ergoTreeScript: string;
+	address: string;
+	assets: Asset[];
+	additionalRegisters: Record<string, any>;
+};
+
+type UnconfirmedInput = CommonInput;
+
+type ConfirmedInput = CommonInput & {
 	spendingProof: string | null;
 	outputBlockId: string;
 	outputTransactionId: string;
@@ -18,34 +29,33 @@ export type ExplorerInput = {
 	outputGlobalIndex: number;
 	outputCreatedAt: number;
 	outputSettledAt: number;
+};
+
+type CommonOutput = {
+	boxId: string;
+	value: number;
+	index: number;
+	creationHeight: number;
 	ergoTree: string;
 	ergoTreeConstants: string;
 	ergoTreeScript: string;
 	address: string;
-	assets: ExplorerAsset[];
+	assets: Asset[];
 	additionalRegisters: Record<string, any>;
 };
 
-export type ExplorerOutput = {
-	boxId: string;
+type UnconfirmedOutput = CommonOutput;
+
+type ConfirmedOutput = CommonOutput & {
 	transactionId: string;
 	blockId: string;
-	value: number;
-	index: number;
 	globalIndex: number;
-	creationHeight: number;
 	settlementHeight: number;
-	ergoTree: string;
-	ergoTreeConstants: string;
-	ergoTreeScript: string;
-	address: string;
-	assets: ExplorerAsset[];
-	additionalRegisters: Record<string, any>;
 	spentTransactionId: string | null;
 	mainChain: boolean;
 };
 
-export type ExplorerTransaction = {
+export type ConfirmedTransaction = {
 	id: string;
 	blockId: string;
 	inclusionHeight: number;
@@ -53,8 +63,22 @@ export type ExplorerTransaction = {
 	index: number;
 	globalIndex: number;
 	numConfirmations: number;
-	inputs: ExplorerInput[];
+	inputs: ConfirmedInput[];
 	dataInputs: any[];
-	outputs: ExplorerOutput[];
+	outputs: ConfirmedOutput[];
 	size: number;
+};
+
+export type UnconfirmedTransaction = {
+	id: string;
+	inputs: UnconfirmedInput[];
+	dataInputs: any[];
+	outputs: UnconfirmedOutput[];
+	creationTimestamp: number;
+	size: number;
+};
+
+export type ExplorerTransaction = {
+	confirmed?: ConfirmedTransaction;
+	unconfirmed?: UnconfirmedTransaction;
 };

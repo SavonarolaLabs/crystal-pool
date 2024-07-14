@@ -7,7 +7,7 @@ import type { TxRow } from '../../lib/types/txRow';
 import { parseBox } from './boxParser';
 import { serializeBigInt } from './serializeBigInt';
 import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, persistBox } from './sqlDb';
-import type { ExplorerTransaction } from '$lib/types/explorer';
+import type { ConfirmedTransaction } from '$lib/types/explorer';
 import type { SubmittedTxRox, TxPurpose } from '$lib/types/fallibleTxRow';
 
 interface HasId {
@@ -102,7 +102,7 @@ export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
 	db.unsignedTxs.push(newRow);
 }
 
-export function db_addSubmittedTx(db: BoxDB, tx: ExplorerTransaction, purpose: TxPurpose) {
+export function db_addSubmittedTx(db: BoxDB, tx: ConfirmedTransaction, purpose: TxPurpose) {
 	const newRow: SubmittedTxRox = {
 		id: nextId(db.submittedTxs),
 		tx: tx,
@@ -141,7 +141,7 @@ export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
 	db.unprocessedDepositTxIds.push(txId);
 }
 
-export function db_addMempoolDepositTx(db: BoxDB, tx: ExplorerTransaction): BoxRow[] {
+export function db_addMempoolDepositTx(db: BoxDB, tx: ConfirmedTransaction): BoxRow[] {
 	db.unprocessedDepositTxIds = db.unprocessedDepositTxIds.filter((id) => id != tx.id);
 	db_addSubmittedTx(db, tx, 'DEPOSIT');
 	const deposits = boxesAtAddress(tx, DEPOSIT_ADDRESS);

@@ -1,9 +1,9 @@
-import type { ExplorerTransaction } from './explorer';
+import type { ConfirmedTransaction } from './explorer';
 
 export type TxPurpose = 'DEPOSIT';
 
 export type SubmittedTxRox = {
 	id: number;
-	tx: ExplorerTransaction;
+	tx: ConfirmedTransaction;
 	purpose: TxPurpose;
 };

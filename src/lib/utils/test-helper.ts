@@ -1,5 +1,5 @@
 import { DEPOSIT_ADDRESS } from '$lib/constants/addresses';
-import type { ExplorerTransaction } from '$lib/types/explorer';
+import type { ConfirmedTransaction } from '$lib/types/explorer';
 import { decodeR4 } from '../../server/db/boxParser';
 import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
 import { ErgoAddress } from '@fleet-sdk/core';
@@ -9,7 +9,7 @@ export function boxAtAddress(tx: SignedTransaction, address: string): Box {
 }
 
 export function boxesAtAddress(
-	tx: SignedTransaction | EIP12UnsignedTransaction | ExplorerTransaction,
+	tx: SignedTransaction | EIP12UnsignedTransaction | ConfirmedTransaction,
 	address: string
 ): Box[] {
 	// @ts-ignore
