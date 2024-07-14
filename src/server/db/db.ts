@@ -105,7 +105,7 @@ export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
 export function db_addSubmittedTx(db: BoxDB, tx: ConfirmedTransaction, purpose: TxPurpose) {
 	const newRow: SubmittedTxRox = {
 		id: nextId(db.submittedTxs),
-		tx: tx,
+		tx: { confirmed: tx },
 		purpose
 	};
 	db.submittedTxs.push(newRow);
