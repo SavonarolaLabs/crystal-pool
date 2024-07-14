@@ -8,7 +8,7 @@ import { parseBox } from './boxParser';
 import { serializeBigInt } from './serializeBigInt';
 import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, persistBox } from './sqlDb';
 import type { ExplorerTransaction } from '$lib/types/explorer';
-import type { FallibleTxRow, TxPurpose } from '$lib/types/fallibleTxRow';
+import type { SubmittedTxRox, TxPurpose } from '$lib/types/fallibleTxRow';
 
 interface HasId {
 	id: number;
@@ -19,7 +19,7 @@ export type BoxDB = {
 	unsignedTxs: TxRow[];
 	unprocessedDepositTxIds: string[];
 	mempoolTxIds: Set<string>;
-	fallibleTxs: FallibleTxRow[];
+	submittedTxs: SubmittedTxRox[];
 };
 
 export async function initDb(): Promise<BoxDB> {
@@ -29,7 +29,7 @@ export async function initDb(): Promise<BoxDB> {
 		unsignedTxs: [],
 		unprocessedDepositTxIds: [],
 		mempoolTxIds: new Set(),
-		fallibleTxs: []
+		submittedTxs: []
 	};
 }
 
@@ -39,7 +39,7 @@ export async function db_clearDB(db: BoxDB) {
 	db.unsignedTxs = [];
 	db.unprocessedDepositTxIds = [];
 	db.mempoolTxIds = new Set();
-	db.fallibleTxs = [];
+	db.submittedTxs = [];
 }
 
 export async function db_initDepositUtxo(db: BoxDB) {
@@ -102,13 +102,13 @@ export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
 	db.unsignedTxs.push(newRow);
 }
 
-export function db_addFallibleTx(db: BoxDB, tx: ExplorerTransaction, purpose: TxPurpose) {
-	const newRow: FallibleTxRow = {
-		id: nextId(db.fallibleTxs),
+export function db_addSubmittedTx(db: BoxDB, tx: ExplorerTransaction, purpose: TxPurpose) {
+	const newRow: SubmittedTxRox = {
+		id: nextId(db.submittedTxs),
 		tx: tx,
 		purpose
 	};
-	db.fallibleTxs.push(newRow);
+	db.submittedTxs.push(newRow);
 }
 
 // helper functions
@@ -143,7 +143,7 @@ export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
 
 export function db_addMempoolDepositTx(db: BoxDB, tx: ExplorerTransaction): BoxRow[] {
 	db.unprocessedDepositTxIds = db.unprocessedDepositTxIds.filter((id) => id != tx.id);
-	db_addFallibleTx(db, tx, 'DEPOSIT');
+	db_addSubmittedTx(db, tx, 'DEPOSIT');
 	const deposits = boxesAtAddress(tx, DEPOSIT_ADDRESS);
 	return db_addBoxes(db, deposits);
 }

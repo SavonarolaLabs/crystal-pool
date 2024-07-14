@@ -2,7 +2,7 @@ import type { ExplorerTransaction } from './explorer';
 
 export type TxPurpose = 'DEPOSIT';
 
-export type FallibleTxRow = {
+export type SubmittedTxRox = {
 	id: number;
 	tx: ExplorerTransaction;
 	purpose: TxPurpose;
