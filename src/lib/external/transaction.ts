@@ -40,3 +40,43 @@ export async function fetchUnconfirmedTransaction(
 		return false;
 	}
 }
+
+const servers = [
+	'https://gql.ergoplatform.com/',
+	'https://graphql.erg.zelcore.io/',
+	'https://explore.sigmaspace.io/api/graphql'
+];
+
+async function sendTx(signedTx: UnconfirmedTransaction): Promise<string> {
+	const query = `
+	  mutation Mutation($signedTransaction: SignedTransaction!) {
+		submitTransaction(signedTransaction: $signedTransaction)
+	  }
+	`;
+
+	for (const server of servers) {
+		try {
+			const response = await fetch(server, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					query: query,
+					variables: {
+						signedTransaction: signedTx
+					}
+				})
+			});
+
+			const result = await response.json();
+			if (!result.errors && result.data?.submitTransaction) {
+				return result.data.submitTransaction;
+			}
+		} catch {
+			// Pokemon
+		}
+	}
+
+	return '';
+}
