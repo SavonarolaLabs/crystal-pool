@@ -1,16 +1,19 @@
 <script lang="ts">
 	import { ergoTokens } from '$lib/constants/ergoTokens';
 	import SelectCrypto from '$lib/ui/assets/SelectCrypto.svelte';
+	import { showToast } from '$lib/ui/header/toaster';
 	import {
-	addWeb3WalletDepositTx,
+		addWeb3WalletDepositTx,
 		connectWeb3Wallet,
 		has_pending_deposits,
 		loadUIState,
+		user_address,
 		web3wallet_confirmedTokens,
 		web3wallet_connected
 	} from '$lib/ui/ui_state';
 	import { asBigInt } from '$lib/utils/helper';
 	import { deposit } from '$lib/wallet/deposit';
+	import { depositWithConnectedWallet } from '$lib/wallet/depositWeb3';
 	import type { SignedTransaction } from '@fleet-sdk/common';
 	import { RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 	import { onMount } from 'svelte';
@@ -33,7 +36,7 @@
 	function clickAdd() {
 		const newToken = { tokenId: tokenId, amount: 0 };
 		selectedTokens = [...selectedTokens.filter((t) => t.tokenId != tokenId), newToken];
-		//setTimeout(scrollToBottom, 100);
+		setTimeout(scrollToBottom, 100);
 	}
 
 	function removeFromDeposit(tokenId) {
@@ -45,26 +48,21 @@
 			selectCrypto();
 			return;
 		}
-		const blockchainHeight = await ergo.get_current_height();
-		const inputBoxes = await ergo.get_utxos();
-		const changeAddress = await ergo.get_change_address();
-		//const userPk = $crystalwallet_pk;
-		const userPk = changeAddress;
-		const unlockHeight = 1_400_000;
 		const depositNanoErg = SAFE_MIN_BOX_VALUE;
 		const minGasForWithdrawal = SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE;
 		const depositTotal = depositNanoErg + minGasForWithdrawal;
-		const tx = deposit(
-			blockchainHeight,
-			inputBoxes,
-			changeAddress,
-			userPk,
-			unlockHeight,
-			selectedTokens,
-			depositTotal
-		);
-		const transaction : SignedTransaction = await ergo.sign_tx(tx);
-		addWeb3WalletDepositTx(transaction, depositTotal, selectedTokens);
+		try {
+			//console.log('$user_address', $user_address);
+			const tx = await depositWithConnectedWallet(
+				$user_address,
+				depositTotal,
+				selectedTokens
+			);
+			addWeb3WalletDepositTx(tx, depositTotal, selectedTokens);
+		} catch (e) {
+			console.log(e);
+			showToast('Deposit failed.', 'error');
+		}
 	}
 
 	function scrollToBottom() {
