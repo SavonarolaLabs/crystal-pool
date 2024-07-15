@@ -4,13 +4,13 @@ import { user_address, user_mnemonic, wallet_initialized } from './ui_state';
 import { showToast } from './header/toaster';
 import { getChangeAddress } from '$lib/wallet/wallet';
 
-export async function deleteWallet(){
+export async function deleteWallet() {
 	user_mnemonic.set('');
 	user_address.set('');
 	wallet_initialized.set(false);
 	localStorage.removeItem('encryptedMnemonic');
 	localStorage.removeItem('changeAddress');
-	
+
 	showToast('Wallet successfully  deleted!');
 	const registration = await navigator.serviceWorker.ready;
 	const worker = registration.active;
@@ -19,20 +19,20 @@ export async function deleteWallet(){
 			worker.postMessage({
 				type: 'STORE_MNEMONIC',
 				mnemonic: '',
-				changeAddress: '',
+				changeAddress: ''
 			});
 			resolve();
 		});
 	}
 }
 
-function encryptAndStoreMnemonic(mnemonic:string, changeAddress:string, password:string) {
-	const decryptedMnemonic = mnemonic.trim().replace(/\s+/g, ' ');;
+function encryptAndStoreMnemonic(mnemonic: string, changeAddress: string, password: string) {
+	const decryptedMnemonic = mnemonic.trim().replace(/\s+/g, ' ');
 	user_mnemonic.set(decryptedMnemonic);
 	user_address.set(changeAddress);
 	const encrypted = CryptoJS.AES.encrypt(decryptedMnemonic, password).toString();
 	localStorage.setItem('encryptedMnemonic', encrypted);
-	localStorage.setItem('changeAddress', encrypted);
+	localStorage.setItem('changeAddress', changeAddress);
 }
 
 export async function mnemonicRequiresDecryption() {
@@ -51,11 +51,11 @@ function decryptLocalStorageMnemonic(password) {
 export async function onDecrypt(password) {
 	try {
 		const decryptedMnemonic = decryptLocalStorageMnemonic(password);
-		if(decryptedMnemonic.split(' ').length < 12){
+		if (decryptedMnemonic.split(' ').length < 12) {
 			return false;
 		}
-		let changeAddress = localStorage.getItem("changeAddress") ?? "";
-		if(!changeAddress){
+		let changeAddress = localStorage.getItem('changeAddress') ?? '';
+		if (!changeAddress) {
 			changeAddress = await getChangeAddress(decryptedMnemonic);
 		}
 		showToast('Wallet unlocked.');
@@ -77,7 +77,11 @@ export async function onDecrypt(password) {
 	}
 }
 
-export async function persistMnemonic(mnemonic: string, changeAddress:string, password: string): Promise<void> {
+export async function persistMnemonic(
+	mnemonic: string,
+	changeAddress: string,
+	password: string
+): Promise<void> {
 	encryptAndStoreMnemonic(mnemonic, changeAddress, password);
 	wallet_initialized.set(true);
 
@@ -97,11 +101,11 @@ export async function persistMnemonic(mnemonic: string, changeAddress:string, pa
 	});
 }
 
-async function getMnemonic(): Promise<{mnemonic:string, changeAddress:string}> {
+async function getMnemonic(): Promise<{ mnemonic: string; changeAddress: string }> {
 	const registration = await navigator.serviceWorker.ready;
 	const worker = registration.active;
 	if (!worker) {
-		return {mnemonic:"", changeAddress:""};
+		return { mnemonic: '', changeAddress: '' };
 	}
 	return new Promise((resolve) => {
 		const channel = new MessageChannel();
@@ -112,13 +116,13 @@ async function getMnemonic(): Promise<{mnemonic:string, changeAddress:string}> {
 
 export async function initMnemonicWorker() {
 	await navigator.serviceWorker.register('/sw.js');
-	const {mnemonic, changeAddress} = await getMnemonic();
+	const { mnemonic, changeAddress } = await getMnemonic();
 	if (mnemonic) {
 		user_mnemonic.set(mnemonic);
-		if(changeAddress){
+		if (changeAddress) {
 			user_address.set(changeAddress);
-		}else{
-			user_address.set(await getChangeAddress(mnemonic)??"");
+		} else {
+			user_address.set((await getChangeAddress(mnemonic)) ?? '');
 		}
 		wallet_initialized.set(true);
 	}

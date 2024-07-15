@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { DEPOSIT_ADDRESS } from "$lib/constants/addresses";
-	import { has_pending_deposits, toggleTheme } from "../ui_state";
-	import MempoolCapacity from "./MempoolCapacity.svelte"
-	import WalletDropdown from "../wallet/WalletDropdown.svelte";
-	import PendingTransactionsDropdown from "./PendingTransactionsDropdown.svelte";
+	import { DEPOSIT_ADDRESS } from '$lib/constants/addresses';
+	import { pending_deposits, toggleTheme } from '../ui_state';
+	import MempoolCapacity from './MempoolCapacity.svelte';
+	import WalletDropdown from '../wallet/WalletDropdown.svelte';
+	import PendingTransactionsDropdown from './PendingTransactionsDropdown.svelte';
 </script>
 
 <div class="header">
@@ -36,19 +36,19 @@
 					></svg
 				>
 			</a>
-			
+
 			<div class="header_leftMenu">
 				<a
 					class="header_navItem flex flex-col"
 					target="_blank"
 					href="https://explorer.ergoplatform.com/en/mempool"
 				>
-				Mempool
-				<MempoolCapacity></MempoolCapacity>
+					Mempool
+					<MempoolCapacity></MempoolCapacity>
 				</a>
 				<a
 					style="display:none"
-					class="header_navItem "
+					class="header_navItem"
 					target="_blank"
 					href={`https://explorer.ergoplatform.com/en/addresses/${DEPOSIT_ADDRESS}`}
 				>
@@ -63,7 +63,7 @@
 					<!-- <WalletBalanceBar></WalletBalanceBar> -->
 				</div>
 				<div class="header_navItem">
-					{#if $has_pending_deposits}
+					{#if $pending_deposits.length > 0}
 						<PendingTransactionsDropdown></PendingTransactionsDropdown>
 					{/if}
 				</div>

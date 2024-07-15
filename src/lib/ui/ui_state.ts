@@ -7,13 +7,10 @@ import type { Amount, Box, SignedTransaction, TokenAmount } from '@fleet-sdk/com
 import type { TxHistoryEntry } from '$lib/types/txHistory';
 import { serializeBigInt } from '../../server/db/serializeBigInt';
 
-
 export const web3wallet_connected = writable(false);
-export const web3wallet_wallet_name = writable("");
+export const web3wallet_wallet_name = writable('');
 export const web3wallet_available_wallets = writable([]);
 export const web3wallet_confirmedTokens = writable([]);
-export const has_pending_deposits = writable(false);
-//export const has_pending_deposits = writable(true);
 /*
 export const crystalwallet_tokens = writable([{
 	tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b", //tokenId
@@ -33,27 +30,31 @@ export const pending_deposits = writable([{
 },]);
 */
 export const crystalwallet_tokens = writable([]);
-export const pending_deposits = writable([]);
+export const pending_deposits: Writable<TxHistoryEntry[]> = writable([]);
 
 // tx history start
 export const tx_history: Writable<TxHistoryEntry[]> = writable([]);
 
 export const mempool_size: Writable<Number> = writable(0);
 
-export async function addWeb3WalletDepositTx(tx: SignedTransaction, value:bigint, tokens:TokenAmount<Amount>[]){
-	const txEntry:TxHistoryEntry = {
+export async function addWeb3WalletDepositTx(
+	tx: SignedTransaction,
+	value: bigint,
+	tokens: TokenAmount<Amount>[]
+) {
+	const txEntry: TxHistoryEntry = {
 		timestamp: Date.now(),
 		phase: 'MEMPOOL',
 		action: 'DEPOSIT',
+		crystalPoolAck: false,
 		txId: tx.id,
 		value,
 		tokens
 	};
-	tx_history.update(a => {
-		a.push(txEntry);
+	tx_history.update((a) => {
+		a = [txEntry, ...a];
 		return a;
-	})
-	//has_pending_deposits.set(true);
+	});
 	persistTxHistory();
 }
 
@@ -62,72 +63,78 @@ export function persistTxHistory() {
 }
 
 export function loadTxHistory() {
-    const storedHistory = localStorage.getItem('tx_history');
-    if (storedHistory) {
-        try {
-            const parsedHistory: TxHistoryEntry[] = JSON.parse(storedHistory);
-            tx_history.set(parsedHistory);
-        } catch (error) {
-            console.error('Failed to parse transaction history from local storage', error);
-        }
-    }
+	const storedHistory = localStorage.getItem('tx_history');
+	if (storedHistory) {
+		try {
+			const parsedHistory: TxHistoryEntry[] = JSON.parse(storedHistory);
+			updateTxHistoryState(parsedHistory);
+		} catch (error) {
+			console.error('Failed to parse transaction history from local storage', error);
+		}
+	}
+}
+
+function updateTxHistoryState(parsedHistory) {
+	tx_history.set(parsedHistory);
+	const pending = parsedHistory.filter((x) => !x.crystalPoolAck && x.action == 'DEPOSIT');
+	pending_deposits.set(pending);
 }
 
 // tx history end
 
-export async function loadWeb3WalletTokens(){
-	try{
+export async function loadWeb3WalletTokens() {
+	try {
 		const utxo = await ergo.get_utxos();
 		const tokens = utxo.flatMap((box) => box.assets).reduce(sumAssets, []);
 		web3wallet_confirmedTokens.set(tokens);
-	}catch(e){
-		showToast(`Failed to load ${get(web3wallet_wallet_name)} balance.`,'warning')
+	} catch (e) {
+		showToast(`Failed to load ${get(web3wallet_wallet_name)} balance.`, 'warning');
 	}
 }
 
-export async function initWeb3WalletState(){
-	const name = localStorage.getItem("ui_web3wallet_wallet_name");
-	if(name){
+export async function initWeb3WalletState() {
+	const name = localStorage.getItem('ui_web3wallet_wallet_name');
+	if (name) {
 		web3wallet_wallet_name.set(name);
 	}
-	if(window.ergoConnector){
-		web3wallet_available_wallets.set(Object.keys(window.ergoConnector))
-		if(get(web3wallet_wallet_name)){
-			if(window.ergoConnector[get(web3wallet_wallet_name)]?.isConnected){
+	if (window.ergoConnector) {
+		web3wallet_available_wallets.set(Object.keys(window.ergoConnector));
+		if (get(web3wallet_wallet_name)) {
+			if (window.ergoConnector[get(web3wallet_wallet_name)]?.isConnected) {
 				await window.ergoConnector[get(web3wallet_wallet_name)]?.connect();
 				web3wallet_connected.set(true);
 				await loadWeb3WalletTokens();
 			}
-		}else{
-			const connected = await window.ergoConnector[get(web3wallet_wallet_name)]?.connect()
-			if(connected){
+		} else {
+			const connected = await window.ergoConnector[get(web3wallet_wallet_name)]?.connect();
+			if (connected) {
 				web3wallet_connected.set(true);
 				await loadWeb3WalletTokens();
-			}else{
-				showToast('Wallet reconnect failed', 'warning')
+			} else {
+				showToast('Wallet reconnect failed', 'warning');
 			}
 		}
 	}
 }
 
-export async function disconnectWeb3Wallet(){
+export async function disconnectWeb3Wallet() {
 	await window.ergoConnector[get(web3wallet_wallet_name)].disconnect();
 	web3wallet_connected.set(false);
-	web3wallet_wallet_name.set("");
-	localStorage.removeItem("ui_web3wallet_wallet_name");
+	web3wallet_wallet_name.set('');
+	localStorage.removeItem('ui_web3wallet_wallet_name');
 }
 
-export async function connectWeb3Wallet(walletname =""){
-	const wallets = window.ergoConnector ? Object.keys(window.ergoConnector): []
-	if(wallets.length > 0){
+export async function connectWeb3Wallet(walletname = '') {
+	const wallets = window.ergoConnector ? Object.keys(window.ergoConnector) : [];
+	if (wallets.length > 0) {
 		let connected = await window.ergoConnector[wallets[0]].connect();
-		if(connected){
+		if (connected) {
 			web3wallet_connected.set(true);
 			web3wallet_wallet_name.set(wallets[0]);
-			localStorage.setItem("ui_web3wallet_wallet_name",wallets[0]);
+			localStorage.setItem('ui_web3wallet_wallet_name', wallets[0]);
 			showToast(`Wallet connected.`);
 			await loadWeb3WalletTokens();
-		}else{
+		} else {
 			showToast(`Connecting ${wallets[0]} failed.`, 'warning');
 		}
 	}
@@ -140,21 +147,20 @@ export function toggleTheme() {
 		const currentTheme = document.documentElement.getAttribute('data-theme');
 		const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 		document.documentElement.setAttribute('data-theme', newTheme);
-		localStorage.setItem("ui_isDarkMode",newTheme);
-		isDarkMode.set(newTheme == 'dark')
+		localStorage.setItem('ui_isDarkMode', newTheme);
+		isDarkMode.set(newTheme == 'dark');
 	}
 }
 
-export async function loadUIState(){
-	const ui_isDarkMode = localStorage.getItem("ui_isDarkMode");
-	if(ui_isDarkMode == 'light'){
+export async function loadUIState() {
+	const ui_isDarkMode = localStorage.getItem('ui_isDarkMode');
+	if (ui_isDarkMode == 'light') {
 		document.documentElement.setAttribute('data-theme', 'light');
 		isDarkMode.set(false);
 	}
 	await initWeb3WalletState();
 	loadTxHistory();
 }
-
 
 // wallet_initialized
 export const wallet_initialized = writable(false);
@@ -275,7 +281,7 @@ export async function fetchBalance() {
 	const address = get(user_address);
 	if (address) {
 		const boxes = await userBoxes(address);
-		user_deposit_boxes.set(boxes.filter(row => row.contract == 'DEPOSIT').map(r => r.box));
+		user_deposit_boxes.set(boxes.filter((row) => row.contract == 'DEPOSIT').map((r) => r.box));
 
 		const updatedTokens = boxes
 			.flatMap((row: { box: { assets: any } }) => row.box.assets)

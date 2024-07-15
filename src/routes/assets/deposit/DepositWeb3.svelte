@@ -5,16 +5,13 @@
 	import {
 		addWeb3WalletDepositTx,
 		connectWeb3Wallet,
-		has_pending_deposits,
 		loadUIState,
 		user_address,
 		web3wallet_confirmedTokens,
 		web3wallet_connected
 	} from '$lib/ui/ui_state';
 	import { asBigInt } from '$lib/utils/helper';
-	import { deposit } from '$lib/wallet/deposit';
 	import { depositWithConnectedWallet } from '$lib/wallet/depositWeb3';
-	import type { SignedTransaction } from '@fleet-sdk/common';
 	import { RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -52,7 +49,6 @@
 		const minGasForWithdrawal = SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE;
 		const depositTotal = depositNanoErg + minGasForWithdrawal;
 		try {
-			//console.log('$user_address', $user_address);
 			const tx = await depositWithConnectedWallet(
 				$user_address,
 				depositTotal,
