@@ -50,7 +50,6 @@
     def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) 
 
   	def sumValue(a:Long, b: Box) = a + b.value
-  	def sumTokenAmount(a:Long, b: Box) = a + tokenAmount(b)
   	def sumTokenAmountXRate(a:Long, b: Box) = a + tokenAmount(b) * getRateInMaxDenom(b)  
 
     val maxSellRate: Long = INPUTS
@@ -77,14 +76,11 @@
 		.filter(isLegitInput) 
 		.fold(0L, {(a:Long, b: Box) => a + b.tokens(0)._2})
   
-	val tokensIn: Long = sumTokensIn(INPUTS)
-  
 	def tokensRemaining(boxes: Coll[Box]): Long = boxes
 		.filter(isLegitSellOrderOutput)
 		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)}) 
 	
-	val tokensBack: Long = tokensRemaining(OUTPUTS)
-	val tokensSold: Long = tokensIn - tokensBack
+	val tokensSold: Long = sumTokensIn(INPUTS) - tokensRemaining(OUTPUTS)
   
 	val nanoErgsPaid: Long = OUTPUTS
 		.filter(isPaymentBox)
