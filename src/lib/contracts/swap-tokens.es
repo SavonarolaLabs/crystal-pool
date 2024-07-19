@@ -6,7 +6,7 @@
 	def getBuyingTokenId(box: Box)         	= box.R6[(Coll[Byte],Coll[Byte])].getOrElse((Coll[Byte](),Coll[Byte]()))._2
 	def getRate(box: Box)                  	= box.R7[Long].get
 	def getSellerMultisigAddress(box: Box)  = box.R8[Coll[Byte]].get
-  def getDenom(box: Box)                  = box.R9[Long].get
+  	def getDenom(box: Box)                  = box.R9[Long].get
 
 	def tokenId(box: Box) = box.tokens(0)._1
 	def tokenAmount(box: Box) = box.tokens(0)._2
@@ -19,7 +19,7 @@
 		getBuyingTokenId(SELF)  == getBuyingTokenId(box)
 
 	
-  def hasSellingToken(box: Box) = 
+  	def hasSellingToken(box: Box) = 
 		getSellingTokenId(SELF) == getSellingTokenId(box) &&
 		box.tokens.size > 0 &&
 		getSellingTokenId(SELF) == tokenId(box)
@@ -30,7 +30,8 @@
 		getBuyingTokenId(SELF) == tokenId(box)
 
   	def isGreaterZeroRate(box:Box) =
-		getRate(box) > 0
+		getRate(box) > 0 &&
+		getDenom(box) > 0
 
 	def isSameSeller(box: Box)   = 
 		getSellerPk(SELF) == getSellerPk(box) &&
@@ -51,7 +52,7 @@
 		isGreaterZeroRate(box) &&
 		isSameMultisig(box)
 
-  val maxDenom: Long = INPUTS
+  	val maxDenom: Long = INPUTS
 		.filter(isLegitInput)
 		.fold(0L, {(r:Long, box:Box) => {
 			if(r > getDenom(box)) r else getDenom(box)
@@ -68,8 +69,8 @@
         if(r > getRateInMaxDenom(box)) r else getRateInMaxDenom(box)
       }})
 
-      def hasMaxSellRate(box: Box) =
-    getRate(box)*maxDenom==getDenom(box)*maxSellRate 
+	def hasMaxSellRate(box: Box) =
+    	getRate(box) * maxDenom == getDenom(box) * maxSellRate 
 
   	def isLegitSellOrderOutput(box: Box) =
 	  	isLegitInput(box)&&
@@ -97,11 +98,11 @@
 
   	val tokensPaid = sumBuyTokensPaid(OUTPUTS).toBigInt 
 
-    	val inSellTokensXRate = INPUTS 
+	val inSellTokensXRate = INPUTS 
 		.filter(isLegitInput) 
 		.fold(0L, sumTokenAmountXRate)   
 
-     	val outSellTokensXRate = OUTPUTS  
+	val outSellTokensXRate = OUTPUTS  
 		.filter(isLegitSellOrderOutput)
 		.fold(0L, sumTokenAmountXRate)  
 
