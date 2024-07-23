@@ -55,6 +55,7 @@
 		"@fleet-sdk/common": "^0.3.4",
 		"@fleet-sdk/compiler": "^0.3.4",
 		"@fleet-sdk/core": "^0.3.4",
+		"@fleet-sdk/mock-chain": "^0.5.1",
 		"@fleet-sdk/serializer": "^0.3.4",
 		"@noble/secp256k1": "^2.1.0",
 		"@scure/bip32": "^1.4.0",

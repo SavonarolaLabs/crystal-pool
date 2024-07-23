@@ -1,11 +1,11 @@
 {	
 	def getSellerPk(box: Box)              = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
 	def getPoolPk(box: Box)                = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(1)
-	def unlockHeight(box: Box)             = box.R5[Int].get
+	def unlockHeight(box: Box)             = box.R5[Int].getOrElse(0)
 	def getTokenId(box: Box)               = box.R6[Coll[Byte]].getOrElse(Coll[Byte]()) 
-	def getRate(box: Box)                  = box.R7[Long].get
-	def getSellerMultisigAddress(box: Box) = box.R8[Coll[Byte]].get
-	def getDenom(box: Box)                 = box.R9[Long].get
+	def getRate(box: Box)                  = box.R7[Coll[Long]].getOrElse(Coll[SigmaProp](0L,0L))(0)
+	def getDenom(box: Box)                 = box.R7[Coll[Long]].getOrElse(Coll[SigmaProp](0L,0L))(1)
+    def getSellerMultisigAddress(box: Box) = box.R8[Coll[Byte]].getOrElse(Coll[Byte]())
 
  	def tokenId(box: Box) = box.tokens(0)._1
 	def tokenAmount(box: Box) = box.tokens(0)._2
@@ -71,16 +71,8 @@
 		getTokenId(SELF) == getTokenId(box) &&
 		getSellerMultisigAddress(SELF) == box.propositionBytes
 	}
-  
-	def sumTokensIn(boxes: Coll[Box]): Long = boxes
-		.filter(isLegitInput) 
-		.fold(0L, {(a:Long, b: Box) => a + b.tokens(0)._2})
-  
-	def tokensRemaining(boxes: Coll[Box]): Long = boxes
-		.filter(isLegitSellOrderOutput)
-		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)}) 
-	
-	val tokensSold: Long = sumTokensIn(INPUTS) - tokensRemaining(OUTPUTS)
+
+    // calculation
   
 	val nanoErgsPaid: Long = OUTPUTS
 		.filter(isPaymentBox)
@@ -96,10 +88,9 @@
 		.filter(isLegitSellOrderOutput)
 		.fold(0L, sumTokenAmountXRate)
 
-	val sellTokensXRate = inSellTokensXRate.toBigInt - outSellTokensXRate.toBigInt
+	val expectedRate = inSellTokensXRate.toBigInt - outSellTokensXRate.toBigInt
 
-	val expectedRate = sellTokensXRate.toBigInt / tokensSold.toBigInt
-	val isPaidAtFairRate = maxDenom.toBigInt * nanoErgsPaid.toBigInt / tokensSold.toBigInt >= expectedRate.toBigInt
+    val isPaidAtFairRate = maxDenom.toBigInt * nanoErgsPaid.toBigInt >= expectedRate.toBigInt
 
 	if(HEIGHT > unlockHeight(SELF)){
 		getSellerPk(SELF)

@@ -1,99 +1,93 @@
-{	
-	def getBuyerPk(box: Box)               = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
-	def getPoolPk(box: Box)                = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(1)
-	def unlockHeight(box: Box)             = box.R5[Int].get
-	def getTokenId(box: Box)               = box.R6[Coll[Byte]].getOrElse(Coll[Byte]()) 
-	def getBuyRate(box: Box)               = box.R7[Long].get
-	def getBuyerMultisigAddress(box: Box)  = box.R8[Coll[Byte]].get
+{
+    def getBuyerPk(box: Box)               = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
+    def getPoolPk(box: Box)                = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(1)
+    def unlockHeight(box: Box)             = box.R5[Int].getOrElse(0)
+    def getTokenId(box: Box)               = box.R6[Coll[Byte]].getOrElse(Coll[Byte]()) 
+	def getRate(box: Box)                  = box.R7[Coll[Long]].getOrElse(Coll[SigmaProp](0L,0L))(0)
+	def getDenom(box: Box)                 = box.R7[Coll[Long]].getOrElse(Coll[SigmaProp](0L,0L))(1)
+    def getBuyerMultisigAddress(box: Box)  = box.R8[Coll[Byte]].getOrElse(Coll[Byte]())
 
-	def tokenId(box: Box) = 
-		box.tokens(0)._1
-	def tokenAmount(box: Box) = 
-		box.tokens(0)._2
+    def tokenAmount(box: Box) = {
+        if(box.tokens.size > 0) 
+        {
+            box.tokens(0)._2
+        } else{
+         0L
+        } 
+    }
+  
+    def isSameContract(box: Box) = 
+        box.propositionBytes == SELF.propositionBytes
+  
+    def isGreaterZeroRate(box:Box) =
+        getRate(box) > 0 &&
+        getDenom(box) > 0
+  
+    def isSameBuyer(box: Box)   = 
+        getBuyerPk(SELF) == getBuyerPk(box) &&
+        getPoolPk(SELF) == getPoolPk(box)
 
-	def isSameContract(box: Box) = 
-		box.propositionBytes == SELF.propositionBytes
+    def isSameUnlockHeight(box: Box)  = 
+        unlockHeight(SELF) == unlockHeight(box)
 
-	def isSameTokenId (box: Box) = 
-		getTokenId(SELF) == getTokenId(box)
+    def isSameMultisig(box: Box)    =
+        getBuyerMultisigAddress(SELF) == getBuyerMultisigAddress(box)
 
-	def includesToken(box: Box) = 
-		getTokenId(SELF) == getTokenId(box) &&
-		box.tokens.size > 0 &&
-		getTokenId(SELF) == tokenId(box)
+    def isLegitInput(b: Box) = {
+        isSameContract(b) && 
+        isSameMultisig(b) && 
+        isSameBuyer(b) && 
+        isSameUnlockHeight(b) &&
+        getTokenId(SELF) == getTokenId(b) &&
+        isGreaterZeroRate(b)
+    }
 
-  	def isGreaterZeroRate(box:Box) =
-		getBuyRate(box) > 0
+    def isPaymentBox(box:Box) = {
+      isSameBuyer(box) &&
+      isSameUnlockHeight(box) &&
+      getTokenId(SELF) == getTokenId(box) &&
+      getBuyerMultisigAddress(SELF) == box.propositionBytes
+    }
 
-	def isSameBuyer(box: Box)   = 
-		getBuyerPk(SELF) == getBuyerPk(box) &&
-		getPoolPk(SELF) == getPoolPk(box)
+    val maxDenom: Long = INPUTS
+        .filter(isLegitInput)
+        .fold(0L, {(r:Long, box:Box) => {
+            if(r > getDenom(box)) r else getDenom(box)
+        }}) 
+  
+    def getRateInMaxDenom(box:Box) = getRate(box)*maxDenom/getDenom(box) 
 
-  	def isSameUnlockHeight(box: Box)  = 
-		unlockHeight(SELF) == unlockHeight(box)
+    val filteredInputs = INPUTS.filter(isLegitInput)
+    val minBuyRate: Long = filteredInputs
+      .fold(getRateInMaxDenom(filteredInputs(0)), {(r:Long, box:Box) => {
+        if(r < getRateInMaxDenom(box)) r else getRateInMaxDenom(box)
+      }})
 
-  	def isSameMultisig(box: Box)    =
-		getBuyerMultisigAddress(SELF) == getBuyerMultisigAddress(box)
+    def hasMinBuyRate(box: Box) =
+        getRate(box) * maxDenom == getDenom(box) * minBuyRate
 
-	def isLegitBuyOrderInput(box: Box) =
-		isSameBuyer(box) &&
-		isSameUnlockHeight(box) && 
-		isSameTokenId(box) &&
-		isGreaterZeroRate(box) &&
-		isSameMultisig(box) &&
-		isSameContract(box)
+    def isChangeBox(box: Box) =
+        isLegitInput(box) &&
+        hasMinBuyRate(box)
 
-	val minBuyRate = INPUTS
-		.filter(isLegitBuyOrderInput)
-		.fold(0L, {(r:Long, box:Box) => {
-			if(r < getBuyRate(box)) r else getBuyRate(box)
-		}})
+    def sumTokenAmount(a:Long, b: Box) = a + tokenAmount(b)
+    def sumErgXMinRate(a:Long, b: Box) = a + b.value * minBuyRate
+    def sumErgXRate(a:Long, b: Box) = a + b.value * getRateInMaxDenom(b) 
+  	def sumTokenAmountXRate(a:Long, b: Box) = a + tokenAmount(b) * getRateInMaxDenom(b) 
 
-  	def isLegitBuyOrderOutput(box: Box) =
-		isLegitBuyOrderInput(box)&&
-		minBuyRate == getBuyRate(box)
+    val tokensPaid = OUTPUTS.filter(isPaymentBox).fold(0L, sumTokenAmount).toBigInt
+    val expectedErgXRate = {
+        val in = INPUTS.filter(isLegitInput).fold(0L, sumErgXRate)
+        val out = OUTPUTS.filter(isChangeBox).fold(0L, sumErgXMinRate).toBigInt +
+        OUTPUTS.filter(isPaymentBox).fold(0L, sumErgXMinRate).toBigInt
+        in - out
+    }
 
-	def isPaymentBox(box:Box) =
-		isSameBuyer(box) &&
-		isSameUnlockHeight(box) &&
-		includesToken(box) &&
-		getBuyerMultisigAddress(SELF) == box.propositionBytes
+    val isPaidAtFairRate = tokensPaid * maxDenom >= expectedErgXRate
 
-	def sumValuesIn(boxes: Coll[Box]): Long = boxes
-			.filter(isLegitBuyOrderInput) 
-			.fold(0L, {(a:Long, b: Box) => a + b.value})
-
-	def sumValuesOut(boxes: Coll[Box]): Long = boxes
-		.filter(isLegitBuyOrderOutput) 
-		.fold(0L, {(a:Long, b: Box) => a + b.value})
-
-	def sumAmountsIn(boxes: Coll[Box]): Long = boxes
-		.filter(isLegitBuyOrderInput) 
-		.fold(0L, {(a:Long, b: Box) => a + b.value/getBuyRate(b)})
-
-	def sumAmountsOut(boxes: Coll[Box]): Long = boxes
-		.filter(isLegitBuyOrderOutput) 
-		.fold(0L, {(a:Long, b: Box) => a + b.value/getBuyRate(b)})
-
-  	val valuesIn: Long  = sumValuesIn(INPUTS)
-  	val amountsIn: Long = sumAmountsIn(INPUTS)
-
-  	val valuesOut: Long = sumValuesOut(OUTPUTS) 
-  	val amountsOut: Long = sumAmountsOut(OUTPUTS) 
-
-  	val deltaAmounts = amountsIn - amountsOut
-  	val deltaValues = valuesIn - valuesOut
-
-  	def tokensBought(boxes: Coll[Box]): Long = boxes
-		.filter(isPaymentBox) 
-		.fold(0L, {(a:Long, b: Box) => a + tokenAmount(b)})
-
-  	val sentToBuyer = tokensBought(OUTPUTS)
-  	val isBuyerPaid = deltaAmounts <= sentToBuyer 
-
-	if(HEIGHT > unlockHeight(SELF)){
-		getBuyerPk(SELF)
-	}else{
-		getBuyerPk(SELF) && getPoolPk(SELF) || sigmaProp(isBuyerPaid) && getPoolPk(SELF)
-	}
+    if(HEIGHT > unlockHeight(SELF)){
+        getBuyerPk(SELF)
+    }else{
+        getBuyerPk(SELF) && getPoolPk(SELF) || sigmaProp(isPaidAtFairRate) && getPoolPk(SELF)
+    }
 }
