@@ -1,10 +1,5 @@
 import { compileContract, compileDepositProxyContract } from '$lib/compiler/compile';
 import { BOB_ADDRESS, DEPOSIT_ADDRESS, SHADOWPOOL_ADDRESS } from '$lib/constants/addresses';
-import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
-import { TOKEN } from '$lib/constants/tokens';
-import { utxos } from '$lib/data/utxos';
-import { fetchHeight } from '$lib/external/height';
-import { boxAtAddress, boxesAtAddress } from '$lib/utils/test-helper';
 import {
 	ErgoAddress,
 	RECOMMENDED_MIN_FEE_VALUE,
@@ -14,21 +9,12 @@ import {
 	SSigmaProp,
 	TransactionBuilder
 } from '@fleet-sdk/core';
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { deposit } from './deposit';
-import { sendToDepositProxy } from './depositProxy';
-import { c, signTx } from './multisig-server';
+import { afterEach, describe, expect, it } from 'vitest';
 import { KeyedMockChainParty, MockChain } from '@fleet-sdk/mock-chain';
 import { SByte, SLong, SPair } from '@fleet-sdk/serializer';
-import { ergOutput, output, rsBTC } from '$lib/contracts/tests/helper';
-
-let unlockHeight = 1_300_000;
-let currentHeight;
+import { comet, ergOutput, output, rsBTC, SigUSD } from '$lib/contracts/tests/helper';
 
 describe('deposit contract', () => {
-	beforeAll(async () => {
-		currentHeight = await fetchHeight();
-	});
 	const PROXYCONTRACT = `{
   val sentToDepositContract  = OUTPUTS(0).propositionBytes == _depositAddress
   val userPKset              = OUTPUTS(0).R4[Coll[SigmaProp]].get(0).propBytes == _userPk
@@ -83,6 +69,7 @@ describe('deposit contract', () => {
 	const unlockHeight = 1_300_000;
 	const pool = mockChain.newParty('Pool');
 	const depositor = mockChain.newParty('Depositor');
+	const anotherUser = mockChain.newParty('Another user');
 	const executor = mockChain.newParty('Bob');
 	mockChain.parties;
 
@@ -91,7 +78,7 @@ describe('deposit contract', () => {
 	let PROXY = compileContract(PROXYCONTRACT, {
 		_depositAddress: SColl(SByte, ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree).toHex(),
 		_userPk: SColl(SByte, ErgoAddress.fromBase58(userPk).ergoTree).toHex(),
-		_poolPk: SColl(SByte, ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).ergoTree).toHex(),
+		_poolPk: SColl(SByte, pool.ergoTree).toHex(),
 		_unlockHeight: SInt(unlockHeight).toHex(),
 		_minerFee: SLong(minerFee).toHex()
 	});
@@ -100,12 +87,10 @@ describe('deposit contract', () => {
 		ErgoAddress.fromBase58(PROXY).ergoTree,
 		'Deposit Proxy Contract'
 	);
-
 	const deposit = mockChain.addParty(
 		ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree,
 		'Deposit Contract'
 	);
-
 	const depositRegisters = (pk: KeyedMockChainParty) => ({
 		R4: SColl(SSigmaProp, [
 			SGroupElement(pk.key.publicKey),
@@ -118,8 +103,52 @@ describe('deposit contract', () => {
 		mockChain.reset();
 	});
 
-	describe('Proxy ', () => {
-		it('can transfer from PROXY to Deposit', () => {
+	describe('Can send ', () => {
+		it('Depositor -> Proxy -> Deposit ', () => {
+			depositor.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
+
+			const transactionProxy = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === depositor.ergoTree)
+				)
+				.from([...depositor.utxos])
+				.to([
+					ergOutput(
+						contract,
+						100_000_000n - RECOMMENDED_MIN_FEE_VALUE,
+						[rsBTC(100000)],
+						depositRegisters(depositor)
+					)
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transactionProxy, { signers: [depositor] })).to.be.true;
+
+			//console.log(contract.utxos.toArray()[0].value); // toArray -> Sum
+
+			const transactionDeposit = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(
+						deposit,
+						100_000_000n - 2n * RECOMMENDED_MIN_FEE_VALUE,
+						[rsBTC(100000)],
+						depositRegisters(depositor)
+					)
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transactionDeposit, { signers: [executor] })).to.be.true;
+		});
+		it('Proxy -> Deposit', () => {
 			contract.addBalance(
 				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
 				depositRegisters(depositor)
@@ -141,109 +170,308 @@ describe('deposit contract', () => {
 				.payFee(RECOMMENDED_MIN_FEE_VALUE)
 				.build();
 
-			console.dir(transaction, { depth: null });
 			expect(mockChain.execute(transaction, { signers: [executor] })).to.be.true;
+		});
+		it('Proxy x3 Box -> Deposit', () => {
+			contract.addBalance(
+				{ nanoergs: 50_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
+			contract.addBalance(
+				{ nanoergs: 40_000_000n, tokens: [SigUSD(100000), comet(500)] },
+				depositRegisters(depositor)
+			);
+			contract.addBalance(
+				{ nanoergs: 10_000_000n, tokens: [SigUSD(100000)] },
+				depositRegisters(depositor)
+			);
+
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(
+						deposit,
+						100_000_000n - RECOMMENDED_MIN_FEE_VALUE,
+						[rsBTC(100000), SigUSD(200000), comet(500)],
+						depositRegisters(depositor)
+					)
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transaction, { signers: [executor] })).to.be.true;
+		});
+
+		it(`Proxy -> Small Box +
+			Proxy -> Second Box -> Deposit`, () => {
+			depositor.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
+			depositor.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [comet(100000)] },
+				depositRegisters(depositor)
+			);
+			// Tx1 Add Small box to Proxy
+			const transactionProxy = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === depositor.ergoTree)
+				)
+				.from([depositor.utxos.toArray()[0]])
+				.to([ergOutput(contract, 1000n, [rsBTC(100000)], depositRegisters(depositor))])
+				.sendChangeTo(depositor.address.toString())
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transactionProxy, { signers: [depositor] })).to.be.true;
+
+			const transactionProxy2 = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === depositor.ergoTree)
+				)
+				.from([...depositor.utxos])
+				.to([
+					ergOutput(contract, 100_000_000n, [comet(100000)], depositRegisters(depositor))
+				])
+				.sendChangeTo(depositor.address.toString())
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transactionProxy2, { signers: [depositor] })).to.be.true;
+
+			//			console.log(contract.utxos.toArray())
+
+			const transactionDeposit = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(
+						deposit,
+						100_000_000n + 1000n - RECOMMENDED_MIN_FEE_VALUE,
+						[rsBTC(100000), comet(100000)],
+						depositRegisters(depositor)
+					)
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transactionDeposit, { signers: [executor] })).to.be.true;
 		});
 	});
 
-	it.skip('works', async () => {
-		const tokens = [{ tokenId: TOKEN.rsBTC.tokenId, amount: 100_000_000n.toString() }];
-		const tx = sendToDepositProxy(
-			PROXY,
-			currentHeight,
-			utxos[BOB_ADDRESS],
-			BOB_ADDRESS,
-			BOB_ADDRESS,
-			unlockHeight,
-			tokens,
-			(10_000_000).toString()
-		);
-		const signed = await signTx(tx, BOB_MNEMONIC);
-		expect(signed).toBeDefined();
-		expect(boxesAtAddress(signed, PROXY).length).toBe(1);
-		expect(boxAtAddress(signed, PROXY).assets).toStrictEqual(tokens);
+	describe('Fake data Single Box: ', () => {
+		it('address', () => {
+			//v1 - value
+			contract.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
 
-		const proxyBox = boxAtAddress(signed, PROXY);
-		const depositUTx = deposit(
-			currentHeight,
-			[proxyBox],
-			BOB_ADDRESS,
-			BOB_ADDRESS,
-			unlockHeight,
-			tokens,
-			(10_000_000n - RECOMMENDED_MIN_FEE_VALUE).toString()
-		);
-		const signed2 = await signTx(depositUTx, ALICE_MNEMONIC);
-		expect(signed2).toBeDefined();
-	});
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(
+						anotherUser,
+						100_000_000n - RECOMMENDED_MIN_FEE_VALUE,
+						[rsBTC(100000)],
+						depositRegisters(depositor)
+					)
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
 
-	it.skip('fails on underpaiment', async () => {
-		const tokens = [
-			{
-				tokenId: TOKEN.rsBTC.tokenId,
-				amount: 100_000_000n.toString()
-			}
-		];
-		const tx = sendToDepositProxy(
-			PROXY,
-			currentHeight,
-			utxos[BOB_ADDRESS],
-			BOB_ADDRESS,
-			BOB_ADDRESS,
-			unlockHeight,
-			tokens,
-			(10_000_000).toString()
-		);
-		const signed = await signTx(tx, BOB_MNEMONIC);
-		expect(signed).toBeDefined();
-		expect(boxesAtAddress(signed, PROXY).length).toBe(1);
-		expect(boxAtAddress(signed, PROXY).assets).toStrictEqual(tokens);
+			expect(mockChain.execute(transaction, { signers: [executor], throw: false })).to.be
+				.false;
+		});
+		it('value', () => {
+			//v1 - value
+			contract.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
 
-		const proxyBox = boxAtAddress(signed, PROXY);
-		const depositUTx = deposit(
-			currentHeight,
-			[proxyBox],
-			BOB_ADDRESS,
-			BOB_ADDRESS,
-			unlockHeight,
-			tokens,
-			(10_000_000n - RECOMMENDED_MIN_FEE_VALUE - 1n).toString()
-		);
-		await expect(signTx(depositUTx, BOB_MNEMONIC)).rejects.toThrow();
-	});
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(
+						deposit,
+						100_000_000n - RECOMMENDED_MIN_FEE_VALUE - 1000000n,
+						[rsBTC(100000)],
+						depositRegisters(depositor)
+					),
+					ergOutput(anotherUser, 1000000n, [])
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
 
-	it.skip('fails on wrong unlock height', async () => {
-		const tokens = [
-			{
-				tokenId: TOKEN.rsBTC.tokenId,
-				amount: 100_000_000n.toString()
-			}
-		];
-		const tx = sendToDepositProxy(
-			PROXY,
-			currentHeight,
-			utxos[BOB_ADDRESS],
-			BOB_ADDRESS,
-			BOB_ADDRESS,
-			unlockHeight,
-			tokens,
-			(10_000_000).toString()
-		);
-		const signed = await signTx(tx, BOB_MNEMONIC);
-		expect(signed).toBeDefined();
-		expect(boxesAtAddress(signed, PROXY).length).toBe(1);
-		expect(boxAtAddress(signed, PROXY).assets).toStrictEqual(tokens);
+			expect(mockChain.execute(transaction, { signers: [executor], throw: false })).to.be
+				.false;
+		});
+		it('tokens	v1', () => {
+			//v1 - value - tokens
+			contract.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
 
-		const proxyBox = boxAtAddress(signed, PROXY);
-		const depositUTx = deposit(
-			currentHeight,
-			[proxyBox],
-			BOB_ADDRESS,
-			BOB_ADDRESS,
-			unlockHeight + 1,
-			tokens,
-			(10_000_000n - RECOMMENDED_MIN_FEE_VALUE).toString()
-		);
-		await expect(signTx(depositUTx, BOB_MNEMONIC)).rejects.toThrow();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(
+						deposit,
+						100_000_000n - RECOMMENDED_MIN_FEE_VALUE - 1000000n,
+						[rsBTC(50000)],
+						depositRegisters(depositor)
+					),
+					output(anotherUser, [rsBTC(50000)])
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transaction, { signers: [executor], throw: false })).to.be
+				.false;
+		});
+		it('tokens	v2', () => {
+			contract.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
+			anotherUser.addBalance({ nanoergs: 100_000_000n, tokens: [] });
+
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...anotherUser.utxos])
+				.to([
+					ergOutput(deposit, 100_000_000n, [rsBTC(50000)], depositRegisters(depositor)),
+					output(anotherUser, [rsBTC(50000)])
+				])
+				.sendChangeTo(anotherUser.key.address.toString())
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transaction, { signers: [executor], throw: false })).to.be
+				.false;
+		});
+		it('tokens	v3 change tokens', () => {
+			contract.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
+			anotherUser.addBalance({ nanoergs: 100_000_000n, tokens: [SigUSD(100000)] });
+
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...anotherUser.utxos])
+				.to([
+					ergOutput(
+						deposit,
+						100_000_000n - RECOMMENDED_MIN_FEE_VALUE,
+						[SigUSD(100000)],
+						depositRegisters(depositor)
+					),
+					output(anotherUser, rsBTC(100000))
+				])
+				.sendChangeTo(anotherUser.key.address.toString())
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transaction, { signers: [executor], throw: false })).to.be
+				.false;
+		});
+		it('registers	R4_1', () => {
+			contract.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
+
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(
+						deposit,
+						100_000_000n - RECOMMENDED_MIN_FEE_VALUE,
+						[rsBTC(100000)],
+						depositRegisters(anotherUser)
+					)
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transaction, { signers: [executor], throw: false })).to.be
+				.false;
+		});
+		it('registers	R4_2', () => {
+			contract.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
+
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(deposit, 100_000_000n - RECOMMENDED_MIN_FEE_VALUE, [rsBTC(100000)], {
+						R4: SColl(SSigmaProp, [
+							SGroupElement(depositor.key.publicKey),
+							SGroupElement(anotherUser.key.publicKey)
+						]).toHex(),
+						R5: SInt(unlockHeight).toHex()
+					})
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transaction, { signers: [executor], throw: false })).to.be
+				.false;
+		});
+		it('registers	R5', () => {
+			contract.addBalance(
+				{ nanoergs: 100_000_000n, tokens: [rsBTC(100000)] },
+				depositRegisters(depositor)
+			);
+
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
+				.to([
+					ergOutput(deposit, 100_000_000n - RECOMMENDED_MIN_FEE_VALUE, [rsBTC(100000)], {
+						R4: SColl(SSigmaProp, [
+							SGroupElement(depositor.key.publicKey),
+							SGroupElement(pool.key.publicKey)
+						]).toHex(),
+						R5: SInt(unlockHeight - 1).toHex()
+					})
+				])
+				.payFee(RECOMMENDED_MIN_FEE_VALUE)
+				.build();
+
+			expect(mockChain.execute(transaction, { signers: [executor], throw: false })).to.be
+				.false;
+		});
 	});
 });
