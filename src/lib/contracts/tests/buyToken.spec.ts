@@ -116,7 +116,7 @@ describe('Timed fund contract', () => {
 	const taker = mockChain.newParty('Bob');
 	mockChain.parties;
 
-	const wtb = mockChain.addParty(ergoTree.toHex(), 'Token Buy Contract');
+	const contract = mockChain.addParty(ergoTree.toHex(), 'Token Buy Contract');
 
 	const buyBtcUsdRegs = (pk: KeyedMockChainParty, rate: bigint = 1n, denom: bigint = 1n) => ({
 		R4: SColl(SSigmaProp, [
@@ -138,11 +138,13 @@ describe('Timed fund contract', () => {
 			taker.addBalance({ nanoergs: 100_000n, tokens: [rsBTC(1000)] });
 		});
 		it('wtb 100 rsBTC with 100 nanoErg', () => {
-			wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
+			contract.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000n, [rsBTC(100)], buyBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -151,11 +153,13 @@ describe('Timed fund contract', () => {
 		});
 
 		it("can't underpay nanoErg", () => {
-			wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
+			contract.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000n - 1n, [rsBTC(100)], buyBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -165,11 +169,13 @@ describe('Timed fund contract', () => {
 		});
 
 		it("can't underpay tokens", () => {
-			wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
+			contract.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000n, [rsBTC(100 - 1)], buyBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -179,12 +185,14 @@ describe('Timed fund contract', () => {
 		});
 
 		it('wtb [100BTC, 100E], [100BTC, 200E]', () => {
-			wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
-			wtb.addBalance({ nanoergs: 200n }, buyBtcUsdRegs(maker, 2n, 1n));
+			contract.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
+			contract.addBalance({ nanoergs: 200n }, buyBtcUsdRegs(maker, 2n, 1n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1n, [rsBTC(500)], buyBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -193,11 +201,13 @@ describe('Timed fund contract', () => {
 		});
 
 		it('change can be sent to maker address', () => {
-			wtb.addBalance({ nanoergs: 2_000n }, buyBtcUsdRegs(maker, 1n, 10n));
+			contract.addBalance({ nanoergs: 2_000n }, buyBtcUsdRegs(maker, 1n, 10n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 2_000n - 10n, [rsBTC(1)], buyBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -205,26 +215,30 @@ describe('Timed fund contract', () => {
 			expect(mockChain.execute(transaction, { signers: [pool, taker] })).to.be.true;
 		});
 		it('change can be sent to contract change box', () => {
-			wtb.addBalance({ nanoergs: 1_000n + 1_000n }, buyBtcUsdRegs(maker, 1n, 10n));
+			contract.addBalance({ nanoergs: 1_000n + 1_000n }, buyBtcUsdRegs(maker, 1n, 10n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 10n, [rsBTC(1)], buyBtcUsdRegs(maker))])
-				.to([ergOutput(wtb, 2_000n - 20n, [], buyBtcUsdRegs(maker, 1n, 10n))])
+				.to([ergOutput(contract, 2_000n - 20n, [], buyBtcUsdRegs(maker, 1n, 10n))])
 				.sendChangeTo(taker.address)
 				.build();
 
 			expect(mockChain.execute(transaction, { signers: [pool, taker] })).to.be.true;
 		});
 		it("can't manipulate rate in contract change box", () => {
-			wtb.addBalance({ nanoergs: 1_000n + 1_000n }, buyBtcUsdRegs(maker, 1n, 10n));
+			contract.addBalance({ nanoergs: 1_000n + 1_000n }, buyBtcUsdRegs(maker, 1n, 10n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 10n, [rsBTC(1)], buyBtcUsdRegs(maker))])
-				.to([ergOutput(wtb, 2_000n - 20n, [], buyBtcUsdRegs(maker, 1n, 100n))])
+				.to([ergOutput(contract, 2_000n - 20n, [], buyBtcUsdRegs(maker, 1n, 100n))])
 				.sendChangeTo(taker.address)
 				.build();
 
@@ -236,12 +250,14 @@ describe('Timed fund contract', () => {
             20ERG/BTC for 1000ERG  (50BTC max), 
             1ERG/BTC for  100ERG (100BTC max)`, () => {
 			// rate = token/ERG
-			wtb.addBalance({ nanoergs: 1000n }, buyBtcUsdRegs(maker, 1n, 20n));
-			wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
+			contract.addBalance({ nanoergs: 1000n }, buyBtcUsdRegs(maker, 1n, 20n));
+			contract.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1n, [rsBTC(150)], buyBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -253,12 +269,14 @@ describe('Timed fund contract', () => {
             20ERG/BTC for 1000ERG  (50BTC max), 
             1ERG/BTC for  100ERG (100BTC max)`, () => {
 			const stealNanoErg = 1n;
-			wtb.addBalance({ nanoergs: 1000n }, buyBtcUsdRegs(maker, 1n, 20n));
-			wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
+			contract.addBalance({ nanoergs: 1000n }, buyBtcUsdRegs(maker, 1n, 20n));
+			contract.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-				.from([...wtb.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([
 					ergOutput(
 						maker,

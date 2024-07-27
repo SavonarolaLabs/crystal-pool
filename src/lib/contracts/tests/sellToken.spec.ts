@@ -122,7 +122,7 @@ describe('Timed fund contract', () => {
 	const taker = mockChain.newParty('Bob');
 	mockChain.parties;
 
-	const sell = mockChain.addParty(ergoTree.toHex(), 'Token Sell Contract');
+	const contract = mockChain.addParty(ergoTree.toHex(), 'Token Sell Contract');
 
 	const sellBtcUsdRegs = (pk: KeyedMockChainParty, rate: bigint = 1n, denom: bigint = 1n) => ({
 		R4: SColl(SSigmaProp, [
@@ -141,12 +141,17 @@ describe('Timed fund contract', () => {
 
 	describe('Sell before unlockHeight', () => {
 		it('sell 100 rsBTC for 100 nanoErg', () => {
-			sell.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, sellBtcUsdRegs(maker));
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(100)] },
+				sellBtcUsdRegs(maker)
+			);
 			taker.addBalance({ nanoergs: 1_000_000n + 100n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 100n, [], sellBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -155,15 +160,17 @@ describe('Timed fund contract', () => {
 		});
 
 		it('sell 1_000 rsBTC for 1 nanoErg', () => {
-			sell.addBalance(
+			contract.addBalance(
 				{ nanoergs: 1_000_000n, tokens: [rsBTC(1000)] },
 				sellBtcUsdRegs(maker, 1n, 1000n)
 			);
 			taker.addBalance({ nanoergs: 1_000_000n + 1n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 1n, [], sellBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -172,15 +179,17 @@ describe('Timed fund contract', () => {
 		});
 
 		it("can't underpay", () => {
-			sell.addBalance(
+			contract.addBalance(
 				{ nanoergs: 1_000_000n, tokens: [rsBTC(1000)] },
 				sellBtcUsdRegs(maker, 1n, 1000n)
 			);
 			taker.addBalance({ nanoergs: 1_000_000n + 1n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 0n, [], sellBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -191,13 +200,15 @@ describe('Timed fund contract', () => {
 
 		it('sell 2x 100 rsBTC for 200 nanoErg', () => {
 			const box = { nanoergs: 1_000_000n, tokens: [rsBTC(100)] };
-			sell.addBalance(box, sellBtcUsdRegs(maker));
-			sell.addBalance(box, sellBtcUsdRegs(maker2));
+			contract.addBalance(box, sellBtcUsdRegs(maker));
+			contract.addBalance(box, sellBtcUsdRegs(maker2));
 			taker.addBalance({ nanoergs: 1_000_000n + 200n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 100n, [], sellBtcUsdRegs(maker))])
 				.to([ergOutput(maker2, 1_000_000n + 100n, [], sellBtcUsdRegs(maker2))])
 				.sendChangeTo(taker.address)
@@ -208,16 +219,18 @@ describe('Timed fund contract', () => {
 
 		it('partial sell 2x 100 rsBTC', () => {
 			const box = { nanoergs: 1_000_000n, tokens: [rsBTC(100)] };
-			sell.addBalance(box, sellBtcUsdRegs(maker));
-			sell.addBalance(box, sellBtcUsdRegs(maker2));
+			contract.addBalance(box, sellBtcUsdRegs(maker));
+			contract.addBalance(box, sellBtcUsdRegs(maker2));
 			taker.addBalance({ nanoergs: 2_000_000n + 200n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 100n, [], sellBtcUsdRegs(maker))])
 				.to([ergOutput(maker2, 1_000_000n + 50n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
-				.to([ergOutput(sell, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
+				.to([ergOutput(contract, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
 				.sendChangeTo(taker.address)
 				.build();
 
@@ -226,16 +239,18 @@ describe('Timed fund contract', () => {
 
 		it('partial sell 2x 100 rsBTC', () => {
 			const box = { nanoergs: 1_000_000n, tokens: [rsBTC(100)] };
-			sell.addBalance(box, sellBtcUsdRegs(maker));
-			sell.addBalance(box, sellBtcUsdRegs(maker2));
+			contract.addBalance(box, sellBtcUsdRegs(maker));
+			contract.addBalance(box, sellBtcUsdRegs(maker2));
 			taker.addBalance({ nanoergs: 2_000_000n + 200n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 50n, [], sellBtcUsdRegs(maker))])
 				.to([ergOutput(maker2, 1_000_000n + 100n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
-				.to([ergOutput(sell, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker))])
+				.to([ergOutput(contract, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
 
@@ -244,17 +259,19 @@ describe('Timed fund contract', () => {
 
 		it('partial sell 2x 100 rsBTC', () => {
 			const box = { nanoergs: 1_000_000n, tokens: [rsBTC(100)] };
-			sell.addBalance(box, sellBtcUsdRegs(maker));
-			sell.addBalance(box, sellBtcUsdRegs(maker2));
+			contract.addBalance(box, sellBtcUsdRegs(maker));
+			contract.addBalance(box, sellBtcUsdRegs(maker2));
 			taker.addBalance({ nanoergs: 3_000_000n + 200n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 50n, [], sellBtcUsdRegs(maker))])
 				.to([ergOutput(maker2, 1_000_000n + 50n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
-				.to([ergOutput(sell, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker))])
-				.to([ergOutput(sell, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
+				.to([ergOutput(contract, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker))])
+				.to([ergOutput(contract, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
 				.sendChangeTo(taker.address)
 				.build();
 
@@ -263,17 +280,19 @@ describe('Timed fund contract', () => {
 
 		it('fail partial sell of lower rate box in 2x 100 rsBTC', () => {
 			const box = { nanoergs: 1_000_000n, tokens: [rsBTC(100)] };
-			sell.addBalance(box, sellBtcUsdRegs(maker));
-			sell.addBalance(box, sellBtcUsdRegs(maker2, 1n, 2n));
+			contract.addBalance(box, sellBtcUsdRegs(maker));
+			contract.addBalance(box, sellBtcUsdRegs(maker2, 1n, 2n));
 			taker.addBalance({ nanoergs: 3_000_000n + 200n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 50n, [], sellBtcUsdRegs(maker))])
 				.to([ergOutput(maker2, 1_000_000n + 25n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
-				.to([ergOutput(sell, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker))])
-				.to([ergOutput(sell, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
+				.to([ergOutput(contract, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker))])
+				.to([ergOutput(contract, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
 				.sendChangeTo(taker.address)
 				.build();
 
@@ -283,16 +302,18 @@ describe('Timed fund contract', () => {
 
 		it('success partial sell of higher rate box in 2x 100 rsBTC', () => {
 			const box = { nanoergs: 1_000_000n, tokens: [rsBTC(100)] };
-			sell.addBalance(box, sellBtcUsdRegs(maker));
-			sell.addBalance(box, sellBtcUsdRegs(maker2, 1n, 2n));
+			contract.addBalance(box, sellBtcUsdRegs(maker));
+			contract.addBalance(box, sellBtcUsdRegs(maker2, 1n, 2n));
 			taker.addBalance({ nanoergs: 3_000_000n + 200n });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === sell.ergoTree))
-				.from([...sell.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([ergOutput(maker, 1_000_000n + 50n, [], sellBtcUsdRegs(maker))])
 				.to([ergOutput(maker2, 1_000_000n + 50n, [rsBTC(50)], sellBtcUsdRegs(maker2))])
-				.to([ergOutput(sell, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker))])
+				.to([ergOutput(contract, 1_000_000n, [rsBTC(50)], sellBtcUsdRegs(maker))])
 				.sendChangeTo(taker.address)
 				.build();
 

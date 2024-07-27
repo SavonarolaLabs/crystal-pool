@@ -142,7 +142,7 @@ describe('Timed fund contract', () => {
 	const taker = mockChain.newParty('Bob');
 	mockChain.parties;
 
-	const swap = mockChain.addParty(ergoTree.toHex(), 'Token Swap Contract');
+	const contract = mockChain.addParty(ergoTree.toHex(), 'Token Swap Contract');
 
 	const swapBtcUsdRegs = (pk: KeyedMockChainParty, rate: bigint = 1n, denom: bigint = 1n) => ({
 		R4: SColl(SSigmaProp, [
@@ -161,11 +161,16 @@ describe('Timed fund contract', () => {
 
 	describe('Swap before unlockHeight', () => {
 		it("can't be canceled by maker", () => {
-			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(maker));
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(100)] },
+				swapBtcUsdRegs(maker)
+			);
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
 				.to([output(maker, [rsBTC(100)], swapBtcUsdRegs(maker))])
 				.build();
 
@@ -173,11 +178,16 @@ describe('Timed fund contract', () => {
 		});
 
 		it('can be canceled by maker+pool to any address', () => {
-			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(maker));
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(100)] },
+				swapBtcUsdRegs(maker)
+			);
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
 				.to([output(maker2, [rsBTC(100)])])
 				.build();
 
@@ -185,12 +195,17 @@ describe('Timed fund contract', () => {
 		});
 
 		it('basic: 100 rsBTC -> 100 SigUSD', () => {
-			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(maker));
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(100)] },
+				swapBtcUsdRegs(maker)
+			);
 			taker.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([
 					output(maker, [SigUSD(100)], swapBtcUsdRegs(maker)),
 					output(taker, rsBTC(100))
@@ -204,12 +219,17 @@ describe('Timed fund contract', () => {
 		});
 
 		it('underpayment fails', () => {
-			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(maker));
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(100)] },
+				swapBtcUsdRegs(maker)
+			);
 			taker.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([
 					output(maker, [SigUSD(99)], swapBtcUsdRegs(maker)),
 					output(taker, [SigUSD(1), rsBTC(100)])
@@ -222,12 +242,17 @@ describe('Timed fund contract', () => {
 		});
 
 		it('fake token fails', () => {
-			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(maker));
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(100)] },
+				swapBtcUsdRegs(maker)
+			);
 			taker.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200), comet(100)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([output(maker, [comet(100)], swapBtcUsdRegs(maker)), output(taker, rsBTC(100))])
 				.sendChangeTo(taker.address)
 				.build();
@@ -237,13 +262,21 @@ describe('Timed fund contract', () => {
 		});
 
 		it('multi input: 100 rsBTC, 50 rsBTC -> 150 SigUSD', () => {
-			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(maker));
-			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(50)] }, swapBtcUsdRegs(maker2));
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(100)] },
+				swapBtcUsdRegs(maker)
+			);
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(50)] },
+				swapBtcUsdRegs(maker2)
+			);
 			taker.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([
 					output(maker, [SigUSD(100)], swapBtcUsdRegs(maker)),
 					output(maker2, [SigUSD(50)], swapBtcUsdRegs(maker2)),
@@ -259,22 +292,30 @@ describe('Timed fund contract', () => {
 		});
 
 		it('partial: 100/100rsBTC + 150/300 rsBTC for 50 + 150 SigUSD', () => {
-			expectTokens(swap, []);
-			swap.addBalance({ nanoergs: 1n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(maker, 1n, 2n));
-			swap.addBalance({ nanoergs: 1n, tokens: [rsBTC(300)] }, swapBtcUsdRegs(maker2, 1n, 1n));
+			expectTokens(contract, []);
+			contract.addBalance(
+				{ nanoergs: 1n, tokens: [rsBTC(100)] },
+				swapBtcUsdRegs(maker, 1n, 2n)
+			);
+			contract.addBalance(
+				{ nanoergs: 1n, tokens: [rsBTC(300)] },
+				swapBtcUsdRegs(maker2, 1n, 1n)
+			);
 			taker.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 			expectTokens(maker, []);
 			expectTokens(maker2, []);
-			expectTokens(swap, [rsBTC(400)]);
+			expectTokens(contract, [rsBTC(400)]);
 			expectTokens(taker, [SigUSD(200)]);
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([
 					output(maker, SigUSD(50), swapBtcUsdRegs(maker)),
 					output(maker2, SigUSD(150), swapBtcUsdRegs(maker2)),
-					output(swap, rsBTC(150), swapBtcUsdRegs(maker2)),
+					output(contract, rsBTC(150), swapBtcUsdRegs(maker2)),
 					output(taker, rsBTC(250))
 				])
 				.sendChangeTo(taker.address)
@@ -284,7 +325,7 @@ describe('Timed fund contract', () => {
 			expect(mockChain.execute(transaction, { signers: [taker, pool] })).to.be.true;
 			expectTokens(maker, [SigUSD(50)]);
 			expectTokens(maker2, [SigUSD(150)]);
-			expectTokens(swap, [rsBTC(150)]);
+			expectTokens(contract, [rsBTC(150)]);
 			expectTokens(taker, [rsBTC(250)]);
 		});
 	});
@@ -296,11 +337,16 @@ describe('Timed fund contract', () => {
 		});
 
 		it('can be canceled by maker to any address', () => {
-			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(maker));
+			contract.addBalance(
+				{ nanoergs: 1_000_000n, tokens: [rsBTC(100)] },
+				swapBtcUsdRegs(maker)
+			);
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos])
 				.to([output(maker2, [rsBTC(100)])])
 				.build();
 
@@ -311,15 +357,17 @@ describe('Timed fund contract', () => {
 
 	describe('Random contract breaking attemps', () => {
 		it('100000 rsBTC -> 2 SigUSD', () => {
-			swap.addBalance(
+			contract.addBalance(
 				{ nanoergs: 1_000_000n, tokens: [rsBTC(100000)] },
 				swapBtcUsdRegs(maker, 1n, 50000n)
 			);
 			taker.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([
 					output(maker, [SigUSD(2)], swapBtcUsdRegs(maker)),
 					output(taker, rsBTC(100000))
@@ -333,15 +381,17 @@ describe('Timed fund contract', () => {
 		});
 
 		it('1 rsBTC -> 1000 SigUSD', () => {
-			swap.addBalance(
+			contract.addBalance(
 				{ nanoergs: 1_000_000n, tokens: [rsBTC(1)] },
 				swapBtcUsdRegs(maker, 1000n)
 			);
 			taker.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(1000)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
-				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
-				.from([...swap.utxos, ...taker.utxos])
+				.configureSelector((s) =>
+					s.ensureInclusion((b) => b.ergoTree === contract.ergoTree)
+				)
+				.from([...contract.utxos, ...taker.utxos])
 				.to([output(maker, [SigUSD(1000)], swapBtcUsdRegs(maker)), output(taker, rsBTC(1))])
 				.sendChangeTo(taker.address)
 				.build();
