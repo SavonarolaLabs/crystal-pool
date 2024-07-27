@@ -86,9 +86,8 @@ export function executeSwap(
 		asBigInt(tokensFromSwapContract.amount) -
 		asBigInt(amountByTokenId(swapOrderInputBoxes, tokensFromSwapContract.tokenId));
 	if (remainingTokens > 0n) {
-		const remainingRateBox = swapOrderInputBoxes[0]; // TODO select the proper box;
 		remainingSwapOrderBox = new OutputBuilder(nanoErg, DEPOSIT_ADDRESS)
-			.setAdditionalRegisters(remainingRateBox.additionalRegisters)
+			.setAdditionalRegisters(swapOrderInputBoxes[0].additionalRegisters)
 			.addTokens({
 				tokenId: tokensFromSwapContract.tokenId,
 				amount: remainingTokens
