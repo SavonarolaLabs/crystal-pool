@@ -20,7 +20,7 @@
 					></path></svg
 				>
 				<div>
-					<div class="headline_bigName">rsBTC/sigUSD</div>
+					<div class="headline_bigName">rsBTC/SigUSD</div>
 					<div class="headline_etfDisplay">Bitcoin</div>
 				</div>
 				<div class="headline_divider"></div>
@@ -57,7 +57,7 @@
 								<div class="headline_title">12.38K</div>
 							</div>
 							<div class="subtabs_leftItem">
-								<div class="headline_withBorder">24h Amount (sigUSD)</div>
+								<div class="headline_withBorder">24h Amount (SigUSD)</div>
 								<div class="headline_title">836.47M</div>
 							</div>
 						</div>

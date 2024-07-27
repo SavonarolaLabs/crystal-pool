@@ -1,8 +1,6 @@
-import {
-	SELL_ORDER_ADDRESS,
-	SHADOWPOOL_ADDRESS
-} from '$lib/constants/addresses';
+import { SELL_ORDER_ADDRESS, SHADOWPOOL_ADDRESS } from '$lib/constants/addresses';
 import { utxos } from '$lib/data/utxos';
+import { splitRateStringToNumDenom } from '$lib/tests/rateUtils';
 import { asBigInt } from '$lib/utils/helper';
 import {
 	first,
@@ -30,10 +28,12 @@ export function createSellOrderTx(
 	sellerMultisigAddress: string,
 	inputBoxes: OneOrMore<Box<Amount>>,
 	token: { tokenId: string; amount: Amount },
-	sellRate: bigint,
+	rate: string,
 	currentHeight: number,
 	unlockHeight: number
 ): EIP12UnsignedTransaction {
+	const [numerator, denominator] = splitRateStringToNumDenom(rate);
+
 	const output = new OutputBuilder(
 		2n * RECOMMENDED_MIN_FEE_VALUE + SAFE_MIN_BOX_VALUE,
 		SELL_ORDER_ADDRESS
@@ -41,24 +41,13 @@ export function createSellOrderTx(
 		.addTokens(token)
 		.setAdditionalRegisters({
 			R4: SColl(SSigmaProp, [
-				SGroupElement(
-					first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())
-				),
-				SGroupElement(
-					first(
-						ErgoAddress.fromBase58(
-							SHADOWPOOL_ADDRESS
-						).getPublicKeys()
-					)
-				)
+				SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
+				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
 			]).toHex(),
 			R5: SInt(unlockHeight).toHex(),
 			R6: SColl(SByte, token.tokenId).toHex(),
-			R7: SLong(sellRate).toHex(),
-			R8: SColl(
-				SByte,
-				ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree
-			).toHex()
+			R7: SColl(SLong, [numerator, denominator]).toHex(),
+			R8: SColl(SByte, ErgoAddress.fromBase58(sellerMultisigAddress).ergoTree).toHex()
 		});
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
@@ -81,10 +70,7 @@ export function canсelSellOrderTx(
 	let mandatoryBoxes: Box[] = inputBoxes;
 
 	const tokens = mandatoryBoxes.flatMap((box) => box.assets);
-	let value = mandatoryBoxes.reduce(
-		(a: bigint, e: Box) => asBigInt(a) + asBigInt(e.value),
-		0n
-	);
+	let value = mandatoryBoxes.reduce((a: bigint, e: Box) => asBigInt(a) + asBigInt(e.value), 0n);
 
 	if (value < SAFE_MIN_BOX_VALUE) {
 		value = SAFE_MIN_BOX_VALUE;
@@ -94,16 +80,8 @@ export function canсelSellOrderTx(
 		.addTokens(tokens)
 		.setAdditionalRegisters({
 			R4: SColl(SSigmaProp, [
-				SGroupElement(
-					first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())
-				),
-				SGroupElement(
-					first(
-						ErgoAddress.fromBase58(
-							SHADOWPOOL_ADDRESS
-						).getPublicKeys()
-					)
-				)
+				SGroupElement(first(ErgoAddress.fromBase58(sellerPK).getPublicKeys())),
+				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
 			]).toHex(),
 			R5: SInt(unlockHeight).toHex()
 		});

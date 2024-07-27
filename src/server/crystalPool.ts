@@ -1,21 +1,25 @@
 import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
-import { db_depositBoxes, db_storeSignedSwapTx, db_storeSignedWithdrawTx, type BoxDB } from './db/db';
+import {
+	db_depositBoxes,
+	db_storeSignedSwapTx,
+	db_storeSignedWithdrawTx,
+	type BoxDB
+} from './db/db';
 import { a, c, signTxInput, type JSONTransactionHintsBag } from '$lib/wallet/multisig-server';
-import { createSwapOrderTxR9, executeSwap, splitSellRate } from '$lib/wallet/swap';
+import { createSwapOrderTx, executeSwap } from '$lib/wallet/swap';
 import { ErgoAddress } from '@fleet-sdk/core';
 import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
 import { SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
 import { Transaction, UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
-import type { SwapRequest } from '$lib/ui/service/tradingService';
 import { createWithdrawToAddressTx } from '$lib/wallet/deposit';
 import { fetchHeight } from '$lib/external/height';
 import type { WithdrawRequestParams } from '$lib/types/request';
+import type { SwapRequest } from '$lib/types/trading';
 
 export type TxWithCommits = {
 	unsignedTx: EIP12UnsignedTransaction;
 	publicCommitsPool: JSONTransactionHintsBag;
 };
-
 
 // WITHDRAW
 
@@ -32,26 +36,23 @@ export async function withdrawTxWithCommits(
 	return { unsignedTx, publicCommitsPool };
 }
 
-
 // SWAP ORDER
 
 export async function swapOrderTxWithCommits(
 	swapParams: SwapRequest,
 	db: BoxDB
 ): Promise<TxWithCommits> {
-	const height = 1273521;
-	const depositInputs: any = db_depositBoxes(swapParams.address, db);
+	const height = await fetchHeight();
+	const depositInputs: any = db_depositBoxes(swapParams.makerPk, db);
 
-	const unsignedTx = createSwapOrderTxR9(
-		swapParams.address,
+	const unsignedTx = createSwapOrderTx(
+		swapParams.makerPk,
 		depositInputs.map((db) => db.box),
-		{
-			tokenId: swapParams.sellingTokenId,
-			amount: swapParams.amount
-		},
+		swapParams.nanoErg,
+		swapParams.makerToken,
+		swapParams.takerTokenId,
 		swapParams.price,
-		height,
-		swapParams.buyingTokenId
+		height
 	);
 
 	const { privateCommitsPool, publicCommitsPool } = await a(unsignedTx);

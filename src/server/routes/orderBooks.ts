@@ -10,7 +10,7 @@ interface OrderBooksParams {
 export function getOrderBookByTradingPair(app: Express, db: BoxDB) {
 	app.get('/order-books/:tradingPair', (req: Request, res: Response) => {
 		//const orderbook = createOrderBook(req.params.tradingPair, db);
-		const orderbook = createOrderBook('rsBTC_sigUSD', db);
+		const orderbook = createOrderBook('rsBTC_SigUSD', db);
 		sendJSON(res, orderbook);
 	});
 }

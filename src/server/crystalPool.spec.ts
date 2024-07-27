@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { initDb, db_initDepositUtxo, db_clearDB, } from './db/db';
-import {decodeR4, parseBox } from './db/boxParser'
+import { initDb, db_initDepositUtxo, db_clearDB } from './db/db';
+import { decodeR4, parseBox } from './db/boxParser';
 import {
 	createExecuteSwapOrderTx,
 	signExecuteSwapOrder,
@@ -42,7 +42,7 @@ describe('swap', () => {
 			price: '0.002',
 			amount: '10000',
 			sellingTokenId: TOKEN.rsBTC.tokenId,
-			buyingTokenId: TOKEN.sigUSD.tokenId
+			buyingTokenId: TOKEN.SigUSD.tokenId
 		};
 		let { unsignedTx, publicCommitsPool } = await swapOrderTxWithCommits(swapParamsCreate, db);
 		expect(unsignedTx).toBeDefined();
@@ -72,7 +72,7 @@ describe('swap', () => {
 			price: '0.002',
 			amount: '10000',
 			sellingTokenId: TOKEN.rsBTC.tokenId,
-			buyingTokenId: TOKEN.sigUSD.tokenId
+			buyingTokenId: TOKEN.SigUSD.tokenId
 		};
 		const executeUTx = createExecuteSwapOrderTx(swapParamsExecute, db);
 

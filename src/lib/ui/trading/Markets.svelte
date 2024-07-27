@@ -30,7 +30,7 @@
 	<div class="marketTabs_box">
 		<div class="styles_nav-item nav-item">Favorite</div>
 		<div class="styles_nav-item nav-item">ERG</div>
-		<div class="styles_nav-item nav-item mx-scroll-is-active">sigUSD</div>
+		<div class="styles_nav-item nav-item mx-scroll-is-active">SigUSD</div>
 		<div class="styles_nav-item nav-item">rsBTC</div>
 		<div class="styles_nav-item nav-item">rsETH</div>
 	</div>
@@ -45,7 +45,7 @@
 				<div class="markets_col1">
 					<div class="markets_symbol">
 						<span class="markets_strong">rsBTC</span>
-						<span>/sigUSD</span>
+						<span>/SigUSD</span>
 					</div>
 					<div class="markets_secondLine">Rosen BTC</div>
 				</div>
@@ -80,7 +80,7 @@
 				<div class="markets_col1">
 					<div class="markets_symbol">
 						<span class="markets_strong">ERG</span>
-						<span>/sigUSD</span>
+						<span>/SigUSD</span>
 					</div>
 					<div class="markets_secondLine">ERGO</div>
 				</div>
@@ -115,7 +115,7 @@
 				<div class="markets_col1">
 					<div class="markets_symbol">
 						<span class="markets_strong">Erdoge</span>
-						<span>/sigUSD</span>
+						<span>/SigUSD</span>
 					</div>
 					<div class="markets_secondLine">Erdoge</div>
 				</div>

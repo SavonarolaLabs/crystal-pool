@@ -66,7 +66,7 @@ depositTxId(app, io, db);
 // WebSocket connection
 io.on('connection', (socket) => {
 	console.log('A client connected:', socket.id);
-	const orderbook = createOrderBook('rsBTC_sigUSD', db);
+	const orderbook = createOrderBook('rsBTC_SigUSD', db);
 	io.emit('orderbook', orderbook);
 
 	socket.on('disconnect', () => {

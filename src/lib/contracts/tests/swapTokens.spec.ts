@@ -11,7 +11,7 @@ import {
 import { KeyedMockChainParty, MockChain } from '@fleet-sdk/mock-chain';
 import { SPair } from '@fleet-sdk/serializer';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { comet, expectTokens, output, rsBTC, rsBtcId, sigUSD, sigUsdId } from './helper';
+import { comet, expectTokens, output, rsBTC, rsBtcId, SigUSD, SigUsdId } from './helper';
 
 describe('Timed fund contract', () => {
 	const ergoTree = compile(
@@ -150,7 +150,7 @@ describe('Timed fund contract', () => {
 			SGroupElement(pool.key.publicKey)
 		]).toHex(),
 		R5: SInt(unlockHeight).toHex(),
-		R6: SPair(SColl(SByte, rsBtcId), SColl(SByte, sigUsdId)).toHex(),
+		R6: SPair(SColl(SByte, rsBtcId), SColl(SByte, SigUsdId)).toHex(),
 		R7: SColl(SLong, [rate, denom]).toHex(),
 		R8: SColl(SByte, pk.ergoTree).toHex()
 	});
@@ -186,33 +186,33 @@ describe('Timed fund contract', () => {
 
 		it('basic: 100 rsBTC -> 100 SigUSD', () => {
 			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(seller));
-			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [sigUSD(200)] });
+			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
 				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
 				.from([...swap.utxos, ...buyer.utxos])
 				.to([
-					output(seller, [sigUSD(100)], swapBtcUsdRegs(seller)),
+					output(seller, [SigUSD(100)], swapBtcUsdRegs(seller)),
 					output(buyer, rsBTC(100))
 				])
 				.sendChangeTo(buyer.address)
 				.build();
 
 			expect(mockChain.execute(transaction, { signers: [buyer, pool] })).to.be.true;
-			expectTokens(seller, [sigUSD(100)]);
-			expectTokens(buyer, [rsBTC(100), sigUSD(100)]);
+			expectTokens(seller, [SigUSD(100)]);
+			expectTokens(buyer, [rsBTC(100), SigUSD(100)]);
 		});
 
 		it('underpayment fails', () => {
 			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(seller));
-			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [sigUSD(200)] });
+			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
 				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
 				.from([...swap.utxos, ...buyer.utxos])
 				.to([
-					output(seller, [sigUSD(99)], swapBtcUsdRegs(seller)),
-					output(buyer, [sigUSD(1), rsBTC(100)])
+					output(seller, [SigUSD(99)], swapBtcUsdRegs(seller)),
+					output(buyer, [SigUSD(1), rsBTC(100)])
 				])
 				.sendChangeTo(buyer.address)
 				.build();
@@ -223,7 +223,7 @@ describe('Timed fund contract', () => {
 
 		it('fake token fails', () => {
 			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(seller));
-			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [sigUSD(200), comet(100)] });
+			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200), comet(100)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
 				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
@@ -242,44 +242,44 @@ describe('Timed fund contract', () => {
 		it('multi input: 100 rsBTC, 50 rsBTC -> 150 SigUSD', () => {
 			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(seller));
 			swap.addBalance({ nanoergs: 1_000_000n, tokens: [rsBTC(50)] }, swapBtcUsdRegs(seller2));
-			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [sigUSD(200)] });
+			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
 				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
 				.from([...swap.utxos, ...buyer.utxos])
 				.to([
-					output(seller, [sigUSD(100)], swapBtcUsdRegs(seller)),
-					output(seller2, [sigUSD(50)], swapBtcUsdRegs(seller2)),
+					output(seller, [SigUSD(100)], swapBtcUsdRegs(seller)),
+					output(seller2, [SigUSD(50)], swapBtcUsdRegs(seller2)),
 					output(buyer, rsBTC(150))
 				])
 				.sendChangeTo(buyer.address)
 				.build();
 
 			expect(mockChain.execute(transaction, { signers: [buyer, pool] })).to.be.true;
-			expectTokens(seller, [sigUSD(100)]);
-			expectTokens(seller2, [sigUSD(50)]);
-			expectTokens(buyer, [rsBTC(150), sigUSD(50)]);
+			expectTokens(seller, [SigUSD(100)]);
+			expectTokens(seller2, [SigUSD(50)]);
+			expectTokens(buyer, [rsBTC(150), SigUSD(50)]);
 		});
 
-		it('partial: 100/100rsBTC + 150/300 rsBTC for 50 + 150 sigUSD', () => {
+		it('partial: 100/100rsBTC + 150/300 rsBTC for 50 + 150 SigUSD', () => {
 			expectTokens(swap, []);
 			swap.addBalance({ nanoergs: 1n, tokens: [rsBTC(100)] }, swapBtcUsdRegs(seller, 1n, 2n));
 			swap.addBalance(
 				{ nanoergs: 1n, tokens: [rsBTC(300)] },
 				swapBtcUsdRegs(seller2, 1n, 1n)
 			);
-			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [sigUSD(200)] });
+			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 			expectTokens(seller, []);
 			expectTokens(seller2, []);
 			expectTokens(swap, [rsBTC(400)]);
-			expectTokens(buyer, [sigUSD(200)]);
+			expectTokens(buyer, [SigUSD(200)]);
 
 			const transaction = new TransactionBuilder(mockChain.height)
 				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
 				.from([...swap.utxos, ...buyer.utxos])
 				.to([
-					output(seller, sigUSD(50), swapBtcUsdRegs(seller)),
-					output(seller2, sigUSD(150), swapBtcUsdRegs(seller2)),
+					output(seller, SigUSD(50), swapBtcUsdRegs(seller)),
+					output(seller2, SigUSD(150), swapBtcUsdRegs(seller2)),
 					output(swap, rsBTC(150), swapBtcUsdRegs(seller2)),
 					output(buyer, rsBTC(250))
 				])
@@ -288,8 +288,8 @@ describe('Timed fund contract', () => {
 			mockChain.newBlock();
 
 			expect(mockChain.execute(transaction, { signers: [buyer, pool] })).to.be.true;
-			expectTokens(seller, [sigUSD(50)]);
-			expectTokens(seller2, [sigUSD(150)]);
+			expectTokens(seller, [SigUSD(50)]);
+			expectTokens(seller2, [SigUSD(150)]);
 			expectTokens(swap, [rsBTC(150)]);
 			expectTokens(buyer, [rsBTC(250)]);
 		});
@@ -321,21 +321,21 @@ describe('Timed fund contract', () => {
 				{ nanoergs: 1_000_000n, tokens: [rsBTC(100000)] },
 				swapBtcUsdRegs(seller, 1n, 50000n)
 			);
-			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [sigUSD(200)] });
+			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(200)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
 				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
 				.from([...swap.utxos, ...buyer.utxos])
 				.to([
-					output(seller, [sigUSD(2)], swapBtcUsdRegs(seller)),
+					output(seller, [SigUSD(2)], swapBtcUsdRegs(seller)),
 					output(buyer, rsBTC(100000))
 				])
 				.sendChangeTo(buyer.address)
 				.build();
 
 			expect(mockChain.execute(transaction, { signers: [buyer, pool] })).to.be.true;
-			expectTokens(seller, [sigUSD(2)]);
-			expectTokens(buyer, [rsBTC(100000), sigUSD(198)]);
+			expectTokens(seller, [SigUSD(2)]);
+			expectTokens(buyer, [rsBTC(100000), SigUSD(198)]);
 		});
 
 		it('1 rsBTC -> 1000 SigUSD', () => {
@@ -343,20 +343,20 @@ describe('Timed fund contract', () => {
 				{ nanoergs: 1_000_000n, tokens: [rsBTC(1)] },
 				swapBtcUsdRegs(seller, 1000n)
 			);
-			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [sigUSD(1000)] });
+			buyer.addBalance({ nanoergs: 10_000_000n, tokens: [SigUSD(1000)] });
 
 			const transaction = new TransactionBuilder(mockChain.height)
 				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === swap.ergoTree))
 				.from([...swap.utxos, ...buyer.utxos])
 				.to([
-					output(seller, [sigUSD(1000)], swapBtcUsdRegs(seller)),
+					output(seller, [SigUSD(1000)], swapBtcUsdRegs(seller)),
 					output(buyer, rsBTC(1))
 				])
 				.sendChangeTo(buyer.address)
 				.build();
 
 			expect(mockChain.execute(transaction, { signers: [buyer, pool] })).to.be.true;
-			expectTokens(seller, [sigUSD(1000)]);
+			expectTokens(seller, [SigUSD(1000)]);
 			expectTokens(buyer, [rsBTC(1)]);
 		});
 	});

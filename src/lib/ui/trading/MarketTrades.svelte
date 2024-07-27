@@ -4,7 +4,7 @@
 
 <div class="tab">Market Trades</div>
 <div class="trades_tableHeader">
-	<h2 class="trades_column trades_price">Price(sigUSD)</h2>
+	<h2 class="trades_column trades_price">Price(SigUSD)</h2>
 	<h2 class="trades_column trades_vol">Amount(rsBTC)</h2>
 	<h2 class="trades_column trades_time">Time</h2>
 </div>

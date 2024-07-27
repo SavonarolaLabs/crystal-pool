@@ -15,12 +15,26 @@ import { utxos } from '$lib/data/utxos';
 import type { BoxParameters, ContractType } from '$lib/types/boxRow';
 import { boxesAtAddress, boxesAtAddressUnsigned } from '$lib/utils/test-helper';
 import { deposit } from '$lib/wallet/deposit';
-import { a, arrayToProposition, bInput, cInput, signTx, signTxInput, signTxMulti } from '$lib/wallet/multisig-server';
+import {
+	a,
+	arrayToProposition,
+	bInput,
+	cInput,
+	signTx,
+	signTxInput,
+	signTxMulti
+} from '$lib/wallet/multisig-server';
 import { ErgoAddress, ErgoTree, SAFE_MIN_BOX_VALUE, type Box } from '@fleet-sdk/core';
-import { ErgoBoxes, extract_hints, Transaction, UnsignedTransaction, type Input } from 'ergo-lib-wasm-nodejs';
+import {
+	ErgoBoxes,
+	extract_hints,
+	Transaction,
+	UnsignedTransaction,
+	type Input
+} from 'ergo-lib-wasm-nodejs';
 import { describe, expect, it } from 'vitest';
 import { parseBox } from '../../server/db/boxParser';
-import { createSwapOrderTxR9, executeSwap } from '../wallet/swap';
+import { createSwapOrderTx, executeSwap } from '../wallet/swap';
 
 const CONTRACT_FOR_TEST = `{	
 	def getSellerPk(box: Box)              	= box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
@@ -126,7 +140,7 @@ const CONTRACT_FOR_TEST = `{
 //-----------------
   	val tokensSold = sumSellTokensIn(INPUTS) - sumSellTokensOut(OUTPUTS) //rsBTC on contract (delta) (10000)
 
-  	val tokensPaid = sumBuyTokensPaid(OUTPUTS) //sigUSD PAID (20) + ADD DENOM (1000) = > 20_000 
+  	val tokensPaid = sumBuyTokensPaid(OUTPUTS) //SigUSD PAID (20) + ADD DENOM (1000) = > 20_000 
 
     	val inSellTokensXRate = INPUTS  //VOLUME INPUT ON CONTRACT
 		.filter(isLegitInput) 
@@ -139,7 +153,7 @@ const CONTRACT_FOR_TEST = `{
     val sellTokensXRate = inSellTokensXRate - outSellTokensXRate  // DELTA VOLUME в Макс деноме
     val expectedRate = sellTokensXRate / tokensSold   // 23125124 in DENOM MAX
 
-    val isPaidAtFairRate = maxDenom*tokensPaid/tokensSold >= expectedRate  //sigUSD PAID (20) + ADD DENOM (1000) = > 20_000. * MAX_DENOM
+    val isPaidAtFairRate = maxDenom*tokensPaid/tokensSold >= expectedRate  //SigUSD PAID (20) + ADD DENOM (1000) = > 20_000. * MAX_DENOM
     //1000
     //20
     //10000
@@ -183,7 +197,7 @@ describe('Execute Swap with R9', async () => {
 		amount: '10000'
 	};
 	const paymentToken = {
-		tokenId: TOKEN.sigUSD.tokenId,
+		tokenId: TOKEN.SigUSD.tokenId,
 		amount: 20n
 	};
 
@@ -197,7 +211,7 @@ describe('Execute Swap with R9', async () => {
 			tokenForSale
 		);
 		let signedDepositTx = await signTx(depositTx, BOB_MNEMONIC);
-		let depositsBob = boxesAtAddress(signedDepositTx,DEPOSIT_ADDRESS);
+		let depositsBob = boxesAtAddress(signedDepositTx, DEPOSIT_ADDRESS);
 		expect(depositsBob.length).toBe(1);
 		let depositTxAlice = deposit(
 			height,
@@ -208,10 +222,10 @@ describe('Execute Swap with R9', async () => {
 			paymentToken
 		);
 		let signedDepositTxAlice = await signTx(depositTxAlice, ALICE_MNEMONIC);
-		let depositsAlice = boxesAtAddress(signedDepositTxAlice,DEPOSIT_ADDRESS);
+		let depositsAlice = boxesAtAddress(signedDepositTxAlice, DEPOSIT_ADDRESS);
 		expect(depositsAlice.length).toBe(1);
 
-		let unsignedTx1 = createSwapOrderTxR9(
+		let unsignedTx1 = createSwapOrderTx(
 			BOB_ADDRESS,
 			depositsBob,
 			tokenForSale,
@@ -265,15 +279,15 @@ describe('Execute Swap with R9', async () => {
 		// multisig signing a single input[1]
 		const { privateCommitsPool, publicCommitsPool } = await a(executeSwapOrderTx);
 		expect(publicCommitsPool).toBeDefined();
-		
+
 		const sInput1: Input = await bInput(
 			executeSwapOrderTx,
 			ALICE_MNEMONIC,
 			ALICE_ADDRESS,
 			publicCommitsPool,
-			1,
-		)
-		
+			1
+		);
+
 		function hexToUint8Array(str: string): Uint8Array {
 			const utf8: string = unescape(encodeURIComponent(str));
 			const array = new Uint8Array(utf8.length);
@@ -283,35 +297,35 @@ describe('Execute Swap with R9', async () => {
 			return array;
 		}
 
-		function getProof(input:Input){
-			return hexToUint8Array(input.spending_proof().to_json())
+		function getProof(input: Input) {
+			return hexToUint8Array(input.spending_proof().to_json());
 		}
-		
+
 		// const transaction = proverAlice.sign_reduced_transaction_multi(reducedTx, combinedHints);
 		const unsigned_tx = UnsignedTransaction.from_json(JSON.stringify(executeSwapOrderTx));
-		;
-		const tx = Transaction.from_unsigned_tx(unsigned_tx,[getProof(sInput0),getProof(sInput1)]);
+		const tx = Transaction.from_unsigned_tx(unsigned_tx, [
+			getProof(sInput0),
+			getProof(sInput1)
+		]);
 		//expect(executeSwapOrderTx.inputs).toBe(1);
 
-		 const hUser = ErgoAddress.fromBase58(ALICE_ADDRESS).ergoTree.slice(6);
-		 let extractedHints = extract_hints(
+		const hUser = ErgoAddress.fromBase58(ALICE_ADDRESS).ergoTree.slice(6);
+		let extractedHints = extract_hints(
 			tx,
-		 	fakeContextX(),
-		 	ErgoBoxes.from_boxes_json(executeSwapOrderTx.inputs),
-		 	ErgoBoxes.empty(),
-		 	arrayToProposition([hUser]),
-		 	arrayToProposition([])
-		 ).to_json();
-//		 expect(extractedHints).toBe(1);
+			fakeContextX(),
+			ErgoBoxes.from_boxes_json(executeSwapOrderTx.inputs),
+			ErgoBoxes.empty(),
+			arrayToProposition([hUser]),
+			arrayToProposition([])
+		).to_json();
+		//		 expect(extractedHints).toBe(1);
 
-		const signedInput = await cInput(
-			executeSwapOrderTx,
-			privateCommitsPool,
-			extractedHints,
-			1
-		);
+		const signedInput = await cInput(executeSwapOrderTx, privateCommitsPool, extractedHints, 1);
 		const utx = UnsignedTransaction.from_json(JSON.stringify(executeSwapOrderTx));
-		const signedTx = Transaction.from_unsigned_tx(utx,[getProof(sInput0),getProof(signedInput)]).to_js_eip12();
+		const signedTx = Transaction.from_unsigned_tx(utx, [
+			getProof(sInput0),
+			getProof(signedInput)
+		]).to_js_eip12();
 		expect(signedTx).toBeDefined();
 	});
 });

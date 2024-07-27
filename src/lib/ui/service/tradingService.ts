@@ -1,18 +1,10 @@
 import { get } from 'svelte/store';
 import { createSwapTx, executeSwapTx, signExecuteSwapTx, signSwapTx } from './crystalPoolService';
 import { user_address, user_mnemonic } from '../ui_state';
-import type { Box } from '@fleet-sdk/common';
+import type { Amount, Box } from '@fleet-sdk/common';
 import { parse } from '@fleet-sdk/serializer';
 import { ErgoAddress } from '@fleet-sdk/core';
-
-export type SwapRequest = {
-	address: string;
-	price: string;
-	amount: string;
-	sellingTokenId: string;
-	buyingTokenId: string;
-	side: string;
-};
+import type { SwapRequest } from '$lib/types/trading';
 
 export async function createAndMultisigSwapTx(
 	swapParams: SwapRequest,
@@ -43,7 +35,7 @@ export function decodeR4(box: Box): { userPk: string; poolPk: string } | undefin
 export async function executeAndSignInputsSwapTx(swapParams: SwapRequest, signTxInput: Function) {
 	const unsignedTx = await executeSwapTx(swapParams);
 	const inputIndex = unsignedTx.inputs.findIndex(
-		(b: Box) => decodeR4(b)?.userPk == swapParams.address
+		(b: Box) => decodeR4(b)?.userPk == swapParams.makerPk
 	);
 	const signed = await signTxInput(get(user_mnemonic), unsignedTx, inputIndex);
 	const proof = JSON.parse(signed.spending_proof().to_json());

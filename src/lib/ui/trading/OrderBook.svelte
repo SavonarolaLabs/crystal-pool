@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { orderbook_buy, orderbook_latest, orderbook_sell } from '$lib/ui/ui_state';
 
-	// buy -> green -> sigUSD,rsBTC
-	// sell -> red -> rsBTC,sigUSD
+	// buy -> green -> SigUSD,rsBTC
+	// sell -> red -> rsBTC,SigUSD
 </script>
 
 <div class="orderbook">
@@ -120,9 +120,9 @@
 		</div>
 	</div>
 	<div class="orderbook_tableHeader">
-		<h2 class="orderbook_column orderbook_price">Price(sigUSD)</h2>
+		<h2 class="orderbook_column orderbook_price">Price(SigUSD)</h2>
 		<h2 class="orderbook_column orderbook_vol">Amount(rsBTC)</h2>
-		<h2 class="orderbook_column orderbook_amount">Total (sigUSD)</h2>
+		<h2 class="orderbook_column orderbook_amount">Total (SigUSD)</h2>
 	</div>
 	<div class="orderbook_body">
 		<div class="orderbook_asks">

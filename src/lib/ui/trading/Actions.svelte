@@ -6,12 +6,11 @@
 	import { configureSwapTx, createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
 	import { user_address, user_mnemonic, user_tokens, wallet_initialized } from '../ui_state';
-	import {
-		createAndMultisigSwapTx,
-		executeAndSignInputsSwapTx,
-		type SwapRequest
-	} from '../service/tradingService';
+	import { createAndMultisigSwapTx, executeAndSignInputsSwapTx } from '../service/tradingService';
 	import { goto } from '$app/navigation';
+	import type { SwapRequest } from '$lib/types/trading';
+	import { SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
+	import { asBigInt } from '$lib/utils/helper';
 
 	let buyPriceInput = '69000';
 	let buyAmountInput = '0.1';
@@ -87,32 +86,32 @@
 		}
 	}
 
-	function bigIntReplacer(value: any): string {
-		return typeof value === 'bigint' ? value.toString() : value;
-	}
-
 	function dummySwapParams() {
 		const address = BOB_ADDRESS;
 
-		const price = 100n;
+		const price = '100';
 		const amount = 200n;
-		const sellingTokenId = TOKEN.sigUSD.tokenId;
+		const sellingTokenId = TOKEN.SigUSD.tokenId;
 		const buyingTokenId = TOKEN.rsBTC.tokenId;
 
 		const swapParams: SwapRequest = {
-			address: address,
-			price: bigIntReplacer(price),
-			amount: bigIntReplacer(amount),
-			sellingTokenId: sellingTokenId,
-			buyingTokenId: buyingTokenId,
-			side: 'sell'
+			makerPk: address,
+			price: price,
+			nanoErg: SAFE_MIN_BOX_VALUE,
+			makerToken: {
+				tokenId: sellingTokenId,
+				amount: asBigInt(amount)
+			},
+			takerTokenId: buyingTokenId,
+			tradingPair: 'rsBTC_SigUSD',
+			side: 'SELL'
 		};
 
 		return swapParams;
 	}
 	async function swapExecuteBuy() {
 		const sellingToken = TOKEN.rsBTC;
-		const buyingToken = TOKEN.sigUSD;
+		const buyingToken = TOKEN.SigUSD;
 
 		// take user inputs
 		const amountInput = new BigNumber(buyAmountInput);
@@ -120,7 +119,7 @@
 
 		// load and calculate decimals
 		const decimalsToken = TOKEN.rsBTC.decimals;
-		const decimalsCurrency = TOKEN.sigUSD.decimals;
+		const decimalsCurrency = TOKEN.SigUSD.decimals;
 		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
 		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
 		const bigDecimalsDelta = bigDecimalsToken.dividedBy(bigDecimalsCurrency);
@@ -135,12 +134,16 @@
 		console.log('total amount: cents =', total.toString());
 
 		const swapParams: SwapRequest = {
-			address: $user_address,
+			makerPk: $user_address,
 			price: real_price.toString(),
-			amount: real_amount.toString(),
-			sellingTokenId: sellingToken.tokenId,
-			buyingTokenId: buyingToken.tokenId,
-			side: 'sell'
+			nanoErg: SAFE_MIN_BOX_VALUE,
+			makerToken: {
+				tokenId: sellingToken.tokenId,
+				amount: real_amount.toString()
+			},
+			takerTokenId: buyingToken.tokenId,
+			tradingPair: 'rsBTC_SigUSD',
+			side: 'SELL'
 		};
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
@@ -151,7 +154,7 @@
 	async function swapActionBuy() {
 		//const swapParams = dummySwapParams();
 
-		const sellingToken = TOKEN.sigUSD;
+		const sellingToken = TOKEN.SigUSD;
 		const buyingToken = TOKEN.rsBTC;
 
 		// take user inputs
@@ -160,7 +163,7 @@
 
 		// load and calculate decimals
 		const decimalsToken = TOKEN.rsBTC.decimals;
-		const decimalsCurrency = TOKEN.sigUSD.decimals;
+		const decimalsCurrency = TOKEN.SigUSD.decimals;
 		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
 		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
 		const bigDecimalsDelta = bigDecimalsToken.dividedBy(bigDecimalsCurrency);
@@ -198,7 +201,7 @@
 
 	async function swapActionSell() {
 		const sellingToken = TOKEN.rsBTC;
-		const buyingToken = TOKEN.sigUSD;
+		const buyingToken = TOKEN.SigUSD;
 
 		// take user inputs
 		const amountInput = new BigNumber(sellAmountInput);
@@ -206,7 +209,7 @@
 
 		// load and calculate decimals
 		const decimalsToken = TOKEN.rsBTC.decimals;
-		const decimalsCurrency = TOKEN.sigUSD.decimals;
+		const decimalsCurrency = TOKEN.SigUSD.decimals;
 		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
 		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
 		const bigDecimalsDelta = bigDecimalsToken.dividedBy(bigDecimalsCurrency);
@@ -245,7 +248,7 @@
 	async function configureBuy() {
 		//configure 1-st pack of params for Sell Check
 		const sellingToken = TOKEN.rsBTC;
-		const buyingToken = TOKEN.sigUSD;
+		const buyingToken = TOKEN.SigUSD;
 
 		// take user inputs
 		const amountInput = new BigNumber(buyAmountInput);
@@ -253,7 +256,7 @@
 
 		// load and calculate decimals
 		const decimalsToken = TOKEN.rsBTC.decimals;
-		const decimalsCurrency = TOKEN.sigUSD.decimals;
+		const decimalsCurrency = TOKEN.SigUSD.decimals;
 		const bigDecimalsToken = BigNumber(10).pow(decimalsToken);
 		const bigDecimalsCurrency = BigNumber(10).pow(decimalsCurrency);
 		const bigDecimalsDelta = bigDecimalsToken.dividedBy(bigDecimalsCurrency);
@@ -314,14 +317,14 @@
 							>Available
 						</span><span
 							><span>
-								{($user_tokens.find((t) => t.name == 'sigUSD')?.amount ?? 0) /
+								{($user_tokens.find((t) => t.name == 'SigUSD')?.amount ?? 0) /
 									10 **
-										($user_tokens.find((t) => t.name == 'sigUSD')?.decimals ??
+										($user_tokens.find((t) => t.name == 'SigUSD')?.decimals ??
 											2)}
-							</span><span> sigUSD</span></span
+							</span><span> SigUSD</span></span
 						>
 					</div>
-					<a href="/assets/deposit/sigUSD" class="actions_deposit"
+					<a href="/assets/deposit/SigUSD" class="actions_deposit"
 						><svg
 							class="sc-eqUAAy cMqsAc mx-icon"
 							focusable="false"
@@ -351,7 +354,7 @@
 								type="text"
 								on:input={handleBuyPriceChange}
 								bind:value={buyPriceInput}
-							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
+							/><span class="ant-input-suffix"><span>SigUSD</span> </span></span
 						>
 					</div>
 				</div>
@@ -443,7 +446,7 @@
 								type="text"
 								on:input={handleBuyTotalChange}
 								bind:value={buyTotalInput}
-							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
+							/><span class="ant-input-suffix"><span>SigUSD</span> </span></span
 						>
 					</div>
 				</div>
@@ -500,7 +503,7 @@
 								type="text"
 								on:input={handleSellPriceChange}
 								bind:value={sellPriceInput}
-							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
+							/><span class="ant-input-suffix"><span>SigUSD</span> </span></span
 						>
 					</div>
 				</div>
@@ -592,7 +595,7 @@
 								type="text"
 								on:input={handleSellTotalChange}
 								bind:value={sellTotalInput}
-							/><span class="ant-input-suffix"><span>sigUSD</span> </span></span
+							/><span class="ant-input-suffix"><span>SigUSD</span> </span></span
 						>
 					</div>
 				</div>

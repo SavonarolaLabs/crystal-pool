@@ -1,6 +1,6 @@
 import type { BoxRow } from '$lib/types/boxRow';
 import type { WithdrawRequestParams } from '$lib/types/request';
-import type { SwapRequest } from './tradingService';
+import type { SwapRequest } from '$lib/types/trading';
 
 const CRYSTALPOOL_URL = 'http://127.0.0.1:3000';
 const CONFIGURE_SWAP_REQUEST = '/swap-order/configure';
@@ -71,7 +71,7 @@ export async function userBoxes(address: string): Promise<BoxRow[]> {
 	return await get(USER_BOXES + address);
 }
 
-export async function createWithdrawTx(params: WithdrawRequestParams){
+export async function createWithdrawTx(params: WithdrawRequestParams) {
 	return await post(WITHDRAW_CREATE_TX, params);
 }
 

@@ -270,10 +270,10 @@ export const user_tokens = writable([
 		decimals: TOKEN.rsBTC.decimals
 	},
 	{
-		name: TOKEN.sigUSD.name,
-		tokenId: TOKEN.sigUSD.tokenId,
+		name: TOKEN.SigUSD.name,
+		tokenId: TOKEN.SigUSD.tokenId,
 		amount: 0,
-		decimals: TOKEN.sigUSD.decimals
+		decimals: TOKEN.SigUSD.decimals
 	}
 ]);
 

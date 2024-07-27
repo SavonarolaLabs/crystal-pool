@@ -5,21 +5,21 @@ export const TOKEN = {
 		decimals: 9,
 		type: 'EIP-004'
 	},
-	sigUSD: {
+	SigUSD: {
 		tokenId: 'f60bff91f7ae3f3a5f0c2d35b46ef8991f213a61d7f7e453d344fa52a42d9f9a',
-		name: 'sigUSD',
+		name: 'SigUSD',
 		decimals: 2,
 		type: 'EIP-004'
 	}
 };
 
 export const pairName = {
-	rsBTC_sigUSD: 'rsBTC_sigUSD'
+	rsBTC_SigUSD: 'rsBTC_SigUSD'
 };
 
 export const tradingPairs = [
 	{
-		name: pairName.rsBTC_sigUSD,
-		tokens: [TOKEN.rsBTC.tokenId, TOKEN.sigUSD.tokenId]
+		name: pairName.rsBTC_SigUSD,
+		tokens: [TOKEN.rsBTC.tokenId, TOKEN.SigUSD.tokenId]
 	}
 ];

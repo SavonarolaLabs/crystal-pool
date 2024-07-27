@@ -6,9 +6,7 @@
 					<div class="scroll-subtabs_tabs">
 						<div class="scroll-subtabs_subMarketWrap">
 							<div class="orders_headerLeftWrapper">
-								<div class="orders_tab orders_tab-active">
-									Open orders
-								</div>
+								<div class="orders_tab orders_tab-active">Open orders</div>
 								<div class="orders_tab">Order history</div>
 							</div>
 						</div>
@@ -17,16 +15,9 @@
 			</div>
 			<div class="orders_headerRight">
 				<div class="orders_showCurrent">
-					<label
-						class="ant-checkbox-wrapper"
-						style="color: var(--text-secondary);"
-					>
+					<label class="ant-checkbox-wrapper" style="color: var(--text-secondary);">
 						<span class="ant-checkbox"
-							><input
-								type="checkbox"
-								class="ant-checkbox-input"
-								value=""
-							/>
+							><input type="checkbox" class="ant-checkbox-input" value="" />
 							<span class="ant-checkbox-inner"></span>
 						</span>
 						<span style="font-size: 12px;">Hide Other Pairs</span>
@@ -101,32 +92,28 @@
 		</section>
 		<div class="table-content">
 			{#each new Array(7) as i}
-			<div class="table-row">
-					<div class="orders_cell_data orders_symbol">rsBTC/sigUSD</div>
-					<div class="orders_cell_data orders_date">
-						20:32:12
-					</div>
-					<div class="orders_cell_data orders_type">
-						Limit
-					</div>
+				<div class="table-row">
+					<div class="orders_cell_data orders_symbol">rsBTC/SigUSD</div>
+					<div class="orders_cell_data orders_date">20:32:12</div>
+					<div class="orders_cell_data orders_type">Limit</div>
 					<div class="orders_cell_data orders_side">Buy</div>
 					<div class="orders_cell_data orders_price">65,000.00</div>
 					<div class="orders_cell_data orders_quantity">0.3</div>
 					<div class="orders_cell_data orders_amount">$37,500.00</div>
 					<div class="orders_cell_data orders_filled">0%</div>
 					<div class="orders_cell_data orders_cancel">cancel</div>
-			</div>
+				</div>
 			{/each}
 		</div>
 	</section>
 </div>
 
 <style lang="postcss">
-	.table-content{
+	.table-content {
 		padding-inline-start: 16px;
 		padding-inline-end: 16px;
 	}
-	.table-row{
+	.table-row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -261,8 +248,7 @@
 		height: var(--checkbox-size);
 		direction: ltr;
 		background-color: initial;
-		border: var(--checkbox-border-width) var(--border-style-base)
-			var(--border-color-base);
+		border: var(--checkbox-border-width) var(--border-style-base) var(--border-color-base);
 		border-radius: var(--checkbox-border-radius);
 		border-collapse: initial;
 		transition: all 0.3s;
