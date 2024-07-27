@@ -24,7 +24,7 @@ export function createSwapOrderTx(
 	price: string,
 	currentHeight: number
 ): EIP12UnsignedTransaction {
-	const inputBoxes = makerDepositBoxes;
+	const despositBoxes = makerDepositBoxes;
 	const [numerator, denominator] = splitRateStringToNumDenom(price);
 
 	const outputSwapOrder = new OutputBuilder(nanoErg, SWAP_ORDER_ADDRESS)
@@ -34,27 +34,31 @@ export function createSwapOrderTx(
 				SGroupElement(first(ErgoAddress.fromBase58(makerPK).getPublicKeys())),
 				SGroupElement(first(ErgoAddress.fromBase58(SHADOWPOOL_ADDRESS).getPublicKeys()))
 			]).toHex(),
-			R5: inputBoxes[0].additionalRegisters.R5!,
+			R5: despositBoxes[0].additionalRegisters.R5!,
 			R6: SPair(SColl(SByte, makerToken.tokenId), SColl(SByte, takerTokenId)).toHex(),
 			R7: SColl(SLong, [numerator, denominator]).toHex(),
 			R8: SColl(SByte, ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree).toHex()
 		});
 
-	// TODO: make change conditional
-	const change = new OutputBuilder(
-		sumNanoErg(inputBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
-		DEPOSIT_ADDRESS
-	)
-		.setAdditionalRegisters({
-			R4: inputBoxes[0].additionalRegisters.R4,
-			R5: inputBoxes[0].additionalRegisters.R5
-		})
-		.addTokens(calcTokenChange([...inputBoxes], [makerToken]));
+	let change;
+	if (sumNanoErg(despositBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE > 0) {
+		change = new OutputBuilder(
+			sumNanoErg(despositBoxes) - asBigInt(nanoErg) - RECOMMENDED_MIN_FEE_VALUE,
+			DEPOSIT_ADDRESS
+		)
+			.setAdditionalRegisters({
+				R4: despositBoxes[0].additionalRegisters.R4,
+				R5: despositBoxes[0].additionalRegisters.R5
+			})
+			.addTokens(calcTokenChange([...despositBoxes], [makerToken]));
+	}
 
 	const unsignedTransaction = new TransactionBuilder(currentHeight)
-		.configureSelector((selector) => selector.ensureInclusion(inputBoxes.map((b) => b.boxId)))
-		.from(inputBoxes)
-		.to([outputSwapOrder, change])
+		.configureSelector((selector) =>
+			selector.ensureInclusion(despositBoxes.map((b) => b.boxId))
+		)
+		.from(despositBoxes)
+		.to([outputSwapOrder, change].filter((x) => x != undefined))
 		.payFee(RECOMMENDED_MIN_FEE_VALUE)
 		.build()
 		.toEIP12Object();
