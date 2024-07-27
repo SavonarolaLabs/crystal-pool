@@ -1,20 +1,20 @@
-import { compile } from "@fleet-sdk/compiler";
+import { compile } from '@fleet-sdk/compiler';
 import {
-    SAFE_MIN_BOX_VALUE,
-    SByte,
-    SColl,
-    SGroupElement,
-    SInt,
-    SLong,
-    SSigmaProp,
-    TransactionBuilder
-} from "@fleet-sdk/core";
-import { KeyedMockChainParty, MockChain } from "@fleet-sdk/mock-chain";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { ergOutput, rsBTC, rsBtcId } from "./helper";
+	SAFE_MIN_BOX_VALUE,
+	SByte,
+	SColl,
+	SGroupElement,
+	SInt,
+	SLong,
+	SSigmaProp,
+	TransactionBuilder
+} from '@fleet-sdk/core';
+import { KeyedMockChainParty, MockChain } from '@fleet-sdk/mock-chain';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { ergOutput, rsBTC, rsBtcId } from './helper';
 
-describe("Timed fund contract", () => {
-    const ergoTree = compile(`{
+describe('Timed fund contract', () => {
+	const ergoTree = compile(`{
     def getBuyerPk(box: Box)               = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)
     def getPoolPk(box: Box)                = box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(1)
     def unlockHeight(box: Box)             = box.R5[Int].getOrElse(0)
@@ -108,170 +108,170 @@ describe("Timed fund contract", () => {
         getBuyerPk(SELF) && getPoolPk(SELF) || sigmaProp(isPaidAtFairRate) && getPoolPk(SELF)
     }
 }`);
-    const mockChain = new MockChain({ height: 1_052_944 });
-    const unlockHeight = mockChain.height + 500;
-    const pool = mockChain.newParty("Pool");
-    const buyer = mockChain.newParty("Seller");
-    const buyer2 = mockChain.newParty("Seller2");
-    const executor = mockChain.newParty("Bob");
-    mockChain.parties;
+	const mockChain = new MockChain({ height: 1_052_944 });
+	const unlockHeight = mockChain.height + 500;
+	const pool = mockChain.newParty('Pool');
+	const maker = mockChain.newParty('Seller');
+	const maker2 = mockChain.newParty('Seller2');
+	const taker = mockChain.newParty('Bob');
+	mockChain.parties;
 
-    const wtb = mockChain.addParty(ergoTree.toHex(), "Token Buy Contract");
+	const wtb = mockChain.addParty(ergoTree.toHex(), 'Token Buy Contract');
 
-    const buyBtcUsdRegs = (pk: KeyedMockChainParty, rate: bigint = 1n, denom: bigint = 1n) => ({
-        R4: SColl(SSigmaProp, [
-            SGroupElement(pk.key.publicKey),
-            SGroupElement(pool.key.publicKey)
-        ]).toHex(),
-        R5: SInt(unlockHeight).toHex(),
-        R6: SColl(SByte, rsBtcId).toHex(),
-        R7: SColl(SLong, [rate, denom]).toHex(),
-        R8: SColl(SByte, pk.ergoTree).toHex()
-    });
+	const buyBtcUsdRegs = (pk: KeyedMockChainParty, rate: bigint = 1n, denom: bigint = 1n) => ({
+		R4: SColl(SSigmaProp, [
+			SGroupElement(pk.key.publicKey),
+			SGroupElement(pool.key.publicKey)
+		]).toHex(),
+		R5: SInt(unlockHeight).toHex(),
+		R6: SColl(SByte, rsBtcId).toHex(),
+		R7: SColl(SLong, [rate, denom]).toHex(),
+		R8: SColl(SByte, pk.ergoTree).toHex()
+	});
 
-    afterEach(() => {
-        mockChain.reset();
-    });
+	afterEach(() => {
+		mockChain.reset();
+	});
 
-    describe("Buy before unlockHeight", () => {
-        beforeEach(() => {
-            executor.addBalance({ nanoergs: 100_000n, tokens: [rsBTC(1000)] });
-        });
-        it("wtb 100 rsBTC with 100 nanoErg", () => {
-            wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(buyer, 1n, 1n));
+	describe('Buy before unlockHeight', () => {
+		beforeEach(() => {
+			taker.addBalance({ nanoergs: 100_000n, tokens: [rsBTC(1000)] });
+		});
+		it('wtb 100 rsBTC with 100 nanoErg', () => {
+			wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([ergOutput(buyer, 1_000n, [rsBTC(100)], buyBtcUsdRegs(buyer))])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([ergOutput(maker, 1_000n, [rsBTC(100)], buyBtcUsdRegs(maker))])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor] })).to.be.true;
-        });
+			expect(mockChain.execute(transaction, { signers: [pool, taker] })).to.be.true;
+		});
 
-        it("can't underpay nanoErg", () => {
-            wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(buyer, 1n, 1n));
+		it("can't underpay nanoErg", () => {
+			wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([ergOutput(buyer, 1_000n - 1n, [rsBTC(100)], buyBtcUsdRegs(buyer))])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([ergOutput(maker, 1_000n - 1n, [rsBTC(100)], buyBtcUsdRegs(maker))])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor], throw: false })).to
-                .be.false;
-        });
+			expect(mockChain.execute(transaction, { signers: [pool, taker], throw: false })).to.be
+				.false;
+		});
 
-        it("can't underpay tokens", () => {
-            wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(buyer, 1n, 1n));
+		it("can't underpay tokens", () => {
+			wtb.addBalance({ nanoergs: 1_000n + 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([ergOutput(buyer, 1_000n, [rsBTC(100 - 1)], buyBtcUsdRegs(buyer))])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([ergOutput(maker, 1_000n, [rsBTC(100 - 1)], buyBtcUsdRegs(maker))])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor], throw: false })).to
-                .be.false;
-        });
+			expect(mockChain.execute(transaction, { signers: [pool, taker], throw: false })).to.be
+				.false;
+		});
 
-        it("wtb [100BTC, 100E], [100BTC, 200E]", () => {
-            wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(buyer, 1n, 1n));
-            wtb.addBalance({ nanoergs: 200n }, buyBtcUsdRegs(buyer, 2n, 1n));
+		it('wtb [100BTC, 100E], [100BTC, 200E]', () => {
+			wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
+			wtb.addBalance({ nanoergs: 200n }, buyBtcUsdRegs(maker, 2n, 1n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([ergOutput(buyer, 1n, [rsBTC(500)], buyBtcUsdRegs(buyer))])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([ergOutput(maker, 1n, [rsBTC(500)], buyBtcUsdRegs(maker))])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor] })).to.be.true;
-        });
+			expect(mockChain.execute(transaction, { signers: [pool, taker] })).to.be.true;
+		});
 
-        it("change can be sent to buyer address", () => {
-            wtb.addBalance({ nanoergs: 2_000n }, buyBtcUsdRegs(buyer, 1n, 10n));
+		it('change can be sent to maker address', () => {
+			wtb.addBalance({ nanoergs: 2_000n }, buyBtcUsdRegs(maker, 1n, 10n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([ergOutput(buyer, 2_000n - 10n, [rsBTC(1)], buyBtcUsdRegs(buyer))])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([ergOutput(maker, 2_000n - 10n, [rsBTC(1)], buyBtcUsdRegs(maker))])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor] })).to.be.true;
-        });
-        it("change can be sent to contract change box", () => {
-            wtb.addBalance({ nanoergs: 1_000n + 1_000n }, buyBtcUsdRegs(buyer, 1n, 10n));
+			expect(mockChain.execute(transaction, { signers: [pool, taker] })).to.be.true;
+		});
+		it('change can be sent to contract change box', () => {
+			wtb.addBalance({ nanoergs: 1_000n + 1_000n }, buyBtcUsdRegs(maker, 1n, 10n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([ergOutput(buyer, 10n, [rsBTC(1)], buyBtcUsdRegs(buyer))])
-                .to([ergOutput(wtb, 2_000n - 20n, [], buyBtcUsdRegs(buyer, 1n, 10n))])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([ergOutput(maker, 10n, [rsBTC(1)], buyBtcUsdRegs(maker))])
+				.to([ergOutput(wtb, 2_000n - 20n, [], buyBtcUsdRegs(maker, 1n, 10n))])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor] })).to.be.true;
-        });
-        it("can't manipulate rate in contract change box", () => {
-            wtb.addBalance({ nanoergs: 1_000n + 1_000n }, buyBtcUsdRegs(buyer, 1n, 10n));
+			expect(mockChain.execute(transaction, { signers: [pool, taker] })).to.be.true;
+		});
+		it("can't manipulate rate in contract change box", () => {
+			wtb.addBalance({ nanoergs: 1_000n + 1_000n }, buyBtcUsdRegs(maker, 1n, 10n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([ergOutput(buyer, 10n, [rsBTC(1)], buyBtcUsdRegs(buyer))])
-                .to([ergOutput(wtb, 2_000n - 20n, [], buyBtcUsdRegs(buyer, 1n, 100n))])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([ergOutput(maker, 10n, [rsBTC(1)], buyBtcUsdRegs(maker))])
+				.to([ergOutput(wtb, 2_000n - 20n, [], buyBtcUsdRegs(maker, 1n, 100n))])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor], throw: false })).to
-                .be.false;
-        });
+			expect(mockChain.execute(transaction, { signers: [pool, taker], throw: false })).to.be
+				.false;
+		});
 
-        it(`wtb 
+		it(`wtb 
             20ERG/BTC for 1000ERG  (50BTC max), 
             1ERG/BTC for  100ERG (100BTC max)`, () => {
-            // rate = token/ERG
-            wtb.addBalance({ nanoergs: 1000n }, buyBtcUsdRegs(buyer, 1n, 20n));
-            wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(buyer, 1n, 1n));
+			// rate = token/ERG
+			wtb.addBalance({ nanoergs: 1000n }, buyBtcUsdRegs(maker, 1n, 20n));
+			wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([ergOutput(buyer, 1n, [rsBTC(150)], buyBtcUsdRegs(buyer))])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([ergOutput(maker, 1n, [rsBTC(150)], buyBtcUsdRegs(maker))])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor] })).to.be.true;
-        });
+			expect(mockChain.execute(transaction, { signers: [pool, taker] })).to.be.true;
+		});
 
-        it(`can't steal value with change erg
+		it(`can't steal value with change erg
             20ERG/BTC for 1000ERG  (50BTC max), 
             1ERG/BTC for  100ERG (100BTC max)`, () => {
-            const stealNanoErg = 1n;
-            wtb.addBalance({ nanoergs: 1000n }, buyBtcUsdRegs(buyer, 1n, 20n));
-            wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(buyer, 1n, 1n));
+			const stealNanoErg = 1n;
+			wtb.addBalance({ nanoergs: 1000n }, buyBtcUsdRegs(maker, 1n, 20n));
+			wtb.addBalance({ nanoergs: 100n }, buyBtcUsdRegs(maker, 1n, 1n));
 
-            const transaction = new TransactionBuilder(mockChain.height)
-                .configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
-                .from([...wtb.utxos, ...executor.utxos])
-                .to([
-                    ergOutput(
-                        buyer,
-                        1000n + 20n - stealNanoErg,
-                        [rsBTC(100 - 1)],
-                        buyBtcUsdRegs(buyer)
-                    )
-                ])
-                .sendChangeTo(executor.address)
-                .build();
+			const transaction = new TransactionBuilder(mockChain.height)
+				.configureSelector((s) => s.ensureInclusion((b) => b.ergoTree === wtb.ergoTree))
+				.from([...wtb.utxos, ...taker.utxos])
+				.to([
+					ergOutput(
+						maker,
+						1000n + 20n - stealNanoErg,
+						[rsBTC(100 - 1)],
+						buyBtcUsdRegs(maker)
+					)
+				])
+				.sendChangeTo(taker.address)
+				.build();
 
-            expect(mockChain.execute(transaction, { signers: [pool, executor], throw: false })).to
-                .be.false;
-        });
-    });
+			expect(mockChain.execute(transaction, { signers: [pool, taker], throw: false })).to.be
+				.false;
+		});
+	});
 });
