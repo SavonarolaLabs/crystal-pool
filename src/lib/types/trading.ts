@@ -1,10 +1,10 @@
 import type { Amount } from '@fleet-sdk/common';
 
-type PK = string;
-type Price = string;
-type TradingPair = string;
-type Side = 'BUY' | 'SELL';
-type TokenId = string;
+export type PK = string;
+export type Price = string;
+export type TradingPair = string;
+export type Side = 'BUY' | 'SELL';
+export type TokenId = string;
 
 export type SwapRequest = {
 	makerPk: PK;

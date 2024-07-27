@@ -1,8 +1,13 @@
-import { BUY_ORDER_ADDRESS, DEPOSIT_ADDRESS, SELL_ORDER_ADDRESS, SWAP_ORDER_ADDRESS } from "$lib/constants/addresses";
-import { tradingPairs } from "$lib/constants/tokens";
-import type { BoxParameters, ContractType } from "$lib/types/boxRow";
-import { ErgoAddress, ErgoTree, type Box } from "@fleet-sdk/core";
-import { parse } from "@fleet-sdk/serializer";
+import {
+	BUY_ORDER_ADDRESS,
+	DEPOSIT_ADDRESS,
+	SELL_ORDER_ADDRESS,
+	SWAP_ORDER_ADDRESS
+} from '$lib/constants/addresses';
+import { tradingPairs } from '$lib/constants/tokens';
+import type { BoxParameters, ContractType } from '$lib/types/boxRow';
+import { ErgoAddress, ErgoTree, type Box } from '@fleet-sdk/core';
+import { parse } from '@fleet-sdk/serializer';
 
 export function parseBox(
 	box: Box,
@@ -101,7 +106,6 @@ export function contractTypeFromErgoTree(box: Box): ContractType {
 	}
 }
 
-
 export function pairAndSideByTokenIds(
 	tokenId: string,
 	additionalTokenId: string = ''
@@ -112,12 +116,12 @@ export function pairAndSideByTokenIds(
 	if (pair) {
 		return {
 			pair: pair.name,
-			side: pair.tokens.indexOf(tokenId) == 0 ? 'sell' : 'buy'
+			side: pair.tokens.indexOf(tokenId) == 0 ? 'SELL' : 'BUY'
 		};
 	} else {
 		return {
 			pair: '',
-			side: 'sell'
+			side: 'SELL'
 		};
 	}
 }

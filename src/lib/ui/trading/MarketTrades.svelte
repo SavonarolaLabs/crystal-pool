@@ -13,8 +13,8 @@
 		<div class="trades_row">
 			<div
 				class="trades_price"
-				class:trades_sell={trade.side == 'sell'}
-				class:trades_buy={trade.side == 'buy'}
+				class:trades_sell={trade.side == 'SELL'}
+				class:trades_buy={trade.side == 'BUY'}
 			>
 				{trade.price}
 			</div>

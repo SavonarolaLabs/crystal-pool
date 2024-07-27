@@ -20,8 +20,8 @@ export function createOrderBook(tradingPair: string, db: BoxDB) {
 	});
 	//parameters.rate
 
-	const buyOrders = allOrders.filter((order) => order.side == 'buy');
-	const sellOrders = allOrders.filter((order) => order.side == 'sell');
+	const buyOrders = allOrders.filter((order) => order.side == 'BUY');
+	const sellOrders = allOrders.filter((order) => order.side == 'SELL');
 
 	const orderbook = {
 		buy: buyOrders.map((r) => {

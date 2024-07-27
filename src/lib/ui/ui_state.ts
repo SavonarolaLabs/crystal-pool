@@ -178,7 +178,7 @@ const dummy_trades = Array.from({ length: 50 }, () => ({
 	price: 69001.34,
 	amount: 1.302628,
 	time: '20:20:12',
-	side: Math.random() < 0.5 ? 'buy' : 'sell'
+	side: Math.random() < 0.5 ? 'BUY' : 'SELL'
 }));
 
 export const market_trades: Writable<Array<MarketTrade>> = writable(dummy_trades);
@@ -215,7 +215,7 @@ export const orderbook_buy: Writable<Array<Order>> = writable([]);
 export const orderbook_latest = writable({
 	price: '69,001.34',
 	value: '69,001.34',
-	side: 'sell'
+	side: 'SELL'
 });
 
 function roundToStep(price: number, step: number): number {

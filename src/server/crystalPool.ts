@@ -76,14 +76,13 @@ export async function signWithdraw(unsignedTx, hints, db) {
 }
 
 export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
-	const [rate, denom] = splitSellRate(swapParams.price);
 	const height = 1273521;
 
 	const swapOrderInputBoxes: any = db.boxRows.filter(
 		(b) =>
 			b.contract == 'SWAP' &&
 			//@ts-ignore
-			b.parameters.side == 'sell' &&
+			b.parameters.side == 'SELL' &&
 			//@ts-ignore
 			b.parameters.rate == rate &&
 			//@ts-ignore

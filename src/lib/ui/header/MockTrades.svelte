@@ -7,7 +7,7 @@
 			price: (Math.random() * (70000 - 68000) + 68000).toFixed(2),
 			amount: (Math.random() * 2).toFixed(6),
 			time: new Date().toLocaleTimeString(),
-			side: Math.random() < 0.5 ? 'buy' : 'sell'
+			side: Math.random() < 0.5 ? 'BUY' : 'SELL'
 		};
 	}
 

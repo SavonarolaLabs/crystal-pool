@@ -188,7 +188,7 @@
 			amount: real_amount.toString(),
 			sellingTokenId: sellingToken.tokenId,
 			buyingTokenId: buyingToken.tokenId,
-			side: 'buy'
+			side: 'BUY'
 		};
 		//
 
@@ -237,7 +237,7 @@
 			amount: real_amount.toString(),
 			sellingTokenId: sellingToken.tokenId,
 			buyingTokenId: buyingToken.tokenId,
-			side: 'sell'
+			side: 'SELL'
 		};
 		console.log('swap params for selling:', swapParams);
 		//----------------------------
@@ -276,7 +276,7 @@
 			amount: real_amount.toString(),
 			sellingTokenId: sellingToken.tokenId,
 			buyingTokenId: buyingToken.tokenId,
-			side: 'sell'
+			side: 'SELL'
 		};
 		console.log('swap params for configuring buy action:', swapParams);
 

@@ -1,4 +1,5 @@
 import type { Box } from '@fleet-sdk/common';
+import type { Side, TradingPair } from './trading';
 
 export type ContractType = 'DEPOSIT' | 'BUY' | 'SELL' | 'SWAP' | 'UNKNOWN';
 
@@ -12,16 +13,16 @@ export type BuyParams = DepositParams & {
 	tokenId: string;
 	buyRate: bigint;
 	buyerMultisigAddress: string;
-	pair: string;
-	side: string;
+	pair: TradingPair;
+	side: Side;
 };
 
 export type SellParams = DepositParams & {
 	tokenId: string;
 	sellRate: bigint;
 	sellerMultisigAddress: string;
-	pair: string;
-	side: string;
+	pair: TradingPair;
+	side: Side;
 };
 
 export type SwapParams = DepositParams & {
@@ -30,8 +31,8 @@ export type SwapParams = DepositParams & {
 	rate: bigint;
 	denom: bigint;
 	sellerMultisigAddress: string;
-	pair: string;
-	side: string;
+	pair: TradingPair;
+	side: Side;
 };
 
 export type BoxParameters = {

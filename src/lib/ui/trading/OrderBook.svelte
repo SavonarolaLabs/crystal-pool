@@ -143,8 +143,8 @@
 		<div class="flex items-center">
 			<span
 				class="orderbook_bigPrice"
-				class:orderbook_sell={$orderbook_latest.side == 'sell'}
-				class:orderbook_buy={$orderbook_latest.side == 'buy'}
+				class:orderbook_sell={$orderbook_latest.side == 'SELL'}
+				class:orderbook_buy={$orderbook_latest.side == 'BUY'}
 				><span>{$orderbook_latest.price}</span><svg
 					class="orderbook_updownArrow"
 					focusable="false"

@@ -76,8 +76,7 @@ export function executeSwap(
 	const paymentOutputBox = new OutputBuilder(nanoErg, DEPOSIT_ADDRESS)
 		.setAdditionalRegisters({
 			R4: swapOrderInputBoxes[0].additionalRegisters.R4,
-			R5: swapOrderInputBoxes[0].additionalRegisters.R5,
-			R6: swapOrderInputBoxes[0].additionalRegisters.R6
+			R5: swapOrderInputBoxes[0].additionalRegisters.R5
 		})
 		.addTokens(tokensAsPayment);
 

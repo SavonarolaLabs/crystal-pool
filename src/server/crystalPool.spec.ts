@@ -1,17 +1,18 @@
+import { ALICE_ADDRESS, BOB_ADDRESS } from '$lib/constants/addresses';
+import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
+import { TOKEN } from '$lib/constants/tokens';
+import type { SwapRequest } from '$lib/types/trading';
+import { b, signTxInput } from '$lib/wallet/multisig-server';
+import type { Box } from '@fleet-sdk/common';
 import { describe, expect, it } from 'vitest';
-import { initDb, db_initDepositUtxo, db_clearDB } from './db/db';
-import { decodeR4, parseBox } from './db/boxParser';
 import {
 	createExecuteSwapOrderTx,
 	signExecuteSwapOrder,
 	signSwap,
 	swapOrderTxWithCommits
 } from './crystalPool';
-import { ALICE_ADDRESS, BOB_ADDRESS } from '$lib/constants/addresses';
-import { TOKEN } from '$lib/constants/tokens';
-import { b, signTxInput } from '$lib/wallet/multisig-server';
-import { ALICE_MNEMONIC, BOB_MNEMONIC } from '$lib/constants/mnemonics';
-import type { Box } from '@fleet-sdk/common';
+import { decodeR4, parseBox } from './db/boxParser';
+import { db_clearDB, db_initDepositUtxo, initDb } from './db/db';
 
 describe('swap', () => {
 	const swapCreator: string = 'bob';
@@ -37,14 +38,16 @@ describe('swap', () => {
 
 		await db_initDepositUtxo(db);
 
-		const swapParamsCreate = {
-			address: swapCreatorAddress,
+		const swapParams: SwapRequest = {
+			makerPk: swapCreatorAddress,
+			nanoErg: 10000n,
 			price: '0.002',
-			amount: '10000',
-			sellingTokenId: TOKEN.rsBTC.tokenId,
-			buyingTokenId: TOKEN.SigUSD.tokenId
+			makerToken: { tokenId: TOKEN.SigUSD.tokenId, amount: 100n },
+			takerTokenId: TOKEN.rsBTC.tokenId,
+			tradingPair: 'rsBTC_SigUSD',
+			side: 'BUY'
 		};
-		let { unsignedTx, publicCommitsPool } = await swapOrderTxWithCommits(swapParamsCreate, db);
+		let { unsignedTx, publicCommitsPool } = await swapOrderTxWithCommits(swapParams, db);
 		expect(unsignedTx).toBeDefined();
 
 		//signByUser
@@ -59,12 +62,17 @@ describe('swap', () => {
 		//signByServer
 		let signedTx = await signSwap(unsignedTx, extractedHints, db);
 
-		// prettier-ignore
-		{
 		expect(db.boxRows.find((b) => b.contract == 'SWAP')).toBeDefined();
-		expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapCreatorAddress)).toBeDefined();
-		expect(db.boxRows.find((b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapExecutorAddress)).toBeDefined();
-		}
+		expect(
+			db.boxRows.find(
+				(b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapCreatorAddress
+			)
+		).toBeDefined();
+		expect(
+			db.boxRows.find(
+				(b) => b.contract == 'DEPOSIT' && b.parameters.userPk == swapExecutorAddress
+			)
+		).toBeDefined();
 
 		// execute Tx + sign
 		const swapParamsExecute = {
