@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { proxyRecogniser, proxyRecogniser_fix } from './proxyRecongniser';
+import { proxyRecogniser, proxyRecogniser_fix } from './proxyRecogniser';
 import {
 	tx_example_good_v1,
 	tx_example_good_v2,
