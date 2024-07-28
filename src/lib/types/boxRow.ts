@@ -1,13 +1,15 @@
 import type { Box } from '@fleet-sdk/common';
 import type { Side, TradingPair } from './trading';
 
-export type ContractType = 'DEPOSIT' | 'BUY' | 'SELL' | 'SWAP' | 'UNKNOWN';
+export type ContractType = 'PROXY' | 'DEPOSIT' | 'BUY' | 'SELL' | 'SWAP' | 'UNKNOWN';
 
 export type DepositParams = {
 	userPk: string;
 	poolPk: string;
 	unlockHeight: number;
 };
+
+export type ProxyParams = DepositParams;
 
 export type BuyParams = DepositParams & {
 	tokenId: string;
@@ -37,14 +39,14 @@ export type SwapParams = DepositParams & {
 
 export type BoxParameters = {
 	contract: ContractType;
-	parameters: DepositParams | BuyParams | SellParams | SwapParams;
+	parameters: ProxyParams | DepositParams | BuyParams | SellParams | SwapParams;
 };
 
 export type BoxRow = {
 	id: number;
 	box: Box;
 	contract: ContractType;
-	parameters: DepositParams | BuyParams | SellParams | SwapParams;
+	parameters: ProxyParams | DepositParams | BuyParams | SellParams | SwapParams;
 	unspent: boolean;
 };
 

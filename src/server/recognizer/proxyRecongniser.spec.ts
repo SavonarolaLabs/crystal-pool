@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { proxyRecogniser } from './proxyRecongniser';
+import { proxyRecogniser, proxyRecogniser_fix } from './proxyRecongniser';
 import {
 	tx_example_good_v1,
 	tx_example_good_v2,
@@ -21,7 +21,7 @@ describe('proxy recognizer find outputs', () => {
 		expect(legitOutputs.length).toBe(1);
 	});
 	it('found', () => {
-		let legitOutputs = proxyRecogniser(tx_example_good_v3);
+		let legitOutputs = proxyRecogniser_fix(tx_example_good_v3);
 		expect(legitOutputs.length).toBe(1);
 	});
 });
