@@ -1,4 +1,4 @@
-export const tx_example_wrong = {
+export const tx_no_outputs = {
 	id: 'c7160733b052cb3e76e46696ecc5e333bb3bbeed5e44dd90cb954dd09e1f0943',
 	inputs: [
 		{
@@ -77,7 +77,7 @@ export const tx_example_wrong = {
 	}
 };
 
-export const tx_example_good_v1 = {
+export const tx_one_output_v1 = {
 	id: 'ad22ba1540091326fe3967c69a059648bf5cd6c36192d51acea2a85eca766d76',
 	inputs: [
 		{
@@ -177,7 +177,7 @@ export const tx_example_good_v1 = {
 	}
 };
 
-export const tx_example_good_v2 = {
+export const tx_one_output_v2 = {
 	id: '1f239a2d6c62e7533d4cdc071848330db36e299ae078a168eaa2bcb6fb567b5f',
 	inputs: [
 		{
@@ -349,7 +349,7 @@ export const tx_example_good_v2 = {
 	}
 };
 
-export const tx_example_good_v3 = {
+export const tx_one_output_v3 = {
 	id: 'c59b4b20649c366746d048b4630eedf3081370d52e93b9ac646d3e5086f72fb6',
 	inputs: [
 		{
@@ -521,7 +521,7 @@ export const tx_example_good_v3 = {
 	}
 };
 
-export const tx_example_good_v4 = {
+export const tx_one_output_v4 = {
 	id: '3a3008da39d8dca753129ac337ba48c57add0f9908cb099f60c746b490e1fec2',
 	inputs: [
 		{

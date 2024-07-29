@@ -9,7 +9,9 @@ export type DepositParams = {
 	unlockHeight: number;
 };
 
-export type ProxyParams = DepositParams;
+export type ProxyParams = DepositParams & {
+	minerFee: number;
+};
 
 export type BuyParams = DepositParams & {
 	tokenId: string;
