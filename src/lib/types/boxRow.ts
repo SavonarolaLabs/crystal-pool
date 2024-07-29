@@ -11,6 +11,7 @@ export type DepositParams = {
 
 export type ProxyParams = DepositParams & {
 	minerFee: number;
+	notEnoughErgoToForward: boolean;
 };
 
 export type BuyParams = DepositParams & {
