@@ -33,8 +33,8 @@ import {
 	type Input
 } from 'ergo-lib-wasm-nodejs';
 import { describe, expect, it } from 'vitest';
-import { parseBox } from '../../server/db/boxParser';
 import { createSwapOrderTx, executeSwap } from '../wallet/swap';
+import { parseBox } from '../../server/parser/boxParser';
 
 const CONTRACT_FOR_TEST = `{	
 	def getSellerPk(box: Box)              	= box.R4[Coll[SigmaProp]].getOrElse(Coll[SigmaProp](sigmaProp(false),sigmaProp(false)))(0)

@@ -4,11 +4,11 @@ import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '../../lib/constants/address
 import { initDeposits } from '../../lib/server-agent/simulator';
 import type { BoxRow, ContractType } from '../../lib/types/boxRow';
 import type { TxRow } from '../../lib/types/txRow';
-import { parseBox } from './boxParser';
-import { serializeBigInt } from './serializeBigInt';
+import { serializeBigInt } from '../../lib/utils/serializeBigInt';
 import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, persistBox } from './sqlDb';
 import type { ConfirmedTransaction } from '$lib/types/explorer';
 import type { SubmittedTxRox, TxPurpose } from '$lib/types/fallibleTxRow';
+import { parseBox } from '../parser/boxParser';
 
 interface HasId {
 	id: number;

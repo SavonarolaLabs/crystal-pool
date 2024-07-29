@@ -20,18 +20,15 @@ export function asBigInt(v: bigint | string | number) {
 		try {
 			return BigInt(v);
 		} catch (e) {
-			console.error("asBigInt"+v)
-			return 0n
+			console.error('asBigInt' + v);
+			return 0n;
 		}
 	}
-	return 0n
+	return 0n;
 }
 
 export function sumNanoErg(boxes: Box<Amount>[]): bigint {
-	return boxes.reduce(
-		(a: bigint, b: Box<Amount>) => asBigInt(a) + asBigInt(b.value),
-		0n
-	);
+	return boxes.reduce((a: bigint, b: Box<Amount>) => asBigInt(a) + asBigInt(b.value), 0n);
 }
 
 export function calcTokenChange(
@@ -39,9 +36,7 @@ export function calcTokenChange(
 	tokensOut: TokenAmount<Amount>[]
 ): TokenAmount<Amount>[] {
 	let inputCopy: Box[] = JSON.parse(JSON.stringify(utxosIn));
-	const inputTokens = inputCopy
-		.flatMap((box) => box.assets)
-		.reduce(sumAssets, []);
+	const inputTokens = inputCopy.flatMap((box) => box.assets).reduce(sumAssets, []);
 	return _subtractAssets(inputTokens, tokensOut);
 }
 
@@ -50,16 +45,10 @@ export function sumAssetsFromBoxes(boxes: Box[]) {
 }
 
 export function amountByTokenId(boxes: Box[], tokenId: string): Amount {
-	return (
-		sumAssetsFromBoxes(boxes).find((t) => t.tokenId == tokenId)?.amount ??
-		0n
-	);
+	return sumAssetsFromBoxes(boxes).find((t) => t.tokenId == tokenId)?.amount ?? 0n;
 }
 
-export function sumAssets(
-	acc: TokenAmount<Amount>[],
-	asset: TokenAmount<Amount>
-) {
+export function sumAssets(acc: TokenAmount<Amount>[], asset: TokenAmount<Amount>) {
 	const token = acc.find((t) => t.tokenId == asset.tokenId);
 	if (token) {
 		token.amount = asBigInt(token.amount) + asBigInt(asset.amount);

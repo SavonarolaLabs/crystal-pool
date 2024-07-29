@@ -11,8 +11,8 @@ import {
 	signSwap,
 	swapOrderTxWithCommits
 } from './crystalPool';
-import { decodeR4, parseBox } from './db/boxParser';
 import { db_clearDB, db_initDepositUtxo, initDb } from './db/db';
+import { decodeR4, parseBox } from './parser/boxParser';
 
 describe('swap', () => {
 	const swapCreator: string = 'bob';

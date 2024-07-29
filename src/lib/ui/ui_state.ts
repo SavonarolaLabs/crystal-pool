@@ -5,7 +5,7 @@ import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
 import type { Amount, Box, SignedTransaction, TokenAmount } from '@fleet-sdk/common';
 import type { TxHistoryEntry } from '$lib/types/txHistory';
-import { serializeBigInt } from '../../server/db/serializeBigInt';
+import { serializeBigInt } from '../utils/serializeBigInt';
 
 export const web3wallet_connected = writable(false);
 export const web3wallet_wallet_name = writable('');

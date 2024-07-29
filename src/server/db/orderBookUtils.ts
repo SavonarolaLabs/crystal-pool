@@ -1,6 +1,6 @@
 import type { BoxDB } from './db';
 import BigNumber from 'bignumber.js';
-import { serializeBigInt } from './serializeBigInt';
+import { serializeBigInt } from '../../lib/utils/serializeBigInt';
 import type { Amount } from '@fleet-sdk/common';
 import { TOKEN } from '$lib/constants/tokens';
 
