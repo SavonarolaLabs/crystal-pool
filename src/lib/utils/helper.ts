@@ -13,6 +13,10 @@ export function ergoTree(address: string): string {
 	return ErgoAddress.fromBase58(address).ergoTree;
 }
 
+export function arraysEqual(a, b) {
+	return a.length === b.length && a.every((value, index) => value === b[index]);
+}
+
 export function asBigInt(v: bigint | string | number) {
 	if (typeof v == 'bigint') {
 		return v;
