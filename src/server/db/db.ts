@@ -62,7 +62,7 @@ export function db_addBox(db: BoxDB, box: Box): BoxRow | undefined {
 			contract: boxParams.contract,
 			parameters: boxParams.parameters,
 			box,
-			unspent: true
+			spent: false
 		};
 		db.boxRows.push(newRow);
 		persistBox(newRow); // Insert into database

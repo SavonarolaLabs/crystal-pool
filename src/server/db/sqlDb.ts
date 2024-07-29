@@ -15,7 +15,7 @@ await sqlDb.exec(`
         box TEXT NOT NULL,
         contractType TEXT CHECK(contractType IN ('DEPOSIT', 'BUY', 'SELL', 'SWAP', 'UNKNOWN')),
         parameters TEXT NOT NULL,
-        unspent BOOLEAN NOT NULL
+        spent BOOLEAN NOT NULL
     )
 `);
 
@@ -29,15 +29,15 @@ function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
 
 export async function persistBox(boxRow: BoxRow): Promise<void> {
 	const serializedBoxRow = serializeBoxRow(boxRow);
-	const { id, box, contract, parameters, unspent } = serializedBoxRow;
+	const { id, box, contract, parameters, spent } = serializedBoxRow;
 	await sqlDb.run(
-		`INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
+		`INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, spent)
          VALUES (?, ?, ?, ?, ?)`,
 		id,
 		box,
 		contract,
 		parameters,
-		unspent ? 1 : 0 // Ensure boolean is stored as integer
+		spent ? 1 : 0 // Ensure boolean is stored as integer
 	);
 }
 
@@ -47,13 +47,13 @@ export async function persistMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
 		for (const row of boxRows) {
 			const serializedRow = serializeBoxRow(row);
 			await sqlDb.run(
-				`INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, unspent)
+				`INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, spent)
                  VALUES (?, ?, ?, ?, ?)`,
 				serializedRow.id,
 				serializedRow.box,
 				serializedRow.contract,
 				serializedRow.parameters,
-				serializedRow.unspent ? 1 : 0 // Ensure boolean is stored as integer
+				serializedRow.spent ? 1 : 0 // Ensure boolean is stored as integer
 			);
 		}
 		await sqlDb.exec('COMMIT');
@@ -65,7 +65,7 @@ export async function persistMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
 
 export async function loadBoxRows(): Promise<BoxRow[]> {
 	const rows = await sqlDb.all(`
-        SELECT id, box, contractType AS contract, parameters, unspent FROM boxes
+        SELECT id, box, contractType AS contract, parameters, spent FROM boxes
     `);
 
 	return rows.map(
@@ -74,13 +74,13 @@ export async function loadBoxRows(): Promise<BoxRow[]> {
 			box: string;
 			contract: string;
 			parameters: string;
-			unspent: boolean;
+			spent: boolean;
 		}) => ({
 			id: row.id,
 			box: JSON.parse(row.box),
 			contract: row.contract as BoxRow['contract'],
 			parameters: JSON.parse(row.parameters),
-			unspent: Boolean(row.unspent) // Ensure boolean is converted back from integer
+			spent: Boolean(row.spent) // Ensure boolean is converted back from integer
 		})
 	);
 }

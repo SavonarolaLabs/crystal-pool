@@ -1,8 +1,8 @@
 import { DEPOSIT_ADDRESS } from '$lib/constants/addresses';
 import type { ConfirmedTransaction } from '$lib/types/explorer';
-import { decodeR4 } from '../../server/db/boxParser';
 import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
 import { ErgoAddress } from '@fleet-sdk/core';
+import { decodeR4 } from '../../server/parser/boxParser';
 
 export function boxAtAddress(tx: SignedTransaction, address: string): Box {
 	return tx.outputs.find((o) => o.ergoTree == ErgoAddress.fromBase58(address).ergoTree)!;

@@ -46,10 +46,13 @@ export type BoxParameters = {
 
 export type BoxRow = {
 	id: number;
+} & BoxRowNoId;
+
+export type BoxRowNoId = {
 	box: Box;
 	contract: ContractType;
 	parameters: ProxyParams | DepositParams | BuyParams | SellParams | SwapParams;
-	unspent: boolean;
+	spent: boolean;
 };
 
 export type SerializedBoxRow = {
@@ -57,5 +60,5 @@ export type SerializedBoxRow = {
 	box: string;
 	contract: ContractType;
 	parameters: string;
-	unspent: boolean;
+	spent: boolean;
 };

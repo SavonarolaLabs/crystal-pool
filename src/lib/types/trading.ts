@@ -5,6 +5,7 @@ export type Price = string;
 export type TradingPair = string;
 export type Side = 'BUY' | 'SELL';
 export type TokenId = string;
+export type TransactionId = string;
 
 export type SwapRequest = {
 	makerPk: PK;

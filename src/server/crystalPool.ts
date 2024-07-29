@@ -15,6 +15,9 @@ import { createWithdrawToAddressTx } from '$lib/wallet/deposit';
 import { fetchHeight } from '$lib/external/height';
 import type { WithdrawRequestParams } from '$lib/types/request';
 import type { SwapRequest } from '$lib/types/trading';
+import type { Server } from 'socket.io';
+import { proxyOutputs } from './parser/recognizer/proxyRecognizer';
+import type { TransactionNode } from '$lib/types/node';
 
 export type TxWithCommits = {
 	unsignedTx: EIP12UnsignedTransaction;
@@ -123,7 +126,7 @@ export function createExecuteSwapOrderTx(swapParams: SwapRequest, db: BoxDB) {
 	return unsignedTx;
 }
 
-export async function signExecuteSwapOrder(unsignedTx, proof, db) {
+export async function signExecuteSwapOrder(unsignedTx, proof, db: BoxDB) {
 	const inputIndexDeposit = unsignedTx.inputs.findIndex(
 		(box: Box) => box.ergoTree == ErgoAddress.fromBase58(DEPOSIT_ADDRESS).ergoTree
 	);
@@ -170,4 +173,17 @@ function hexStringToUint8Array(hexString: string): Uint8Array {
 	}
 
 	return array;
+}
+
+export function checkIfTransactionIsProxyDeposit(tx: TransactionNode, db: BoxDB, io: Server) {
+	const boxes = proxyOutputs(tx);
+	if (boxes.length > 0) {
+		handleIncomingProxy(tx, boxes, db, io);
+	} else {
+		console.log('transaction processed, no boxes found');
+	}
+}
+
+export function handleIncomingProxy(tx, boxes, db: BoxDB, io: Server) {
+	// notify user about incoming proxy deposit
 }

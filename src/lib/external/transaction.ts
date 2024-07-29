@@ -1,5 +1,7 @@
 import type { ConfirmedTransaction, UnconfirmedTransaction } from '$lib/types/explorer';
+import type { TransactionId } from '@fleet-sdk/common';
 import { nautilusBox } from './box';
+import type { TransactionNode } from '$lib/types/node';
 
 export async function fetchConfirmedTransaction(
 	txId: string
@@ -28,12 +30,28 @@ export async function fetchUnconfirmedTransaction(
 	try {
 		const response = await fetch(url);
 		if (!response.ok) {
-			throw new Error(`Error fetching unconfirmed transaction: ${response.statusText}`);
+			//throw new Error(`Error fetching unconfirmed transaction: ${response.statusText}`);
+			return false;
 		}
 		const data: UnconfirmedTransaction = await response.json();
 
-		data.inputs = data.inputs.map(nautilusBox);
-		data.outputs = data.outputs.map(nautilusBox);
+		return data;
+	} catch (error) {
+		console.error('Error:', error);
+		return false;
+	}
+}
+
+export async function fetchUnconfirmedTransactionFromErgoNode(
+	txId: TransactionId
+): Promise<TransactionNode | false> {
+	const url = `http://213.239.193.208:9053/transactions/unconfirmed/byTransactionId/${txId}`;
+	try {
+		const response = await fetch(url);
+		if (!response.ok) {
+			return false;
+		}
+		const data: TransactionNode = await response.json();
 		return data;
 	} catch (error) {
 		console.error('Error:', error);
