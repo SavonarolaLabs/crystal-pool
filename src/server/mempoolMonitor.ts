@@ -11,7 +11,8 @@ async function fetchMempoolTransactions(offset: number = 0): Promise<Transaction
 			`http://213.239.193.208:9053/transactions/unconfirmed?limit=100&offset=${offset}`
 		);
 		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
+			console.error(`HTTP error! status: ${response.status}`);
+			return [];
 		}
 		return (await response.json()) as TransactionNode[];
 	} catch (error) {
@@ -21,20 +22,20 @@ async function fetchMempoolTransactions(offset: number = 0): Promise<Transaction
 }
 
 async function populateInitialSet(io: Server, db: BoxDB): Promise<void> {
+	console.log(`Initial mempool size: ${getMempoolSize(db)}`);
 	let offset = 0;
 	let transactions: TransactionNode[];
 	let txIds: string[] = [];
 	do {
 		transactions = await fetchMempoolTransactions(offset);
+		console.log(transactions.length);
 		transactions.forEach((tx) => {
 			checkIfTransactionIsProxyDeposit(tx, db, io);
 		});
 		txIds = [...txIds, ...transactions.map((tx) => tx.id)];
 		offset += 100;
 	} while (transactions.length === 100);
-
 	db_setMempoolTxIds(db, txIds);
-	console.log(`Initial mempool size: ${getMempoolSize(db)}`);
 }
 
 async function handleNewBlock(io: Server, db: BoxDB): Promise<void> {
@@ -47,17 +48,15 @@ async function handleNewTransaction(io: Server, db: BoxDB, txId: string): Promis
 	console.log(`Mempool size changed: ${getMempoolSize(db)}`);
 	console.log(`${txId}`);
 	let tx = await fetchUnconfirmedTransactionFromErgoNode(txId);
-
-	setTimeout(async () => {
-		if (tx) {
-			checkIfTransactionIsProxyDeposit(tx, db, io);
-		} else {
-			console.log('WARNING: transaction was NOT fetched');
-		}
-	}, 2000);
+	if (tx) {
+		checkIfTransactionIsProxyDeposit(tx, db, io);
+	} else {
+		console.log('WARNING: transaction was NOT fetched');
+	}
 }
 
 function getMempoolSize(db: BoxDB): number {
+	//console.log(db.mempoolTxIds);
 	return db.mempoolTxIds.size;
 }
 
@@ -70,12 +69,12 @@ export async function run(io: Server, db: BoxDB): Promise<void> {
 	});
 
 	ws.on('message', async (message) => {
-		const [topic, msgStr] = message.toString().split(' ');
+		const [topic, txId] = message.toString().split(' ');
 
 		if (topic === 'newBlock') {
 			handleNewBlock(io, db);
 		} else if (topic === 'mempool') {
-			await handleNewTransaction(io, db, msgStr);
+			await handleNewTransaction(io, db, txId);
 		}
 
 		io.emit('mempoolSize', getMempoolSize(db));

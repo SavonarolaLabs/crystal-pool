@@ -149,7 +149,7 @@ export function db_addMempoolDepositTx(db: BoxDB, tx: ConfirmedTransaction): Box
 }
 
 export function db_setMempoolTxIds(db: BoxDB, txIds: string[]) {
-	db.mempoolTxIds = new Set(...txIds);
+	db.mempoolTxIds = new Set(txIds);
 }
 
 export function db_addMempoolTxId(db: BoxDB, txId: string) {
