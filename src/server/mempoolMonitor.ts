@@ -22,13 +22,11 @@ async function fetchMempoolTransactions(offset: number = 0): Promise<Transaction
 }
 
 async function populateInitialSet(io: Server, db: BoxDB): Promise<void> {
-	console.log(`Initial mempool size: ${getMempoolSize(db)}`);
 	let offset = 0;
 	let transactions: TransactionNode[];
 	let txIds: string[] = [];
 	do {
 		transactions = await fetchMempoolTransactions(offset);
-		console.log(transactions.length);
 		transactions.forEach((tx) => {
 			checkIfTransactionIsProxyDeposit(tx, db, io);
 		});
@@ -36,6 +34,7 @@ async function populateInitialSet(io: Server, db: BoxDB): Promise<void> {
 		offset += 100;
 	} while (transactions.length === 100);
 	db_setMempoolTxIds(db, txIds);
+	console.log(`Mempool(${getMempoolSize(db)}) reset`);
 }
 
 async function handleNewBlock(io: Server, db: BoxDB): Promise<void> {
@@ -44,14 +43,19 @@ async function handleNewBlock(io: Server, db: BoxDB): Promise<void> {
 }
 
 async function handleNewTransaction(io: Server, db: BoxDB, txId: string): Promise<void> {
+	const memPoolSizeBefore = getMempoolSize(db);
 	db_addMempoolTxId(db, txId);
-	console.log(`Mempool size changed: ${getMempoolSize(db)}`);
-	console.log(`${txId}`);
-	let tx = await fetchUnconfirmedTransactionFromErgoNode(txId);
-	if (tx) {
-		checkIfTransactionIsProxyDeposit(tx, db, io);
+	const memPoolSizeAfter = getMempoolSize(db);
+	if (memPoolSizeBefore == memPoolSizeAfter) {
+		return;
 	} else {
-		console.log('WARNING: transaction was NOT fetched');
+		console.log(`Mempool(${memPoolSizeAfter}) ${txId}`);
+		let tx = await fetchUnconfirmedTransactionFromErgoNode(txId);
+		if (tx) {
+			checkIfTransactionIsProxyDeposit(tx, db, io);
+		} else {
+			console.log('WARNING: transaction was NOT fetched');
+		}
 	}
 }
 
