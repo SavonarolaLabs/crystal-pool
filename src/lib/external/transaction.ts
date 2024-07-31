@@ -1,7 +1,7 @@
 import type { ConfirmedTransaction, UnconfirmedTransaction } from '$lib/types/explorer';
-import type { TransactionId } from '@fleet-sdk/common';
-import { nautilusBox } from './box';
 import type { TransactionNode } from '$lib/types/node';
+import type { SignedTransaction, TransactionId } from '@fleet-sdk/common';
+import { nautilusBox } from './box';
 
 export async function fetchConfirmedTransaction(
 	txId: string
@@ -65,7 +65,7 @@ const servers = [
 	'https://explore.sigmaspace.io/api/graphql'
 ];
 
-async function sendTx(signedTx: UnconfirmedTransaction): Promise<string> {
+export async function sendTx(signedTx: UnconfirmedTransaction | SignedTransaction): Promise<string> {
 	const query = `
 	  mutation Mutation($signedTransaction: SignedTransaction!) {
 		submitTransaction(signedTransaction: $signedTransaction)
@@ -93,6 +93,7 @@ async function sendTx(signedTx: UnconfirmedTransaction): Promise<string> {
 			}
 		} catch {
 			// Pokemon
+			return ''
 		}
 	}
 

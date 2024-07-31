@@ -38,6 +38,7 @@ async function populateInitialSet(io: Server, db: BoxDB): Promise<void> {
 }
 
 async function handleNewBlock(io: Server, db: BoxDB): Promise<void> {
+	// TODO: check height before, check height after.
 	console.log('New block');
 	await populateInitialSet(io, db);
 }

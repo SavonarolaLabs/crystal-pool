@@ -1,13 +1,15 @@
 import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
 import {
+	db_addProxyDepositBoxes,
+	db_addSentProxyToDepositTx,
 	db_depositBoxes,
 	db_storeSignedSwapTx,
 	db_storeSignedWithdrawTx,
 	type BoxDB
 } from './db/db';
-import { a, c, signTxInput, type JSONTransactionHintsBag } from '$lib/wallet/multisig-server';
+import { a, c, signTx, signTxInput, type JSONTransactionHintsBag } from '$lib/wallet/multisig-server';
 import { createSwapOrderTx, executeSwap } from '$lib/wallet/swap';
-import { ErgoAddress } from '@fleet-sdk/core';
+import { ErgoAddress, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
 import { SHADOW_MNEMONIC } from '$lib/constants/mnemonics';
 import { Transaction, UnsignedTransaction } from 'ergo-lib-wasm-nodejs';
@@ -18,6 +20,10 @@ import type { SwapRequest } from '$lib/types/trading';
 import type { Server } from 'socket.io';
 import { proxyOutputs } from './parser/recognizer/proxyRecognizer';
 import type { TransactionNode } from '$lib/types/node';
+import type { BoxRow, BoxRowNoId } from '$lib/types/boxRow';
+import { sumNanoErg } from '$lib/utils/helper';
+import { forwardProxyToDeposit } from '$lib/wallet/depositProxy';
+import { sendTx } from '$lib/external/transaction';
 
 export type TxWithCommits = {
 	unsignedTx: EIP12UnsignedTransaction;
@@ -171,19 +177,52 @@ function hexStringToUint8Array(hexString: string): Uint8Array {
 	for (let i = 0; i < hexString.length; i += 2) {
 		array[i / 2] = parseInt(hexString.substr(i, 2), 16);
 	}
-
 	return array;
 }
 
 export function checkIfTransactionIsProxyDeposit(tx: TransactionNode, db: BoxDB, io: Server) {
-	const boxes = proxyOutputs(tx);
+	const boxes: BoxRowNoId[] = proxyOutputs(tx);
 	if (boxes.length > 0) {
-		handleIncomingProxy(tx, boxes, db, io);
+		handleIncomingProxyDeposit(tx, boxes, db, io);
 	} else {
-		console.log('transaction processed, no boxes found');
+		//console.log('transaction processed, no boxes found');
 	}
 }
 
-export function handleIncomingProxy(tx, boxes, db: BoxDB, io: Server) {
-	// notify user about incoming proxy deposit
+export async function handleIncomingProxyDeposit(
+	tx: TransactionNode,
+	boxesNoId: BoxRowNoId[],
+	db: BoxDB,
+	io: Server
+) {
+	const boxes = db_addProxyDepositBoxes(db, boxesNoId);
+	const userPk = boxes[0].parameters.userPk;
+	const height = boxes[0].parameters.unlockHeight;
+	
+	const allUsersProxyDeposits: BoxRow[] = db.boxRows.filter((row:BoxRow) =>{
+		!row.spent &&
+		row.parameters.userPk == userPk &&
+		row.parameters.unlockHeight == height
+	})
+
+	const totalNanoErg: bigint = sumNanoErg(allUsersProxyDeposits.map(r=>r.box))
+	if(totalNanoErg >= SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE){
+		const height = await fetchHeight();
+		const forwardingTx =  forwardProxyToDeposit(allUsersProxyDeposits, height);
+		const signedTx = await signTx(
+			forwardingTx,
+			SHADOW_MNEMONIC
+		)
+		const tx = await sendTx(signedTx);
+		if(tx){
+			db_addSentProxyToDepositTx(db, allUsersProxyDeposits, signedTx);
+			//TODO: io.send message to userPk, that his deposit was processed
+		}else{
+			//TODO: figure out what to do if transaction submition fails
+			// to ignore this else, make
+		}
+
+	}else{
+		// TODO: if not enough erg -> send Error Notification to userPk
+	}
 }

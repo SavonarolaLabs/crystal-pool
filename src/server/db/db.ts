@@ -2,10 +2,10 @@ import { boxesAtAddress } from '$lib/utils/test-helper';
 import { type Box, type EIP12UnsignedTransaction, type SignedTransaction } from '@fleet-sdk/common';
 import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '../../lib/constants/addresses';
 import { initDeposits } from '../../lib/server-agent/simulator';
-import type { BoxRow, ContractType } from '../../lib/types/boxRow';
+import type { BoxRow, BoxRowNoId, ContractType } from '../../lib/types/boxRow';
 import type { TxRow } from '../../lib/types/txRow';
 import { serializeBigInt } from '../../lib/utils/serializeBigInt';
-import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, persistBox } from './sqlDb';
+import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, markBoxesAsSpent, persistBox } from './sqlDb';
 import type { ConfirmedTransaction } from '$lib/types/explorer';
 import type { SubmittedTxRox, TxPurpose } from '$lib/types/fallibleTxRow';
 import { parseBox } from '../parser/boxParser';
@@ -72,6 +72,19 @@ export function db_addBox(db: BoxDB, box: Box): BoxRow | undefined {
 	}
 }
 
+export function db_addBoxRowNoId(db: BoxDB, boxRowNoId: BoxRowNoId): BoxRow {
+	const newRow: BoxRow = {
+		id: nextId(db.boxRows),
+		contract: boxRowNoId.contract,
+		parameters: boxRowNoId.parameters,
+		box: boxRowNoId.box,
+		spent: boxRowNoId.spent
+	};
+	db.boxRows.push(newRow);
+	persistBox(newRow); // Insert into database
+	return newRow;
+}
+
 export function db_removeBoxesByBoxIds(db: BoxDB, removeBoxIds: string[]) {
 	const deleteBoxIds = db.boxRows
 		.filter((row) => removeBoxIds.includes(row.box.boxId))
@@ -92,6 +105,16 @@ export function db_addBoxes(db: BoxDB, boxRows: Box[]): BoxRow[] {
 	return insertedBoxes.filter((x) => x) as BoxRow[];
 }
 
+export function db_spendBoxes(db: BoxDB, boxRows: BoxRow[]): BoxRow[]{
+	const ids = boxRows.map(br => br.id)
+	const rows = db.boxRows.filter(r => ids.includes(r.id));
+	rows.forEach(r =>{
+		r.spent = true;
+	})
+	markBoxesAsSpent(rows);
+	return rows;
+}
+
 export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
 	const newRow: TxRow = {
 		id: nextId(db.unsignedTxs),
@@ -106,6 +129,15 @@ export function db_addSubmittedTx(db: BoxDB, tx: ConfirmedTransaction, purpose: 
 	const newRow: SubmittedTxRox = {
 		id: nextId(db.submittedTxs),
 		tx: { confirmed: tx },
+		purpose
+	};
+	db.submittedTxs.push(newRow);
+}
+
+export function db_addSubmittedUnconfirmedTx(db: BoxDB, tx: SignedTransaction, purpose: TxPurpose) {
+	const newRow: SubmittedTxRox = {
+		id: nextId(db.submittedTxs),
+		tx: { unconfirmed: tx },
 		purpose
 	};
 	db.submittedTxs.push(newRow);
@@ -141,10 +173,28 @@ export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
 	db.unprocessedDepositTxIds.push(txId);
 }
 
+export function db_addProxyDepositBoxes(db: BoxDB, boxesNoId: BoxRowNoId[]): BoxRow[] {
+	const boxesAdded: BoxRow[] = [];
+	boxesNoId.forEach((row: BoxRowNoId) => {
+		if (!db.boxRows.find((r) => r.box.boxId == row.box.boxId)) {
+			boxesAdded.push(db_addBoxRowNoId(db, row));
+		}
+	});
+	return boxesAdded;
+}
+
 export function db_addMempoolDepositTx(db: BoxDB, tx: ConfirmedTransaction): BoxRow[] {
 	db.unprocessedDepositTxIds = db.unprocessedDepositTxIds.filter((id) => id != tx.id);
 	db_addSubmittedTx(db, tx, 'DEPOSIT');
 	const deposits = boxesAtAddress(tx, DEPOSIT_ADDRESS);
+	return db_addBoxes(db, deposits);
+}
+
+export function db_addSentProxyToDepositTx(db: BoxDB, proxyBoxRows: BoxRow[], tx: SignedTransaction): BoxRow[]{
+	db_spendBoxes(db, proxyBoxRows);
+	const deposits = boxesAtAddress(tx, DEPOSIT_ADDRESS);
+	db_addSubmittedTx(db, tx,  'PROXY_TO_DEPOSIT')
+	
 	return db_addBoxes(db, deposits);
 }
 

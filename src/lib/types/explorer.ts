@@ -1,3 +1,5 @@
+import type { SignedTransaction } from "@fleet-sdk/common";
+
 type Asset = {
 	tokenId: string;
 	index: number;
@@ -80,5 +82,5 @@ export type UnconfirmedTransaction = {
 
 export type ExplorerTransaction = {
 	confirmed?: ConfirmedTransaction;
-	unconfirmed?: UnconfirmedTransaction;
+	unconfirmed?: UnconfirmedTransaction | SignedTransaction;
 };

@@ -63,6 +63,22 @@ export async function persistMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
 	}
 }
 
+export async function markBoxesAsSpent(boxRows: BoxRow[]): Promise<void> {
+    await sqlDb.exec('BEGIN TRANSACTION');
+    try {
+        for (const row of boxRows) {
+            await sqlDb.run(
+                `UPDATE boxes SET spent = 1 WHERE id = ?`,
+                row.id
+            );
+        }
+        await sqlDb.exec('COMMIT');
+    } catch (error) {
+        await sqlDb.exec('ROLLBACK');
+        throw error;
+    }
+}
+
 export async function loadBoxRows(): Promise<BoxRow[]> {
 	const rows = await sqlDb.all(`
         SELECT id, box, contractType AS contract, parameters, spent FROM boxes
