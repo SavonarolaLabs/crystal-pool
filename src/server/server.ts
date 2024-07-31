@@ -78,6 +78,11 @@ io.on('connection', (socket) => {
 		console.log('Received exampleEvent:', data);
 		io.emit('orderbook', { buy: [], sell: [] });
 	});
+
+	// receive: pk event
+	socket.on('pk', ({pk})=>{
+		db.connectedClients.set(pk, socket);
+	})
 });
 
 // Start the server

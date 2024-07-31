@@ -9,6 +9,8 @@ import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, markBoxesAsSpent, per
 import type { ConfirmedTransaction } from '$lib/types/explorer';
 import type { SubmittedTxRox, TxPurpose } from '$lib/types/fallibleTxRow';
 import { parseBox } from '../parser/boxParser';
+import type { ClientSocket } from '$lib/types/server';
+import type { PK } from '$lib/types/trading';
 
 interface HasId {
 	id: number;
@@ -20,6 +22,7 @@ export type BoxDB = {
 	unprocessedDepositTxIds: string[];
 	mempoolTxIds: Set<string>;
 	submittedTxs: SubmittedTxRox[];
+	connectedClients: Map<PK, ClientSocket>;
 };
 
 export async function initDb(): Promise<BoxDB> {
@@ -29,7 +32,8 @@ export async function initDb(): Promise<BoxDB> {
 		unsignedTxs: [],
 		unprocessedDepositTxIds: [],
 		mempoolTxIds: new Set(),
-		submittedTxs: []
+		submittedTxs: [],
+		connectedClients: new Map()
 	};
 }
 
@@ -40,6 +44,7 @@ export async function db_clearDB(db: BoxDB) {
 	db.unprocessedDepositTxIds = [];
 	db.mempoolTxIds = new Set();
 	db.submittedTxs = [];
+	db.connectedClients = new Map();
 }
 
 export async function db_initDepositUtxo(db: BoxDB) {

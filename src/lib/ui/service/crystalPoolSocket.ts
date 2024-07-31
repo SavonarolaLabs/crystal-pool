@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import type { DefaultEventsMap } from '@socket.io/component-emitter';
-import { addRecentTrades, fetchBalance, mempool_size, setOrderBook } from '$lib/ui/ui_state';
+import { addRecentTrades, fetchBalance, mempool_size, setOrderBook, user_address } from '$lib/ui/ui_state';
 
 export const receivedDataList = writable<any[]>([]);
 
@@ -10,6 +10,10 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 
   socket.on('connect', () => {
     console.log('Connected to the server:', socket.id);
+
+    user_address.subscribe(pk=>{
+      if(pk) socket.emit('pk', { pk });
+    })
   });
 
   socket.on('orderbook', (data) => {
