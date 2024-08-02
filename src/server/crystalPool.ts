@@ -24,6 +24,7 @@ import type { BoxRow, BoxRowNoId } from '$lib/types/boxRow';
 import { sumNanoErg } from '$lib/utils/helper';
 import { forwardProxyToDeposit } from '$lib/wallet/depositProxy';
 import { sendTx } from '$lib/external/transaction';
+import { sendPeerBalanceUpdate, sendPeerProxyDepositErrorInsufficientErg } from './ioSocket';
 
 export type TxWithCommits = {
 	unsignedTx: EIP12UnsignedTransaction;
@@ -216,13 +217,11 @@ export async function handleIncomingProxyDeposit(
 		const tx = await sendTx(signedTx);
 		if(tx){
 			db_addSentProxyToDepositTx(db, allUsersProxyDeposits, signedTx);
-			//TODO: io.send message to userPk, that his deposit was processed
+			sendPeerBalanceUpdate(db, userPk);
 		}else{
-			//TODO: figure out what to do if transaction submition fails
-			// to ignore this else, make
+			//TODO: if transaction submition fails, retry and send messenger notification
 		}
-
 	}else{
-		// TODO: if not enough erg -> send Error Notification to userPk
+		sendPeerProxyDepositErrorInsufficientErg(db, userPk, allUsersProxyDeposits)
 	}
 }

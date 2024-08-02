@@ -101,7 +101,7 @@
 					</div>
 				</a>
 				<div class="w-full text-end balance-total text-xl py-2 pulse-text">
-					+{tx.value} ERG {#if tx.assetCount}+{tx.assetCount}{/if}
+					+{Number(tx.value) / 10 ** 9} ERG {#if tx.assetCount}+{tx.assetCount}{/if}
 				</div>
 			</div>
 		{/each}

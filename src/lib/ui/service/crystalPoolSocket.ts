@@ -37,8 +37,18 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 
   socket.on('mempoolSize', (data) => {
     try{
-      console.log("new data", data);
+      console.log("mempoolSize", data);
       mempool_size.set(data);
+    }catch(e){
+      //Gotta catch 'em all!
+    }
+  })
+
+  socket.on('error_proxy_insufficient_erg', ({boxRows}) => {
+    try{
+      console.log("insufficinet funds proxy boxes", boxRows);
+      //mempool_size.set(boxRows);
+      
     }catch(e){
       //Gotta catch 'em all!
     }

@@ -90,8 +90,11 @@ export async function sendTx(signedTx: UnconfirmedTransaction | SignedTransactio
 			const result = await response.json();
 			if (!result.errors && result.data?.submitTransaction) {
 				return result.data.submitTransaction;
+			}else{
+				console.error(result);
 			}
-		} catch {
+		} catch(e) {
+			console.error(e);
 			// Pokemon
 			return ''
 		}

@@ -1,11 +1,12 @@
 import { get, writable, type Writable } from 'svelte/store';
 import { userBoxes } from './service/crystalPoolService';
-import { sumAssets } from '$lib/utils/helper';
+import { sumAssets, sumAssetsFromBoxes, sumNanoErg } from '$lib/utils/helper';
 import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
 import type { Amount, Box, SignedTransaction, TokenAmount } from '@fleet-sdk/common';
 import type { TxHistoryEntry } from '$lib/types/txHistory';
 import { serializeBigInt } from '../utils/serializeBigInt';
+import type { BoxRow } from '$lib/types/boxRow';
 
 export const web3wallet_connected = writable(false);
 export const web3wallet_wallet_name = writable('');
@@ -58,6 +59,25 @@ export async function addWeb3WalletDepositTx(
 	persistTxHistory();
 }
 
+export async function addMobileProxyStuckTx(boxRows: BoxRow[]) {
+	const txEntry: TxHistoryEntry = {
+		timestamp: Date.now(),
+		phase: 'MEMPOOL',
+		action: 'PROXY_STUCK',
+		crystalPoolAck: true,
+		txId: boxRows[0].box.transactionId,
+		value: sumNanoErg(boxRows.map((row) => row.box)),
+		tokens: sumAssetsFromBoxes(boxRows.map((row) => row.box))
+	};
+
+	tx_history.update((a) => {
+		a = [txEntry, ...a];
+		return a;
+	});
+
+	persistTxHistory();
+}
+
 export function persistTxHistory() {
 	localStorage.setItem('tx_history', serializeBigInt(get(tx_history)));
 }
@@ -76,7 +96,9 @@ export function loadTxHistory() {
 
 function updateTxHistoryState(parsedHistory) {
 	tx_history.set(parsedHistory);
-	const pending = parsedHistory.filter((x) => !x.crystalPoolAck && x.action == 'DEPOSIT');
+	const pending = parsedHistory.filter(
+		(x) => (!x.crystalPoolAck && x.action == 'DEPOSIT') || x.action == 'PROXY_STUCK'
+	);
 	pending_deposits.set(pending);
 }
 
