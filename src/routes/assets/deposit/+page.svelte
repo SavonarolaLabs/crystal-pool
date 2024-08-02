@@ -1,11 +1,44 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import DepositWeb3 from './DepositWeb3.svelte';
 	import DepositHistory from './DepositHistory.svelte';
 	import MobileDeposit from './MobileDeposit.svelte';
 
-	//let selectedWallet = 'mobile';
 	let selectedWallet = 'web3wallet';
+
+	const updateQueryParam = (wallet) => {
+		if (typeof window !== 'undefined') {
+			const url = new URL(window.location.href);
+			url.searchParams.set('selectedWallet', wallet);
+			goto(url.pathname + url.search);
+		}
+	};
+
+	onMount(() => {
+		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams(window.location.search);
+			const wallet = params.get('selectedWallet');
+			if (wallet) {
+				selectedWallet = wallet;
+			} else {
+				updateQueryParam(selectedWallet);
+			}
+		}
+	});
+
+	$: if (typeof window !== 'undefined') {
+		const params = new URLSearchParams(window.location.search);
+		const wallet = params.get('selectedWallet');
+		if (wallet && wallet !== selectedWallet) {
+			selectedWallet = wallet;
+		}
+	}
+
+	const handleWalletChange = (wallet) => {
+		selectedWallet = wallet;
+		updateQueryParam(wallet);
+	};
 </script>
 
 <div class="h-full flex flex-col items-center">
@@ -20,23 +53,25 @@
 				<input
 					type="radio"
 					id="mobile"
-					name="fav_language_one"
+					name="fav_language"
 					value="mobile"
-					bind:group={selectedWallet}
+					on:change={() => handleWalletChange('mobile')}
+					checked={selectedWallet === 'mobile'}
 				/>
 				<label for="mobile">Mobile</label>
 				<input
 					type="radio"
 					id="web3wallet"
-					name="fav_language_two"
+					name="fav_language"
 					value="web3wallet"
-					bind:group={selectedWallet}
+					on:change={() => handleWalletChange('web3wallet')}
+					checked={selectedWallet === 'web3wallet'}
 				/>
 				<label for="web3wallet">Web3 Wallet</label>
 			</div>
 		</div>
 		<div class="w-full flex justify-center grow">
-			{#if selectedWallet == 'mobile'}
+			{#if selectedWallet === 'mobile'}
 				<MobileDeposit></MobileDeposit>
 			{:else}
 				<DepositWeb3></DepositWeb3>

@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { pending_deposits, wallet_initialized } from '../ui_state';
 	import PendingTransactions from './PendingTransactions.svelte';
+	import WarningIcon from './WarningIcon.svelte';
 	let menuOpen = false;
 	let hoverTimeout;
 
@@ -86,7 +87,7 @@
 								height="1em"
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 512 512"
-								><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path
+								><path
 									d="M432 320H400a16 16 0 0 0 -16 16V448H64V128H208a16 16 0 0 0 16-16V80a16 16 0 0 0 -16-16H48A48 48 0 0 0 0 112V464a48 48 0 0 0 48 48H400a48 48 0 0 0 48-48V336A16 16 0 0 0 432 320zM488 0h-128c-21.4 0-32.1 25.9-17 41l35.7 35.7L135 320.4a24 24 0 0 0 0 34L157.7 377a24 24 0 0 0 34 0L435.3 133.3 471 169c15 15 41 4.5 41-17V24A24 24 0 0 0 488 0z"
 								/></svg
 							>
@@ -100,9 +101,28 @@
 						</div>
 					</div>
 				</a>
-				<div class="w-full text-end balance-total text-xl py-2 pulse-text">
-					+{Number(tx.value) / 10 ** 9} ERG {#if tx.assetCount}+{tx.assetCount}{/if}
-				</div>
+				{#if tx.action == 'PROXY_STUCK'}
+					<a href="/assets/deposit?selectedWallet=mobile">
+						<div class="w-full balance-total py-2">
+							<div
+								class="text-md"
+								style="color:red; display: flex; align-items: center;"
+							>
+								<span class="mr-2" style="display: flex; align-items: center;"
+									><WarningIcon size="3em"></WarningIcon></span
+								>
+								Not enough ERG to forward your Tokens.
+							</div>
+							<div class="w-full text-center">
+								<span class="underline">Click here to deposit more ERG</span>
+							</div>
+						</div>
+					</a>
+				{:else}
+					<div class="w-full text-end balance-total text-xl py-2 pulse-text">
+						+{Number(tx.value) / 10 ** 9} ERG {#if tx.assetCount}+{tx.assetCount}{/if}
+					</div>
+				{/if}
 			</div>
 		{/each}
 	</div>
@@ -131,6 +151,10 @@
 	a:hover {
 		color: var(--primary-blue);
 	}
+	a:hover .underline {
+		color: var(--primary-blue);
+	}
+
 	.balance {
 		margin-bottom: 0.5rem;
 		padding: 1em;
