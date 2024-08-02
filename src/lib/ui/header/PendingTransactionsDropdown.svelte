@@ -4,7 +4,7 @@
 	import { pending_deposits, wallet_initialized } from '../ui_state';
 	import PendingTransactions from './PendingTransactions.svelte';
 	import WarningIcon from './WarningIcon.svelte';
-	let menuOpen = false;
+	let menuOpen = true;
 	let hoverTimeout;
 
 	function handleMouseEnter() {
@@ -104,16 +104,13 @@
 				{#if tx.action == 'PROXY_STUCK'}
 					<a href="/assets/deposit?selectedWallet=mobile">
 						<div class="w-full balance-total py-2">
-							<div
-								class="text-md"
-								style="color:red; display: flex; align-items: center;"
-							>
+							<div class="text-md mt-2 text-red-500 flex items-center">
 								<span class="mr-2" style="display: flex; align-items: center;"
 									><WarningIcon size="3em"></WarningIcon></span
 								>
 								Not enough ERG to forward your Tokens.
 							</div>
-							<div class="w-full text-center">
+							<div class="w-full text-center mt-2 text-red-500">
 								<span class="underline">Click here to deposit more ERG</span>
 							</div>
 						</div>
