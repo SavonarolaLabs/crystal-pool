@@ -43,6 +43,19 @@
 			seconds = Math.floor(Date.now() / 1000);
 		}, 1000);
 	});
+
+	function formatTime(seconds, timestamp) {
+		const remainingSeconds = seconds - Math.floor(timestamp / 1000);
+		const hours = Math.floor(remainingSeconds / 3600);
+		const minutes = Math.floor((remainingSeconds % 3600) / 60);
+		const secs = remainingSeconds % 60;
+
+		const formattedHours = hours > 0 ? String(hours).padStart(2, '0') + ':' : '';
+		const formattedMinutes = String(minutes).padStart(2, '0');
+		const formattedSeconds = String(secs).padStart(2, '0');
+
+		return formattedHours + formattedMinutes + ':' + formattedSeconds;
+	}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -93,11 +106,7 @@
 							>
 						</div>
 						<div>
-							{String(
-								Math.floor((seconds - Math.floor(tx.timestamp / 1000)) / 60)
-							).padStart(2, '0')}:{String(
-								(seconds - Math.floor(tx.timestamp / 1000)) % 60
-							).padStart(2, '0')}
+							{formatTime(seconds, tx.timestamp)}
 						</div>
 					</div>
 				</a>
