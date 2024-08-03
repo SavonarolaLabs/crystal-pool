@@ -7,7 +7,13 @@ import {
 	db_storeSignedWithdrawTx,
 	type BoxDB
 } from './db/db';
-import { a, c, signTx, signTxInput, type JSONTransactionHintsBag } from '$lib/wallet/multisig-server';
+import {
+	a,
+	c,
+	signTx,
+	signTxInput,
+	type JSONTransactionHintsBag
+} from '$lib/wallet/multisig-server';
 import { createSwapOrderTx, executeSwap } from '$lib/wallet/swap';
 import { ErgoAddress, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE } from '@fleet-sdk/core';
 import { DEPOSIT_ADDRESS, SWAP_ORDER_ADDRESS } from '$lib/constants/addresses';
@@ -24,7 +30,11 @@ import type { BoxRow, BoxRowNoId } from '$lib/types/boxRow';
 import { sumNanoErg } from '$lib/utils/helper';
 import { forwardProxyToDeposit } from '$lib/wallet/depositProxy';
 import { sendTx } from '$lib/external/transaction';
-import { sendPeerBalanceUpdate, sendPeerProxyDepositErrorInsufficientErg } from './ioSocket';
+import {
+	sendPeerBalanceUpdate,
+	sendPeerProxyDepositErrorInsufficientErg,
+	sendPeerProxyDepositFixInsufficientErg
+} from './ioSocket';
 
 export type TxWithCommits = {
 	unsignedTx: EIP12UnsignedTransaction;
@@ -199,29 +209,28 @@ export async function handleIncomingProxyDeposit(
 	const boxes = db_addProxyDepositBoxes(db, boxesNoId);
 	const userPk = boxes[0].parameters.userPk;
 	const height = boxes[0].parameters.unlockHeight;
-	
-	const allUsersProxyDeposits: BoxRow[] = db.boxRows.filter((row:BoxRow) =>{
-		!row.spent &&
-		row.parameters.userPk == userPk &&
-		row.parameters.unlockHeight == height
-	})
 
-	const totalNanoErg: bigint = sumNanoErg(allUsersProxyDeposits.map(r=>r.box))
-	if(totalNanoErg >= SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE){
+	const allUsersProxyDeposits: BoxRow[] = db.boxRows.filter((row: BoxRow) => {
+		!row.spent && row.parameters.userPk == userPk && row.parameters.unlockHeight == height;
+	});
+
+	const totalNanoErg: bigint = sumNanoErg(allUsersProxyDeposits.map((r) => r.box));
+	if (totalNanoErg >= SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE) {
 		const height = await fetchHeight();
-		const forwardingTx =  forwardProxyToDeposit(allUsersProxyDeposits, height);
-		const signedTx = await signTx(
-			forwardingTx,
-			SHADOW_MNEMONIC
-		)
+		const forwardingTx = forwardProxyToDeposit(allUsersProxyDeposits, height);
+		const signedTx = await signTx(forwardingTx, SHADOW_MNEMONIC);
 		const tx = await sendTx(signedTx);
-		if(tx){
+		if (tx) {
 			db_addSentProxyToDepositTx(db, allUsersProxyDeposits, signedTx);
+			const someTokensWereStuck = allUsersProxyDeposits.length > boxes.length;
+			if (someTokensWereStuck) {
+				sendPeerProxyDepositFixInsufficientErg(db, userPk, allUsersProxyDeposits);
+			}
 			sendPeerBalanceUpdate(db, userPk);
-		}else{
+		} else {
 			//TODO: if transaction submition fails, retry and send messenger notification
 		}
-	}else{
-		sendPeerProxyDepositErrorInsufficientErg(db, userPk, allUsersProxyDeposits)
+	} else {
+		sendPeerProxyDepositErrorInsufficientErg(db, userPk, allUsersProxyDeposits);
 	}
 }

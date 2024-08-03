@@ -32,17 +32,25 @@ function getCurrentTime() {
 	return `${hours}:${minutes}:${seconds}`;
 }
 
-export function sendPeerBalanceUpdate(db: BoxDB, pk: PK):void{
-	sendMessageToSocket(db, pk, 'balance', {value:100, tokens:[]})
+export function sendPeerBalanceUpdate(db: BoxDB, pk: PK): void {
+	sendMessageToSocket(db, pk, 'balance', { value: 100, tokens: [] });
 }
 
-export function sendPeerProxyDepositErrorInsufficientErg(db: BoxDB, pk: PK, boxRows: BoxRow[]):void{
-	sendMessageToSocket(db, pk, 'error_proxy_insufficient_erg', {boxRows})
+export function sendPeerProxyDepositErrorInsufficientErg(
+	db: BoxDB,
+	pk: PK,
+	boxRows: BoxRow[]
+): void {
+	sendMessageToSocket(db, pk, 'error_proxy_insufficient_erg', { boxRows });
+}
+
+export function sendPeerProxyDepositFixInsufficientErg(db: BoxDB, pk: PK, boxRows: BoxRow[]): void {
+	sendMessageToSocket(db, pk, 'fix_proxy_insufficient_erg', { boxRows });
 }
 
 function sendMessageToSocket(db: BoxDB, pk: PK, channel: string, data: any): void {
-    const clientSocket = db.connectedClients.get(pk);
-    if (clientSocket) {
-        clientSocket.emit(channel, data);
-    }
+	const clientSocket = db.connectedClients.get(pk);
+	if (clientSocket) {
+		clientSocket.emit(channel, data);
+	}
 }
