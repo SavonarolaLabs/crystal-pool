@@ -78,6 +78,29 @@ export async function addMobileProxyStuckTx(boxRows: BoxRow[]) {
 	persistTxHistory();
 }
 
+export async function unstuckMobileProxyTx(boxRows: BoxRow[]) {
+	const txEntry: TxHistoryEntry = {
+		timestamp: Date.now(),
+		phase: 'MEMPOOL',
+		action: 'PROXY_STUCK',
+		crystalPoolAck: true,
+		txId: boxRows[0].box.transactionId,
+		value: sumNanoErg(boxRows.map((row) => row.box)),
+		tokens: sumAssetsFromBoxes(boxRows.map((row) => row.box))
+	};
+
+	tx_history.update((a) => {
+		a.forEach((tx) => {
+			if (boxRows.some((b) => b.box.transactionId == tx.txId)) {
+				tx.action = 'DEPOSIT';
+			}
+		});
+		return a;
+	});
+
+	persistTxHistory();
+}
+
 export function persistTxHistory() {
 	localStorage.setItem('tx_history', serializeBigInt(get(tx_history)));
 }
