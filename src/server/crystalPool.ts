@@ -207,6 +207,7 @@ export async function handleIncomingProxyDeposit(
 	db: BoxDB,
 	io: Server
 ) {
+	console.log('handleIncomingProxyDeposit: ', boxesNoId[0]?.box.boxId);
 	const boxes = db_addProxyDepositBoxes(db, boxesNoId);
 	const userPk = boxes[0].parameters.userPk;
 	const height = boxes[0].parameters.unlockHeight;
@@ -223,12 +224,14 @@ export async function handleIncomingProxyDeposit(
 	if (totalNanoErg >= SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE) {
 		console.log('fetchHeight');
 		const height = await fetchHeight();
+		console.log('height', height);
 		const forwardingTx = forwardProxyToDeposit(allUsersProxyDeposits, height);
+		console.log('forwardingTx', forwardingTx?.inputs?.length);
 		const signedTx = await signTx(forwardingTx, SHADOW_MNEMONIC);
-		console.log('signedTx', signedTx);
+		console.log('signedTx', signedTx.id);
 		const tx = await sendTx(signedTx);
-		console.log('submitted!', tx);
 		if (tx) {
+			console.log('submitted!', tx);
 			console.log('db_addSentProxyToDepositTx');
 			db_addSentProxyToDepositTx(db, allUsersProxyDeposits, signedTx);
 			const someTokensWereStuck = allUsersProxyDeposits.length > boxes.length;

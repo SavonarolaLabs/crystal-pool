@@ -51,19 +51,19 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 
 	socket.on('mempoolSize', (data) => {
 		try {
-			console.log('mempoolSize', data);
+			//console.log('mempoolSize', data);
 			mempool_size.set(data);
 		} catch (e) {
-			//Gotta catch 'em all!
+			//Gotta catch 'em all!'
 		}
 	});
 
 	socket.on('error_proxy_insufficient_erg', ({ boxRows }) => {
 		try {
-			console.error('insufficinet funds proxy boxes', boxRows);
+			console.error('insufficient funds proxy boxes', boxRows);
 			addMobileProxyStuckTx(boxRows);
 		} catch (e) {
-			//Gotta catch 'em all!
+			//Gotta catch 'em all!'
 		}
 	});
 
@@ -72,7 +72,7 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 			console.log('funds forwarded', boxRows);
 			unstuckMobileProxyTx(boxRows);
 		} catch (e) {
-			//Gotta catch 'em all!
+			//Gotta catch 'em all!'
 		}
 	});
 
@@ -82,13 +82,16 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 	});
 
 	socket.on('deposit', ({ value, tokens }: BalanceUpdate) => {
-		showToast(`DEPOSIT: ${asBigInt(value) / 10n ** 9n}ERG`);
+		showToast(`DEPOSIT: ${Number(value) / 10 ** 9}ERG`);
 		tokens.forEach((token) => {
 			if (ergoTokens[token.tokenId]) {
-				showToast(`DEPOSIT: ${token.amount} ${ergoTokens[token.tokenId].ticker}`);
+				showToast(
+					`DEPOSIT: ${Number(token.amount) / 10 ** ergoTokens[token.tokenId].decimals} ${ergoTokens[token.tokenId].ticker}`
+				);
 			}
 		});
 	});
+
 	return socket;
 }
 

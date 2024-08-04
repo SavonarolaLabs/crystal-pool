@@ -66,6 +66,7 @@ export function sendPeerProxyDepositFixInsufficientErg(db: BoxDB, pk: PK, boxRow
 
 function sendMessageToSocket(db: BoxDB, pk: PK, channel: string, data: any): void {
 	const clientSocket = db.connectedClients.get(pk);
+
 	if (clientSocket) {
 		clientSocket.emit(channel, data);
 	}
