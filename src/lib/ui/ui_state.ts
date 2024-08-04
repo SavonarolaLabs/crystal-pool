@@ -342,3 +342,7 @@ export async function fetchBalance() {
 		});
 	}
 }
+
+// system state
+const SIX_MONTH_BLOCKS = 262_800 / 2;
+export const next_unlock_height = writable(1_322_704 + SIX_MONTH_BLOCKS);
