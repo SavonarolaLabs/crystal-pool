@@ -11,7 +11,7 @@
 		if (typeof window !== 'undefined') {
 			const url = new URL(window.location.href);
 			url.searchParams.set('selectedWallet', wallet);
-			goto(url.pathname + url.search);
+			goto(url.pathname + url.search, { replaceState: true });
 		}
 	};
 
@@ -26,14 +26,6 @@
 			}
 		}
 	});
-
-	$: if (typeof window !== 'undefined') {
-		const params = new URLSearchParams(window.location.search);
-		const wallet = params.get('selectedWallet');
-		if (wallet && wallet !== selectedWallet) {
-			selectedWallet = wallet;
-		}
-	}
 
 	const handleWalletChange = (wallet) => {
 		selectedWallet = wallet;
@@ -72,13 +64,13 @@
 		</div>
 		<div class="w-full flex justify-center grow">
 			{#if selectedWallet === 'mobile'}
-				<MobileDeposit></MobileDeposit>
+				<MobileDeposit />
 			{:else}
-				<DepositWeb3></DepositWeb3>
+				<DepositWeb3 />
 			{/if}
 		</div>
 	</div>
-	<DepositHistory></DepositHistory>
+	<DepositHistory />
 </div>
 
 <style lang="postcss">
