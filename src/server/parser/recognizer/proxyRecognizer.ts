@@ -20,10 +20,10 @@ export function proxyOutputs(transaction: TransactionNode): BoxRowNoId[] {
 					box,
 					contract: 'PROXY' as ContractType,
 					parameters: {
-						userPK: ErgoAddress.fromErgoTree(
+						userPk: ErgoAddress.fromErgoTree(
 							Buffer.from(ergoTree.get_constant(3)?.to_js()).toString('hex')
 						).toString(),
-						poolPK: SHADOWPOOL_ADDRESS,
+						poolPk: SHADOWPOOL_ADDRESS,
 						unlockHeight: ergoTree.get_constant(6)?.to_js(),
 						minerFee: ergoTree.get_constant(8)?.to_js()
 					},

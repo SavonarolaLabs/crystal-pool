@@ -52,13 +52,14 @@ export function sendToDepositProxy(
 	return unsignedTx;
 }
 
-export function forwardProxyToDeposit(inputBoxes: BoxRow[], 
+export function forwardProxyToDeposit(
+	inputBoxes: BoxRow[],
 	blockchainHeight: number
 ): EIP12UnsignedTransaction {
-	const userPk = inputBoxes[0].parameters.userPk
-	const nanoErg = sumNanoErg(inputBoxes.map(r=>r.box))
-	const unlockHeight = inputBoxes[0].parameters.unlockHeight
-	const tokens = sumAssetsFromBoxes(inputBoxes.map(r=>r.box))
+	const userPk = inputBoxes[0].parameters.userPk;
+	const nanoErg = sumNanoErg(inputBoxes.map((r) => r.box));
+	const unlockHeight = inputBoxes[0].parameters.unlockHeight;
+	const tokens = sumAssetsFromBoxes(inputBoxes.map((r) => r.box));
 
 	const depositBox = new OutputBuilder(nanoErg - RECOMMENDED_MIN_FEE_VALUE, DEPOSIT_ADDRESS)
 		.setAdditionalRegisters({
@@ -71,7 +72,7 @@ export function forwardProxyToDeposit(inputBoxes: BoxRow[],
 		.addTokens(tokens);
 
 	const unsignedTx = new TransactionBuilder(blockchainHeight)
-		.from(inputBoxes.map(row => row.box))
+		.from(inputBoxes.map((row) => row.box))
 		.to(depositBox)
 		.payFee(RECOMMENDED_MIN_FEE_VALUE)
 		.build()

@@ -4,12 +4,19 @@ import type { DefaultEventsMap } from '@socket.io/component-emitter';
 import {
 	addMobileProxyStuckTx,
 	addRecentTrades,
+	crystalwallet_tokens,
+	crystalwallet_value,
 	fetchBalance,
 	mempool_size,
 	setOrderBook,
 	unstuckMobileProxyTx,
 	user_address
 } from '$lib/ui/ui_state';
+import type { Amount, TokenAmount } from '@fleet-sdk/common';
+import type { BalanceUpdate } from '$lib/types/trading';
+import { showToast } from '../header/toaster';
+import { ergoTokens } from '$lib/constants/ergoTokens';
+import { asBigInt } from '$lib/utils/helper';
 
 export const receivedDataList = writable<any[]>([]);
 
@@ -18,7 +25,6 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 
 	socket.on('connect', () => {
 		console.log('Connected to the server:', socket.id);
-
 		user_address.subscribe((pk) => {
 			if (pk) socket.emit('pk', { pk });
 		});
@@ -54,7 +60,7 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 
 	socket.on('error_proxy_insufficient_erg', ({ boxRows }) => {
 		try {
-			console.log('insufficinet funds proxy boxes', boxRows);
+			console.error('insufficinet funds proxy boxes', boxRows);
 			addMobileProxyStuckTx(boxRows);
 		} catch (e) {
 			//Gotta catch 'em all!
@@ -70,6 +76,19 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 		}
 	});
 
+	socket.on('balance', ({ value, tokens }: BalanceUpdate) => {
+		crystalwallet_value.set(asBigInt(value));
+		crystalwallet_tokens.set(tokens);
+	});
+
+	socket.on('deposit', ({ value, tokens }: BalanceUpdate) => {
+		showToast(`DEPOSIT: ${asBigInt(value) / 10n ** 9n}ERG`);
+		tokens.forEach((token) => {
+			if (ergoTokens[token.tokenId]) {
+				showToast(`DEPOSIT: ${token.amount} ${ergoTokens[token.tokenId].ticker}`);
+			}
+		});
+	});
 	return socket;
 }
 

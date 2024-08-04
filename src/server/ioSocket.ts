@@ -1,8 +1,9 @@
 import type { Server } from 'socket.io';
 import { createOrderBook } from './db/orderBookUtils';
-import type { PK } from '$lib/types/trading';
+import type { BalanceUpdate, PK } from '$lib/types/trading';
 import type { BoxDB } from './db/db';
 import type { BoxRow } from '$lib/types/boxRow';
+import { sumAssetsFromBoxes, sumNanoErg } from '$lib/utils/helper';
 
 export function broadcastOrderBook(pair, io, db) {
 	console.log(`update ${pair} orderbook`);
@@ -33,7 +34,22 @@ function getCurrentTime() {
 }
 
 export function sendPeerBalanceUpdate(db: BoxDB, pk: PK): void {
-	sendMessageToSocket(db, pk, 'balance', { value: 100, tokens: [] });
+	const userBoxes = db.boxRows
+		.filter(
+			(row) =>
+				row.parameters.userPk == pk &&
+				!row.spent &&
+				['DEPOSIT', 'BUY', 'SELL', 'SWAP'].includes(row.contract)
+		)
+		.map((row) => row.box);
+
+	const value = sumNanoErg(userBoxes);
+	const tokens = sumAssetsFromBoxes(userBoxes);
+	sendMessageToSocket(db, pk, 'balance', { value, tokens });
+}
+
+export function sendPeerDepositNotification(db: BoxDB, pk: PK, balance: BalanceUpdate): void {
+	sendMessageToSocket(db, pk, 'deposit', balance);
 }
 
 export function sendPeerProxyDepositErrorInsufficientErg(

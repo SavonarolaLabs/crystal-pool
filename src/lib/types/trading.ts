@@ -1,4 +1,4 @@
-import type { Amount } from '@fleet-sdk/common';
+import type { Amount, TokenAmount } from '@fleet-sdk/common';
 
 export type PK = string;
 export type Price = string;
@@ -16,4 +16,9 @@ export type SwapRequest = {
 	takerTokenId: TokenId;
 	tradingPair: TradingPair;
 	side: Side;
+};
+
+export type BalanceUpdate = {
+	value: bigint;
+	tokens: TokenAmount<Amount>[];
 };

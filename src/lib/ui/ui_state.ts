@@ -30,7 +30,8 @@ export const pending_deposits = writable([{
 	txId : 'f54150801685b1cd77120625c28a00bcdef7952711ab980d66f0f37d810f9666',
 },]);
 */
-export const crystalwallet_tokens = writable([]);
+export const crystalwallet_value: Writable<bigint> = writable(0n);
+export const crystalwallet_tokens: Writable<TokenAmount<Amount>[]> = writable([]);
 export const pending_deposits: Writable<TxHistoryEntry[]> = writable([]);
 
 // tx history start

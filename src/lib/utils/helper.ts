@@ -27,11 +27,14 @@ export function asBigInt(v: bigint | string | number) {
 			console.error('asBigInt' + v);
 			return 0n;
 		}
+	} else if (typeof v == 'number') {
+		return BigInt(v);
 	}
 	return 0n;
 }
 
-export function sumNanoErg(boxes: Box<Amount>[]): bigint {
+export function sumNanoErg(boxes: Box[]): bigint {
+	console.log(boxes);
 	return boxes.reduce((a: bigint, b: Box<Amount>) => asBigInt(a) + asBigInt(b.value), 0n);
 }
 

@@ -5,7 +5,13 @@ import { initDeposits } from '../../lib/server-agent/simulator';
 import type { BoxRow, BoxRowNoId, ContractType } from '../../lib/types/boxRow';
 import type { TxRow } from '../../lib/types/txRow';
 import { serializeBigInt } from '../../lib/utils/serializeBigInt';
-import { deleteAllBoxes, deleteMultipleBoxes, loadBoxRows, markBoxesAsSpent, persistBox } from './sqlDb';
+import {
+	deleteAllBoxes,
+	deleteMultipleBoxes,
+	loadBoxRows,
+	markBoxesAsSpent,
+	persistBox
+} from './sqlDb';
 import type { ConfirmedTransaction } from '$lib/types/explorer';
 import type { SubmittedTxRox, TxPurpose } from '$lib/types/fallibleTxRow';
 import { parseBox } from '../parser/boxParser';
@@ -110,12 +116,12 @@ export function db_addBoxes(db: BoxDB, boxRows: Box[]): BoxRow[] {
 	return insertedBoxes.filter((x) => x) as BoxRow[];
 }
 
-export function db_spendBoxes(db: BoxDB, boxRows: BoxRow[]): BoxRow[]{
-	const ids = boxRows.map(br => br.id)
-	const rows = db.boxRows.filter(r => ids.includes(r.id));
-	rows.forEach(r =>{
+export function db_spendBoxes(db: BoxDB, boxRows: BoxRow[]): BoxRow[] {
+	const ids = boxRows.map((br) => br.id);
+	const rows = db.boxRows.filter((r) => ids.includes(r.id));
+	rows.forEach((r) => {
 		r.spent = true;
-	})
+	});
 	markBoxesAsSpent(rows);
 	return rows;
 }
@@ -181,8 +187,11 @@ export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
 export function db_addProxyDepositBoxes(db: BoxDB, boxesNoId: BoxRowNoId[]): BoxRow[] {
 	const boxesAdded: BoxRow[] = [];
 	boxesNoId.forEach((row: BoxRowNoId) => {
-		if (!db.boxRows.find((r) => r.box.boxId == row.box.boxId)) {
+		let existingBoxRow = db.boxRows.find((r) => r.box.boxId == row.box.boxId);
+		if (!existingBoxRow) {
 			boxesAdded.push(db_addBoxRowNoId(db, row));
+		} else {
+			boxesAdded.push(existingBoxRow);
 		}
 	});
 	return boxesAdded;
@@ -195,11 +204,15 @@ export function db_addMempoolDepositTx(db: BoxDB, tx: ConfirmedTransaction): Box
 	return db_addBoxes(db, deposits);
 }
 
-export function db_addSentProxyToDepositTx(db: BoxDB, proxyBoxRows: BoxRow[], tx: SignedTransaction): BoxRow[]{
+export function db_addSentProxyToDepositTx(
+	db: BoxDB,
+	proxyBoxRows: BoxRow[],
+	tx: SignedTransaction
+): BoxRow[] {
 	db_spendBoxes(db, proxyBoxRows);
 	const deposits = boxesAtAddress(tx, DEPOSIT_ADDRESS);
-	db_addSubmittedTx(db, tx,  'PROXY_TO_DEPOSIT')
-	
+	db_addSubmittedTx(db, tx, 'PROXY_TO_DEPOSIT');
+
 	return db_addBoxes(db, deposits);
 }
 

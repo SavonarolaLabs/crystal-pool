@@ -1,6 +1,7 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import { Encoder, Decoder } from 'socket.io-parser';
 import { json } from 'body-parser';
 import cors from 'cors';
 import { getBoxes, getBoxesByAddress, getSwapContractBoxes } from './routes/boxes';
@@ -20,11 +21,31 @@ import { depositTxId } from './routes/deposits';
 
 const app = express();
 const server = http.createServer(app);
+
+// Create a custom encoder that handles BigInt
+class CustomEncoder extends Encoder {
+	encode(packet: any): any[] {
+		const encodedPacket = JSON.parse(
+			JSON.stringify(packet, (_, value) =>
+				typeof value === 'bigint' ? value.toString() : value
+			)
+		);
+		return super.encode(encodedPacket);
+	}
+}
+
+// Create a custom parser
+const customParser = {
+	Encoder: CustomEncoder,
+	Decoder: Decoder
+};
+
 const io = new Server(server, {
 	cors: {
 		origin: '*',
 		methods: ['GET', 'POST']
-	}
+	},
+	parser: customParser
 });
 
 app.use(
@@ -80,9 +101,9 @@ io.on('connection', (socket) => {
 	});
 
 	// receive: pk event
-	socket.on('pk', ({pk})=>{
+	socket.on('pk', ({ pk }) => {
 		db.connectedClients.set(pk, socket);
-	})
+	});
 });
 
 // Start the server

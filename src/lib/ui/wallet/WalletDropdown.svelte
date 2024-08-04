@@ -1,6 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { connectWeb3Wallet, disconnectWeb3Wallet, wallet_initialized, web3wallet_available_wallets, web3wallet_connected, web3wallet_wallet_name } from '../ui_state';
+	import { ergoTokens } from '$lib/constants/ergoTokens';
+	import { asBigInt } from '$lib/utils/helper';
+	import {
+		connectWeb3Wallet,
+		crystalwallet_tokens,
+		crystalwallet_value,
+		disconnectWeb3Wallet,
+		wallet_initialized,
+		web3wallet_available_wallets,
+		web3wallet_connected,
+		web3wallet_wallet_name
+	} from '../ui_state';
 	let menuOpen = false;
 	let hoverTimeout;
 
@@ -45,10 +56,10 @@
 		goto('/wallet/restore');
 	}
 
-	let element
+	let element;
 	function setZIndexTo10() {
 		const elements = document.querySelectorAll('.zfix');
-		elements.forEach(element => {
+		elements.forEach((element) => {
 			element.style.zIndex = '10';
 		});
 		element.style.zIndex = '11';
@@ -94,7 +105,10 @@
 		tabindex="-1"
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class="balance text-xs" on:click={()=> $wallet_initialized ? goto('/assets') : goto('/wallet')}>
+		<div
+			class="balance text-xs"
+			on:click={() => ($wallet_initialized ? goto('/assets') : goto('/wallet'))}
+		>
 			<div class="flex items-center gap-2">
 				Estimated Balance
 				<svg
@@ -107,8 +121,19 @@
 					/></svg
 				>
 			</div>
-			<div class="balance-total text-xl py-2">0 ERG</div>
-			≈ 0.00 USD
+			<div class="balance-total text-xl py-2">
+				{asBigInt($crystalwallet_value) / 10n ** 9n} ERG
+			</div>
+			<div>
+				{#each $crystalwallet_tokens as token}
+					{#if ergoTokens[token.tokenId]}
+						<div>
+							{ergoTokens[token.tokenId].amount /
+								10 ** ergoTokens[token.tokenId].decimals} ergoTokens[token.tokenId].ticker
+						</div>
+					{/if}
+				{/each}
+			</div>
 		</div>
 		<div class="actions">
 			{#if $wallet_initialized}
@@ -131,7 +156,7 @@
 				}}>Disconnect {$web3wallet_wallet_name}</a
 			>
 		{:else if $web3wallet_available_wallets.length}
-			{#each  $web3wallet_available_wallets as wallet}
+			{#each $web3wallet_available_wallets as wallet}
 				<a
 					href="#"
 					class="text-center"
