@@ -82,11 +82,11 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 	});
 
 	socket.on('deposit', ({ value, tokens }: BalanceUpdate) => {
-		showToast(`DEPOSIT: ${Number(value) / 10 ** 9}ERG`);
+		showToast(`[successful deposit]\n ${Number(value) / 10 ** 9} ERG`);
 		tokens.forEach((token) => {
 			if (ergoTokens[token.tokenId]) {
 				showToast(
-					`DEPOSIT: ${Number(token.amount) / 10 ** ergoTokens[token.tokenId].decimals} ${ergoTokens[token.tokenId].ticker}`
+					`[successful deposit]\n ${Number(token.amount) / 10 ** ergoTokens[token.tokenId].decimals} ${ergoTokens[token.tokenId].ticker}`
 				);
 			}
 		});
