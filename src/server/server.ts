@@ -64,7 +64,7 @@ app.use(
 app.use(json());
 
 // Initialize the database
-const db = await initDb();
+const db = await initDb('chain.db');
 db_initDepositUtxo(db);
 
 // Register routes

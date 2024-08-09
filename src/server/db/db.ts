@@ -8,6 +8,7 @@ import { serializeBigInt } from '../../lib/utils/serializeBigInt';
 import {
 	deleteAllBoxes,
 	deleteMultipleBoxes,
+	init,
 	loadBoxRows,
 	markBoxesAsSpent,
 	persistBox
@@ -31,7 +32,8 @@ export type BoxDB = {
 	connectedClients: Map<PK, ClientSocket>;
 };
 
-export async function initDb(): Promise<BoxDB> {
+export async function initDb(dbFileName: string): Promise<BoxDB> {
+	await init(dbFileName);
 	const boxRows: BoxRow[] = (await loadBoxRows()) ?? [];
 	return {
 		boxRows,
@@ -187,11 +189,8 @@ export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
 export function db_addProxyDepositBoxes(db: BoxDB, boxesNoId: BoxRowNoId[]): BoxRow[] {
 	const boxesAdded: BoxRow[] = [];
 	boxesNoId.forEach((row: BoxRowNoId) => {
-		let existingBoxRow = db.boxRows.find((r) => r.box.boxId == row.box.boxId);
-		if (!existingBoxRow) {
+		if (!db.boxRows.find((r) => r.box.boxId == row.box.boxId)) {
 			boxesAdded.push(db_addBoxRowNoId(db, row));
-		} else {
-			boxesAdded.push(existingBoxRow);
 		}
 	});
 	return boxesAdded;

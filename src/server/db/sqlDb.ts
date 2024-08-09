@@ -1,23 +1,33 @@
 import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { open, type Database } from 'sqlite';
 import type { BoxRow, SerializedBoxRow } from '../../lib/types/boxRow';
 import { serializeBigInt } from '../../lib/utils/serializeBigInt';
 
-export const sqlDb = await open({
-	filename: 'chain.db',
-	driver: sqlite3.Database
-});
+export async function initializeDatabase(filename: string): Promise<Database> {
+	const db = await open({
+		filename,
+		driver: sqlite3.Database
+	});
 
-await sqlDb.exec(`
-    PRAGMA journal_mode = WAL;
-    CREATE TABLE IF NOT EXISTS boxes (
-        id INTEGER PRIMARY KEY,
-        box TEXT NOT NULL,
-        contractType TEXT CHECK(contractType IN ('DEPOSIT', 'BUY', 'SELL', 'SWAP', 'UNKNOWN')),
-        parameters TEXT NOT NULL,
-        spent BOOLEAN NOT NULL
-    )
-`);
+	await db.exec(`
+        PRAGMA journal_mode = WAL;
+        CREATE TABLE IF NOT EXISTS boxes (
+            id INTEGER PRIMARY KEY,
+            box TEXT NOT NULL,
+            contractType TEXT CHECK(contractType IN ('DEPOSIT', 'BUY', 'SELL', 'SWAP', 'UNKNOWN')),
+            parameters TEXT NOT NULL,
+            spent BOOLEAN NOT NULL
+        )
+    `);
+
+	return db;
+}
+
+export let sqlDb: Database;
+
+export async function init(filename: string = 'chain.db'): Promise<void> {
+	sqlDb = await initializeDatabase(filename);
+}
 
 function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
 	return {
@@ -64,19 +74,16 @@ export async function persistMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
 }
 
 export async function markBoxesAsSpent(boxRows: BoxRow[]): Promise<void> {
-    await sqlDb.exec('BEGIN TRANSACTION');
-    try {
-        for (const row of boxRows) {
-            await sqlDb.run(
-                `UPDATE boxes SET spent = 1 WHERE id = ?`,
-                row.id
-            );
-        }
-        await sqlDb.exec('COMMIT');
-    } catch (error) {
-        await sqlDb.exec('ROLLBACK');
-        throw error;
-    }
+	await sqlDb.exec('BEGIN TRANSACTION');
+	try {
+		for (const row of boxRows) {
+			await sqlDb.run(`UPDATE boxes SET spent = 1 WHERE id = ?`, row.id);
+		}
+		await sqlDb.exec('COMMIT');
+	} catch (error) {
+		await sqlDb.exec('ROLLBACK');
+		throw error;
+	}
 }
 
 export async function loadBoxRows(): Promise<BoxRow[]> {
@@ -91,13 +98,16 @@ export async function loadBoxRows(): Promise<BoxRow[]> {
 			contract: string;
 			parameters: string;
 			spent: boolean;
-		}) => ({
-			id: row.id,
-			box: JSON.parse(row.box),
-			contract: row.contract as BoxRow['contract'],
-			parameters: JSON.parse(row.parameters),
-			spent: Boolean(row.spent) // Ensure boolean is converted back from integer
-		})
+		}) => {
+			const parsedBox = JSON.parse(row.box);
+			return {
+				id: row.id,
+				box: { ...parsedBox, value: parsedBox.value ? BigInt(parsedBox.value) : 0n },
+				contract: row.contract as BoxRow['contract'],
+				parameters: JSON.parse(row.parameters),
+				spent: Boolean(row.spent)
+			};
+		}
 	);
 }
 
