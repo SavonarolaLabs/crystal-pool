@@ -12,7 +12,7 @@ import {
 	signExecuteSwap,
 	signSwapOrder
 } from './routes/swapOrder';
-import { initDb, db_initDepositUtxo } from './db/db';
+import { initDb } from './db/db';
 import { createOrderBook } from './db/orderBookUtils';
 import { getOrderBookByTradingPair } from './routes/orderBooks';
 import { createWithdrawTx, signWithdrawTx } from './routes/withdraw';
@@ -65,7 +65,6 @@ app.use(json());
 
 // Initialize the database
 const db = await initDb('chain.db');
-db_initDepositUtxo(db);
 
 // Register routes
 getBoxes(app, db);

@@ -11,7 +11,7 @@ import {
 	signSwap,
 	swapOrderTxWithCommits
 } from './crystalPool';
-import { db_clearDB, db_initDepositUtxo, initDb } from './db/db';
+import { db_clearDB, initDb } from './db/db';
 import { decodeR4, parseBox } from './parser/boxParser';
 import { sumNanoErg } from '$lib/utils/helper';
 
@@ -36,8 +36,6 @@ describe.skip('swap', () => {
 	it('create and execute', async () => {
 		const db = await initDb();
 		await db_clearDB(db);
-
-		await db_initDepositUtxo(db);
 
 		const swapParams: SwapRequest = {
 			makerPk: swapCreatorAddress,

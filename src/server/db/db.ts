@@ -55,13 +55,6 @@ export async function db_clearDB(db: BoxDB) {
 	db.connectedClients = new Map();
 }
 
-export async function db_initDepositUtxo(db: BoxDB) {
-	if (db.boxRows?.length == 0) {
-		const aliceAndBobDeposits = await initDeposits();
-		db_addBoxes(db, aliceAndBobDeposits);
-	}
-}
-
 function nextId(table: HasId[]): number {
 	const maxId = Math.max(...table.map((row) => row.id), 0) + 1;
 	return maxId;
@@ -78,7 +71,7 @@ export function db_addBox(db: BoxDB, box: Box): BoxRow | undefined {
 			spent: false
 		};
 		db.boxRows.push(newRow);
-		persistBox(newRow); // Insert into database
+		persistBox(newRow);
 		return newRow;
 	} else {
 		console.error('db_addBox() invalid box: ', JSON.stringify(box));
@@ -94,7 +87,7 @@ export function db_addBoxRowNoId(db: BoxDB, boxRowNoId: BoxRowNoId): BoxRow {
 		spent: boxRowNoId.spent
 	};
 	db.boxRows.push(newRow);
-	persistBox(newRow); // Insert into database
+	persistBox(newRow);
 	return newRow;
 }
 
