@@ -8,6 +8,7 @@ import { tradingPairs } from '$lib/constants/tokens';
 import type { BoxParameters, ContractType } from '$lib/types/boxRow';
 import { ErgoAddress, ErgoTree, type Box } from '@fleet-sdk/core';
 import { parse } from '@fleet-sdk/serializer';
+import { mapBoxToProxyBoxRow } from './recognizer/proxyRecognizer';
 
 export function parseBox(
 	box: Box,
@@ -88,6 +89,8 @@ export function parseBox(
 				}
 			};
 		}
+	} else if (contractType == 'UNKNOWN') {
+		return mapBoxToProxyBoxRow(box);
 	}
 }
 

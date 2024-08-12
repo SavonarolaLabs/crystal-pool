@@ -13,3 +13,4 @@ vite.config.ts.timestamp-*
 chain.db
 chain.db-*
 *.db
+**/playground/*

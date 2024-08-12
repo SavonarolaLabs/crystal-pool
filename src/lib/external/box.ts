@@ -1,4 +1,6 @@
-export async function getContractBoxes(address: string): Promise<any> {
+import type { Box } from '@fleet-sdk/common';
+
+export async function getContractBoxes(address: string): Promise<Box[]> {
 	const response = await fetch(
 		'https://api.ergoplatform.com/api/v1/boxes/unspent/byAddress/' + address
 	);

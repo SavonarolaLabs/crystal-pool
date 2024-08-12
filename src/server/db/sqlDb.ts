@@ -47,7 +47,7 @@ export async function persistBox(boxRow: BoxRow): Promise<void> {
 		box,
 		contract,
 		parameters,
-		spent ? 1 : 0 // Ensure boolean is stored as integer
+		spent ? 1 : 0
 	);
 }
 
@@ -63,7 +63,7 @@ export async function persistMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
 				serializedRow.box,
 				serializedRow.contract,
 				serializedRow.parameters,
-				serializedRow.spent ? 1 : 0 // Ensure boolean is stored as integer
+				serializedRow.spent ? 1 : 0
 			);
 		}
 		await sqlDb.exec('COMMIT');
