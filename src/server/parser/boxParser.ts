@@ -5,27 +5,37 @@ import {
 	SWAP_ORDER_ADDRESS
 } from '$lib/constants/addresses';
 import { tradingPairs } from '$lib/constants/tokens';
-import type { BoxParameters, ContractType } from '$lib/types/boxRow';
+import type { BoxParameters, BoxRowNoId, ContractType } from '$lib/types/boxRow';
 import { ErgoAddress, ErgoTree, type Box } from '@fleet-sdk/core';
 import { parse } from '@fleet-sdk/serializer';
 import { mapBoxToProxyBoxRow } from './recognizer/proxyRecognizer';
+import type { MaybeConfirmedOutput } from '$lib/types/parser';
+import type { ConfirmedOutput } from '$lib/types/explorer';
+
+export function maybeConfirmedOutputToBox(box: MaybeConfirmedOutput): Box {
+	const newBox = JSON.parse(JSON.stringify(box));
+	newBox.value = BigInt(newBox.value);
+	return newBox;
+}
 
 export function parseBox(
-	box: Box,
+	box: MaybeConfirmedOutput,
 	getContractType = contractTypeFromErgoTree
-): BoxParameters | undefined {
+): BoxRowNoId | undefined {
 	const contractType = getContractType(box);
 	if (contractType == 'DEPOSIT') {
 		const r4 = decodeR4(box);
 		const r5 = decodeR5(box);
 		if (r4 && r5) {
 			return {
+				box: maybeConfirmedOutputToBox(box),
 				contract: 'DEPOSIT',
 				parameters: {
 					userPk: r4.userPk,
 					poolPk: r4.poolPk,
 					unlockHeight: r5
-				}
+				},
+				spent: !!(box as ConfirmedOutput).spentTransactionId
 			};
 		}
 	} else if (contractType == 'BUY') {
@@ -36,6 +46,7 @@ export function parseBox(
 		const r8 = decodeR8(box);
 		if (r4 && r5 && r6 && r7 && r8) {
 			return {
+				box: maybeConfirmedOutputToBox(box),
 				contract: 'BUY',
 				parameters: {
 					userPk: r4.userPk,
@@ -44,7 +55,8 @@ export function parseBox(
 					tokenId: r6,
 					buyRate: r7,
 					buyerMultisigAddress: r8
-				}
+				},
+				spent: !!(box as ConfirmedOutput).spentTransactionId
 			};
 		}
 	} else if (contractType == 'SELL') {
@@ -55,6 +67,7 @@ export function parseBox(
 		const r8 = decodeR8(box);
 		if (r4 && r5 && r6 && r7 && r8) {
 			return {
+				box: maybeConfirmedOutputToBox(box),
 				contract: 'SELL',
 				parameters: {
 					userPk: r4.userPk,
@@ -63,7 +76,8 @@ export function parseBox(
 					tokenId: r6,
 					sellRate: r7,
 					sellerMultisigAddress: r8
-				}
+				},
+				spent: !!(box as ConfirmedOutput).spentTransactionId
 			};
 		}
 	} else if (contractType == 'SWAP') {
@@ -75,6 +89,7 @@ export function parseBox(
 		const r9 = decodeR9(box);
 		if (r4 && r5 && r6 && r7 && r8) {
 			return {
+				box: maybeConfirmedOutputToBox(box),
 				contract: 'SWAP',
 				parameters: {
 					userPk: r4.userPk,
@@ -86,7 +101,8 @@ export function parseBox(
 					sellerMultisigAddress: r8,
 					denom: r9,
 					...pairAndSideByTokenIds(r6.sellingTokenId, r6.buyingTokenId)
-				}
+				},
+				spent: !!(box as ConfirmedOutput).spentTransactionId
 			};
 		}
 	} else if (contractType == 'UNKNOWN') {
@@ -94,7 +110,7 @@ export function parseBox(
 	}
 }
 
-export function contractTypeFromErgoTree(box: Box): ContractType {
+export function contractTypeFromErgoTree(box: MaybeConfirmedOutput): ContractType {
 	const address = new ErgoTree(box.ergoTree).toAddress().toString();
 	if (address == DEPOSIT_ADDRESS) {
 		return 'DEPOSIT';
@@ -129,7 +145,9 @@ export function pairAndSideByTokenIds(
 	}
 }
 
-export function decodeR4(box: Box): { userPk: string; poolPk: string } | undefined {
+export function decodeR4(
+	box: MaybeConfirmedOutput
+): { userPk: string; poolPk: string } | undefined {
 	const r4 = box.additionalRegisters.R4;
 
 	if (r4) {
@@ -141,7 +159,7 @@ export function decodeR4(box: Box): { userPk: string; poolPk: string } | undefin
 	}
 }
 
-export function decodeR5(box: Box): number | undefined {
+export function decodeR5(box: MaybeConfirmedOutput): number | undefined {
 	const r5 = box.additionalRegisters.R5;
 	if (r5) {
 		const parsed = parse<number>(r5);
@@ -149,7 +167,7 @@ export function decodeR5(box: Box): number | undefined {
 	}
 }
 
-export function decodeTokenIdFromR6(box: Box): string | undefined {
+export function decodeTokenIdFromR6(box: MaybeConfirmedOutput): string | undefined {
 	const r6 = box.additionalRegisters.R6;
 	if (r6) {
 		const parsed = Buffer.from(parse(r6)).toString('hex');
@@ -157,7 +175,7 @@ export function decodeTokenIdFromR6(box: Box): string | undefined {
 	}
 }
 
-export function decodeR7(box: Box): bigint | undefined {
+export function decodeR7(box: MaybeConfirmedOutput): bigint | undefined {
 	const r7 = box.additionalRegisters.R7;
 	if (r7) {
 		const parsed = parse<bigint>(r7);
@@ -165,7 +183,7 @@ export function decodeR7(box: Box): bigint | undefined {
 	}
 }
 
-export function decodeR8(box: Box): string | undefined {
+export function decodeR8(box: MaybeConfirmedOutput): string | undefined {
 	const r8 = box.additionalRegisters.R8;
 	if (r8) {
 		const hexBuffer = Buffer.from(parse(r8)).toString('hex');
@@ -174,7 +192,7 @@ export function decodeR8(box: Box): string | undefined {
 	}
 }
 
-export function decodeR9(box: Box): bigint | undefined {
+export function decodeR9(box: MaybeConfirmedOutput): bigint | undefined {
 	const r9 = box.additionalRegisters.R9;
 	if (r9) {
 		const parsed = parse<bigint>(r9);
@@ -182,7 +200,7 @@ export function decodeR9(box: Box): bigint | undefined {
 	}
 }
 
-export function decodeTokenIdPairFromR6(box: Box):
+export function decodeTokenIdPairFromR6(box: MaybeConfirmedOutput):
 	| {
 			sellingTokenId: string;
 			buyingTokenId: string;

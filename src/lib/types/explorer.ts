@@ -1,4 +1,4 @@
-import type { SignedTransaction } from "@fleet-sdk/common";
+import type { SignedTransaction } from '@fleet-sdk/common';
 
 type Asset = {
 	tokenId: string;
@@ -48,7 +48,7 @@ type CommonOutput = {
 
 type UnconfirmedOutput = CommonOutput;
 
-type ConfirmedOutput = CommonOutput & {
+export type ConfirmedOutput = CommonOutput & {
 	transactionId: string;
 	blockId: string;
 	globalIndex: number;
