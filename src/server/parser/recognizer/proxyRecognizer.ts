@@ -1,5 +1,6 @@
 import { SHADOWPOOL_ADDRESS } from '$lib/constants/addresses';
 import type { BoxRowNoId, ContractType } from '$lib/types/boxRow';
+import type { ConfirmedOutput } from '$lib/types/explorer';
 import type { TransactionNode } from '$lib/types/node';
 import { arraysEqual } from '$lib/utils/helper';
 import { ErgoAddress } from '@fleet-sdk/core';
@@ -31,7 +32,7 @@ export function mapBoxToProxyBoxRow(box) {
 				unlockHeight: ergoTree.get_constant(6)?.to_js(),
 				minerFee: ergoTree.get_constant(8)?.to_js()
 			},
-			spent: false
+			spent: !!(box as ConfirmedOutput).spentTransactionId
 		};
 	}
 	return undefined;
