@@ -18,6 +18,7 @@ import { getOrderBookByTradingPair } from './routes/orderBooks';
 import { createWithdrawTx, signWithdrawTx } from './routes/withdraw';
 import { run } from './mempoolMonitor';
 import { depositTxId } from './routes/deposits';
+import { syncDbCrystalPoolState } from './chain-sync/chainSync';
 
 const app = express();
 const server = http.createServer(app);
@@ -65,6 +66,7 @@ app.use(json());
 
 // Initialize the database
 const db = await initDb('chain.db');
+await syncDbCrystalPoolState(db);
 
 // Register routes
 getBoxes(app, db);

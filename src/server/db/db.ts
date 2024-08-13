@@ -179,7 +179,7 @@ export function db_addUnprocessedDepositTxId(db: BoxDB, txId: string) {
 	db.unprocessedDepositTxIds.push(txId);
 }
 
-export function db_addProxyDepositBoxes(db: BoxDB, boxesNoId: BoxRowNoId[]): BoxRow[] {
+export function db_addBoxRowNoIdList(db: BoxDB, boxesNoId: BoxRowNoId[]): BoxRow[] {
 	const boxesAdded: BoxRow[] = [];
 	boxesNoId.forEach((row: BoxRowNoId) => {
 		if (!db.boxRows.find((r) => r.box.boxId == row.box.boxId)) {

@@ -1,0 +1,21 @@
+import {
+	BUY_ORDER_ADDRESS,
+	DEPOSIT_ADDRESS,
+	SELL_ORDER_ADDRESS,
+	SWAP_ORDER_ADDRESS
+} from '$lib/constants/addresses';
+import { getContractBoxes } from '$lib/external/box';
+
+const PROXY_DEPOSIT1 =
+	'4bCQK1CpyojD7TAQS8b6ZvTAafRisHMF73kpKKNoTcpn1ah931DRBoWy6YvjaG4YDhx271m3CptJJoXsEWtJVifaMBZNxYXjEELLYoMLifxxMn8Q4xuannmzy4F7qsRRkq8hquuWwqn1UozPSkaasU7SFLkeGq9HAuoNUksg6VWGFWmbnKunr662ewTtkAWYugm4xwGh7MXv5zBsMx9cU1xNREfBTmKmfWsWWAvZ11NL3Stz6j8uD8JqgRjPwSGmH6WSjdH5cgzT3gmjzd56invegijmzLxMSmTmJLpp3kYawPdsYTZjvkw3BzVTXGjBszFR9CVg57fiKxiSsRpegfrPf4vTmqvdaJ73jp1KTRk6bhF1hfQof5Wbbgz2DQ6MX5xwAGGstfJabof5gN2d5tGHQGx1vwBdygnL5SntyecNePqcUTpzDfovGRdVCwA9Swct9d4hH4UYKHoQs5XYNfwf954UG5ic7y9vo2BSTJyGi3LdSm9dndUD19CQFYUi9racEenNTbivhGpL5DRhsSExzCusL1bAKJtoHMdBhR9MQhMu7uTCpBZAkCgocW3fNTfU';
+
+const addressesToLoadUtxoFrom = [
+	DEPOSIT_ADDRESS,
+	SWAP_ORDER_ADDRESS,
+	BUY_ORDER_ADDRESS,
+	SELL_ORDER_ADDRESS,
+	PROXY_DEPOSIT1
+];
+
+export const fetchCrystalPoolUtxo = async () =>
+	(await Promise.all(addressesToLoadUtxoFrom.map(getContractBoxes))).flat();

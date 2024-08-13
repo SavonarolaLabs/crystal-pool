@@ -1,6 +1,6 @@
 import type { Box, EIP12UnsignedTransaction, SignedTransaction } from '@fleet-sdk/common';
 import {
-	db_addProxyDepositBoxes,
+	db_addBoxRowNoIdList,
 	db_addSentProxyToDepositTx,
 	db_depositBoxes,
 	db_storeSignedSwapTx,
@@ -208,7 +208,7 @@ export async function handleIncomingProxyDeposit(
 	io: Server
 ) {
 	console.log('handleIncomingProxyDeposit: ', boxesNoId[0]?.box.boxId);
-	const boxes = db_addProxyDepositBoxes(db, boxesNoId);
+	const boxes = db_addBoxRowNoIdList(db, boxesNoId);
 	const userPk = boxes[0].parameters.userPk;
 	const height = boxes[0].parameters.unlockHeight;
 
