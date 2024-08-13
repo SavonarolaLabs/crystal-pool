@@ -6,6 +6,7 @@ import type { BoxRow, BoxRowNoId, ContractType } from '../../lib/types/boxRow';
 import type { TxRow } from '../../lib/types/txRow';
 import { serializeBigInt } from '../../lib/utils/serializeBigInt';
 import {
+	closeDb,
 	deleteAllBoxes,
 	deleteMultipleBoxes,
 	init,
@@ -53,6 +54,10 @@ export async function db_clearDB(db: BoxDB) {
 	db.mempoolTxIds = new Set();
 	db.submittedTxs = [];
 	db.connectedClients = new Map();
+}
+
+export async function db_closeDB() {
+	await closeDb();
 }
 
 function nextId(table: HasId[]): number {

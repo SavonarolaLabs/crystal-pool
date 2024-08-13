@@ -4,6 +4,7 @@ import type { BoxRow, SerializedBoxRow } from '../../lib/types/boxRow';
 import { serializeBigInt } from '../../lib/utils/serializeBigInt';
 
 export async function initializeDatabase(filename: string): Promise<Database> {
+	console.log('Opening database connection...');
 	const db = await open({
 		filename,
 		driver: sqlite3.Database
@@ -23,10 +24,25 @@ export async function initializeDatabase(filename: string): Promise<Database> {
 	return db;
 }
 
-export let sqlDb: Database;
+export let sqlDb: Database | null = null;
 
 export async function init(filename: string = 'chain.db'): Promise<void> {
 	sqlDb = await initializeDatabase(filename);
+}
+
+export async function closeDb(): Promise<void> {
+	if (sqlDb) {
+		try {
+			console.log('Closing the database connection...');
+			await sqlDb.close();
+			sqlDb = null;
+			console.log('Database connection closed.');
+		} catch (error) {
+			console.error('Failed to close the database connection:', error);
+		}
+	} else {
+		console.log('No database connection to close.');
+	}
 }
 
 function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
