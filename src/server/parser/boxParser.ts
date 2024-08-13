@@ -12,6 +12,10 @@ import { mapBoxToProxyBoxRow } from './recognizer/proxyRecognizer';
 import type { MaybeConfirmedOutput } from '$lib/types/parser';
 import type { ConfirmedOutput } from '$lib/types/explorer';
 
+export function parseBoxes(utxoSet: MaybeConfirmedOutput[]): BoxRowNoId[] {
+	return utxoSet.map((b) => parseBox(b)).filter((x) => x != undefined);
+}
+
 export function maybeConfirmedOutputToBox(box: MaybeConfirmedOutput): Box {
 	const newBox = JSON.parse(JSON.stringify(box));
 	newBox.value = BigInt(newBox.value);
