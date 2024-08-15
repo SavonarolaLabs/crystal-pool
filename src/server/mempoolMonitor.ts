@@ -50,7 +50,7 @@ async function handleNewTransaction(io: Server, db: BoxDB, txId: string): Promis
 	if (memPoolSizeBefore == memPoolSizeAfter) {
 		return;
 	} else {
-		console.log(`Mempool(${memPoolSizeAfter}) ${txId}`);
+		//console.log(`Mempool(${memPoolSizeAfter}) ${txId}`);
 		let tx = await fetchUnconfirmedTransactionFromErgoNode(txId);
 		if (tx) {
 			checkIfTransactionIsProxyDeposit(tx, db, io);

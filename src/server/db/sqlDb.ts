@@ -11,15 +11,15 @@ export async function initializeDatabase(filename: string): Promise<Database> {
 	});
 
 	await db.exec(`
-        PRAGMA journal_mode = WAL;
-        CREATE TABLE IF NOT EXISTS boxes (
-            id INTEGER PRIMARY KEY,
-            box TEXT NOT NULL,
-            contractType TEXT CHECK(contractType IN ('DEPOSIT', 'BUY', 'SELL', 'SWAP', 'UNKNOWN')),
-            parameters TEXT NOT NULL,
-            spent BOOLEAN NOT NULL
-        )
-    `);
+		PRAGMA journal_mode = WAL;
+		CREATE TABLE IF NOT EXISTS boxes (
+			id TEXT PRIMARY KEY,
+			box TEXT NOT NULL,
+			contractType TEXT NOT NULL,
+			parameters TEXT NOT NULL,
+			spent BOOLEAN NOT NULL
+		)
+	`);
 
 	return db;
 }
@@ -56,15 +56,30 @@ function serializeBoxRow(boxRow: BoxRow): SerializedBoxRow {
 export async function persistBox(boxRow: BoxRow): Promise<void> {
 	const serializedBoxRow = serializeBoxRow(boxRow);
 	const { id, box, contract, parameters, spent } = serializedBoxRow;
-	await sqlDb.run(
-		`INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, spent)
-         VALUES (?, ?, ?, ?, ?)`,
-		id,
-		box,
-		contract,
-		parameters,
-		spent ? 1 : 0
-	);
+
+	try {
+		const result = await sqlDb.run(
+			`INSERT OR IGNORE INTO boxes (id, box, contractType, parameters, spent)
+			VALUES (?, ?, ?, ?, ?)`,
+			id,
+			box,
+			contract,
+			parameters,
+			spent ? 1 : 0
+		);
+
+		if (result.changes > 0) {
+			console.log(`Box with ID ${id} was persisted successfully.`);
+			console.log(
+				`Contract: ${contract}, Spent: ${spent}, Parameters: ${JSON.stringify(parameters)}`
+			);
+		} else {
+			console.log(`Box with ID ${id} was not persisted (it might already exist).`);
+		}
+	} catch (error) {
+		console.error(`Error occurred while persisting box with ID ${id}:`, error);
+		throw error;
+	}
 }
 
 export async function persistMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
@@ -91,13 +106,19 @@ export async function persistMultipleBoxes(boxRows: BoxRow[]): Promise<void> {
 
 export async function markBoxesAsSpent(boxRows: BoxRow[]): Promise<void> {
 	await sqlDb.exec('BEGIN TRANSACTION');
+	let updatedCount = 0;
 	try {
 		for (const row of boxRows) {
-			await sqlDb.run(`UPDATE boxes SET spent = 1 WHERE id = ?`, row.id);
+			const result = await sqlDb.run(`UPDATE boxes SET spent = 1 WHERE id = ?`, row.id);
+			if (result.changes > 0) {
+				updatedCount++;
+			}
 		}
 		await sqlDb.exec('COMMIT');
+		console.log(`Successfully updated ${updatedCount} box(es) as spent.`);
 	} catch (error) {
 		await sqlDb.exec('ROLLBACK');
+		console.error('Error occurred while updating boxes as spent:', error);
 		throw error;
 	}
 }
@@ -109,7 +130,7 @@ export async function loadBoxRows(): Promise<BoxRow[]> {
 
 	return rows.map(
 		(row: {
-			id: number;
+			id: string;
 			box: string;
 			contract: string;
 			parameters: string;
@@ -127,7 +148,7 @@ export async function loadBoxRows(): Promise<BoxRow[]> {
 	);
 }
 
-export async function deleteMultipleBoxes(ids: number[]): Promise<void> {
+export async function deleteMultipleBoxes(ids: string[]): Promise<void> {
 	if (ids.length === 0) return;
 	const placeholders = ids.map(() => '?').join(',');
 	await sqlDb.run(`DELETE FROM boxes WHERE id IN (${placeholders})`, ids);

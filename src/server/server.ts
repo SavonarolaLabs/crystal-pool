@@ -19,6 +19,7 @@ import { createWithdrawTx, signWithdrawTx } from './routes/withdraw';
 import { run } from './mempoolMonitor';
 import { depositTxId } from './routes/deposits';
 import { syncDbCrystalPoolState } from './chain-sync/chainSync';
+import { sendPeerBalanceUpdate } from './ioSocket';
 
 const app = express();
 const server = http.createServer(app);
@@ -102,8 +103,9 @@ io.on('connection', (socket) => {
 	});
 
 	// receive: pk event
-	socket.on('pk', ({ pk }) => {
+	socket.on('pk', async ({ pk }) => {
 		db.connectedClients.set(pk, socket);
+		await sendPeerBalanceUpdate(db, pk);
 	});
 });
 

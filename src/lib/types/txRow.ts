@@ -1,10 +1,10 @@
-import type { EIP12UnsignedTransaction } from "@fleet-sdk/common"
+import type { EIP12UnsignedTransaction } from '@fleet-sdk/common';
 
-type todo = []
+type todo = [];
 
 export type TxRow = {
-    id: number
-    unsignedTx: EIP12UnsignedTransaction
-    commitments: todo
-    hintbags: todo
-}
+	id: string;
+	unsignedTx: EIP12UnsignedTransaction;
+	commitments: todo;
+	hintbags: todo;
+};

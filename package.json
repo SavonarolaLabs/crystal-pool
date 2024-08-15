@@ -81,6 +81,7 @@
 		"sqlite": "^5.1.1",
 		"sqlite3": "^5.1.7",
 		"svelte-french-toast": "^1.2.0",
-		"tiny-secp256k1": "^2.2.3"
+		"tiny-secp256k1": "^2.2.3",
+		"uuid": "^10.0.0"
 	}
 }

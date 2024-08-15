@@ -122,7 +122,7 @@
 				>
 			</div>
 			<div class="balance-total text-xl py-2">
-				{asBigInt($crystalwallet_value) / 10n ** 9n} ERG
+				{Number($crystalwallet_value) / 10 ** 9} ERG
 			</div>
 			<div>
 				{#each $crystalwallet_tokens as token}

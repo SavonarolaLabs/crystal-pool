@@ -26,7 +26,9 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 	socket.on('connect', () => {
 		console.log('Connected to the server:', socket.id);
 		user_address.subscribe((pk) => {
-			if (pk) socket.emit('pk', { pk });
+			if (pk) {
+				socket.emit('pk', { pk });
+			}
 		});
 	});
 
@@ -77,6 +79,7 @@ function createSocket(): Socket<DefaultEventsMap, DefaultEventsMap> {
 	});
 
 	socket.on('balance', ({ value, tokens }: BalanceUpdate) => {
+		console.log('balance');
 		crystalwallet_value.set(asBigInt(value));
 		crystalwallet_tokens.set(tokens);
 	});

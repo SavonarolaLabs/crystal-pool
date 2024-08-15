@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { DEPOSIT_ADDRESS } from '$lib/constants/addresses';
-	import { pending_deposits, toggleTheme } from '../ui_state';
+	import { crystalwallet_value, pending_deposits, toggleTheme } from '../ui_state';
 	import MempoolCapacity from './MempoolCapacity.svelte';
 	import WalletDropdown from '../wallet/WalletDropdown.svelte';
 	import PendingTransactionsDropdown from './PendingTransactionsDropdown.svelte';

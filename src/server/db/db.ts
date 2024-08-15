@@ -19,10 +19,7 @@ import type { SubmittedTxRox, TxPurpose } from '$lib/types/fallibleTxRow';
 import { parseBox } from '../parser/boxParser';
 import type { ClientSocket } from '$lib/types/server';
 import type { PK } from '$lib/types/trading';
-
-interface HasId {
-	id: number;
-}
+import { v4 as uuidv4 } from 'uuid';
 
 export type BoxDB = {
 	boxRows: BoxRow[];
@@ -60,16 +57,15 @@ export async function db_closeDB() {
 	await closeDb();
 }
 
-function nextId(table: HasId[]): number {
-	const maxId = Math.max(...table.map((row) => row.id), 0) + 1;
-	return maxId;
+function nextId(): string {
+	return uuidv4();
 }
 
 export function db_addBox(db: BoxDB, box: Box): BoxRow | undefined {
 	const boxParams = parseBox(box);
 	if (boxParams) {
 		const newRow: BoxRow = {
-			id: nextId(db.boxRows),
+			id: nextId(),
 			contract: boxParams.contract,
 			parameters: boxParams.parameters,
 			box,
@@ -85,7 +81,7 @@ export function db_addBox(db: BoxDB, box: Box): BoxRow | undefined {
 
 export function db_addBoxRowNoId(db: BoxDB, boxRowNoId: BoxRowNoId): BoxRow {
 	const newRow: BoxRow = {
-		id: nextId(db.boxRows),
+		id: nextId(),
 		contract: boxRowNoId.contract,
 		parameters: boxRowNoId.parameters,
 		box: boxRowNoId.box,
@@ -103,7 +99,7 @@ export function db_removeBoxesByBoxIds(db: BoxDB, removeBoxIds: string[]) {
 
 	if (deleteBoxIds.length > 0) {
 		deleteMultipleBoxes(deleteBoxIds);
-		db.boxRows = db.boxRows.filter((row) => !deleteBoxIds.includes(row.id)); //
+		db.boxRows = db.boxRows.filter((row) => !deleteBoxIds.includes(row.id));
 	}
 }
 
@@ -128,7 +124,7 @@ export function db_spendBoxes(db: BoxDB, boxRows: BoxRow[]): BoxRow[] {
 
 export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
 	const newRow: TxRow = {
-		id: nextId(db.unsignedTxs),
+		id: nextId(),
 		unsignedTx: tx,
 		commitments: [],
 		hintbags: []
@@ -138,7 +134,7 @@ export function db_addTx(db: BoxDB, tx: EIP12UnsignedTransaction) {
 
 export function db_addSubmittedTx(db: BoxDB, tx: ConfirmedTransaction, purpose: TxPurpose) {
 	const newRow: SubmittedTxRox = {
-		id: nextId(db.submittedTxs),
+		id: nextId(),
 		tx: { confirmed: tx },
 		purpose
 	};
@@ -147,7 +143,7 @@ export function db_addSubmittedTx(db: BoxDB, tx: ConfirmedTransaction, purpose: 
 
 export function db_addSubmittedUnconfirmedTx(db: BoxDB, tx: SignedTransaction, purpose: TxPurpose) {
 	const newRow: SubmittedTxRox = {
-		id: nextId(db.submittedTxs),
+		id: nextId(),
 		tx: { unconfirmed: tx },
 		purpose
 	};
@@ -191,6 +187,7 @@ export function db_addBoxRowNoIdList(db: BoxDB, boxesNoId: BoxRowNoId[]): BoxRow
 			boxesAdded.push(db_addBoxRowNoId(db, row));
 		}
 	});
+	console.log('PERSISTANCE db_addBoxRowNoIdList ', boxesAdded.length, boxesAdded);
 	return boxesAdded;
 }
 
@@ -221,7 +218,7 @@ export function db_addMempoolTxId(db: BoxDB, txId: string) {
 	db.mempoolTxIds.add(txId);
 }
 
-// serialization functinos
+// serialization functions
 export function db_getBoxesString(db: BoxDB) {
 	const serializedData = serializeBigInt(db.boxRows);
 	return serializedData;

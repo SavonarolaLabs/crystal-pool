@@ -45,7 +45,7 @@ export type BoxParameters = {
 };
 
 export type BoxRow = {
-	id: number;
+	id: string;
 } & BoxRowNoId;
 
 export type BoxRowNoId = {
@@ -56,7 +56,7 @@ export type BoxRowNoId = {
 };
 
 export type SerializedBoxRow = {
-	id: number;
+	id: string;
 	box: string;
 	contract: ContractType;
 	parameters: string;
