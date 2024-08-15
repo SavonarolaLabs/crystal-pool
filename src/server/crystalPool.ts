@@ -208,8 +208,11 @@ export async function handleIncomingProxyDeposit(
 	io: Server
 ) {
 	console.log('handleIncomingProxyDeposit: ', boxesNoId[0]?.box.boxId);
-	console.log('PERSISTANCE START');
 	const boxes = db_addBoxRowNoIdList(db, boxesNoId);
+	if (boxes.length == 0) {
+		console.log('ALREADY handled proxy: ', boxesNoId[0]?.box.boxId);
+		return;
+	}
 	const userPk = boxes[0].parameters.userPk;
 	const height = boxes[0].parameters.unlockHeight;
 
