@@ -5,7 +5,14 @@
 	import { b, signTxInput } from '$lib/wallet/multisig-client';
 	import { configureSwapTx, createSwapTx, signSwapTx } from '$lib/ui/service/crystalPoolService';
 	import BigNumber from 'bignumber.js';
-	import { user_address, user_mnemonic, user_tokens, wallet_initialized } from '../ui_state';
+	import {
+		crystalwallet_locked,
+		show_wallet_unlock_dialog,
+		user_address,
+		user_mnemonic,
+		user_tokens,
+		wallet_initialized
+	} from '../ui_state';
 	import { createAndMultisigSwapTx, executeAndSignInputsSwapTx } from '../service/tradingService';
 	import { goto } from '$app/navigation';
 	import type { SwapRequest } from '$lib/types/trading';
@@ -453,6 +460,13 @@
 
 				{#if $wallet_initialized}
 					<button class="buySellButton buyButton" on:click={configureBuy}>Buy</button>
+				{:else if $crystalwallet_locked}
+					<button
+						class="buySellButton buyButton"
+						on:click={() => show_wallet_unlock_dialog.set(true)}
+					>
+						Unlock Wallet
+					</button>
 				{:else}
 					<button class="buySellButton buyButton" on:click={() => goto('/wallet')}>
 						Create/Restore Wallet
@@ -602,6 +616,13 @@
 				{#if $wallet_initialized}
 					<button class="buySellButton sellButton" on:click={swapActionSell}>
 						Sell
+					</button>
+				{:else if $crystalwallet_locked}
+					<button
+						class="buySellButton sellButton"
+						on:click={() => show_wallet_unlock_dialog.set(true)}
+					>
+						Unlock Wallet
 					</button>
 				{:else}
 					<button class="buySellButton sellButton" on:click={() => goto('/wallet')}>

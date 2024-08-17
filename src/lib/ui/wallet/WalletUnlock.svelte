@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { initMnemonicWorker, mnemonicRequiresDecryption, onDecrypt } from '../ui_wallet';
+	import { show_wallet_unlock_dialog } from '../ui_state';
 
-	let showDialog = false;
-	const closeDialog = () => (showDialog = false);
+	const closeDialog = () => show_wallet_unlock_dialog.set(false);
 	let fillColor = 'var(--text-primary)';
 	let password = '';
 	let shake = false;
@@ -28,11 +28,11 @@
 	onMount(async () => {
 		document.addEventListener('keydown', handleKeydown);
 		await initMnemonicWorker();
-		showDialog = await mnemonicRequiresDecryption();
+		show_wallet_unlock_dialog.set(await mnemonicRequiresDecryption());
 	});
 </script>
 
-{#if showDialog}
+{#if $show_wallet_unlock_dialog}
 	<div class="dialog-overlay">
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->

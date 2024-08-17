@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 import { get, writable } from 'svelte/store';
-import { user_address, user_mnemonic, wallet_initialized } from './ui_state';
+import { crystalwallet_locked, user_address, user_mnemonic, wallet_initialized } from './ui_state';
 import { showToast } from './header/toaster';
 import { getChangeAddress } from '$lib/wallet/wallet';
 
@@ -8,6 +8,7 @@ export async function deleteWallet() {
 	user_mnemonic.set('');
 	user_address.set('');
 	wallet_initialized.set(false);
+	crystalwallet_locked.set(false);
 	localStorage.removeItem('encryptedMnemonic');
 	localStorage.removeItem('changeAddress');
 
@@ -30,13 +31,16 @@ function encryptAndStoreMnemonic(mnemonic: string, changeAddress: string, passwo
 	const decryptedMnemonic = mnemonic.trim().replace(/\s+/g, ' ');
 	user_mnemonic.set(decryptedMnemonic);
 	user_address.set(changeAddress);
+	crystalwallet_locked.set(false);
 	const encrypted = CryptoJS.AES.encrypt(decryptedMnemonic, password).toString();
 	localStorage.setItem('encryptedMnemonic', encrypted);
 	localStorage.setItem('changeAddress', changeAddress);
 }
 
 export async function mnemonicRequiresDecryption() {
-	return !!localStorage.getItem('encryptedMnemonic') && !get(user_mnemonic);
+	const isLocked = !!localStorage.getItem('encryptedMnemonic') && !get(user_mnemonic);
+	crystalwallet_locked.set(isLocked);
+	return isLocked;
 }
 
 function decryptLocalStorageMnemonic(password) {
@@ -62,6 +66,7 @@ export async function onDecrypt(password) {
 		user_mnemonic.set(decryptedMnemonic);
 		user_address.set(changeAddress);
 		wallet_initialized.set(true);
+		crystalwallet_locked.set(false);
 
 		if (navigator.serviceWorker.controller) {
 			navigator.serviceWorker.controller.postMessage({
@@ -125,5 +130,6 @@ export async function initMnemonicWorker() {
 			user_address.set((await getChangeAddress(mnemonic)) ?? '');
 		}
 		wallet_initialized.set(true);
+		crystalwallet_locked.set(false);
 	}
 }

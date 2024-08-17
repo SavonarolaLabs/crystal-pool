@@ -4,9 +4,11 @@
 	import { asBigInt } from '$lib/utils/helper';
 	import {
 		connectWeb3Wallet,
+		crystalwallet_locked,
 		crystalwallet_tokens,
 		crystalwallet_value,
 		disconnectWeb3Wallet,
+		show_wallet_unlock_dialog,
 		wallet_initialized,
 		web3wallet_available_wallets,
 		web3wallet_connected,
@@ -39,11 +41,27 @@
 
 	function toToWalletOrAssets() {
 		menuOpen = false;
-		if ($wallet_initialized) {
+		if ($crystalwallet_locked) {
+			show_wallet_unlock_dialog.set(true);
+		} else if ($wallet_initialized) {
 			goto('/assets');
 		} else {
 			goto('/wallet/create');
 		}
+	}
+
+	function clickOnBalance() {
+		if ($crystalwallet_locked) {
+			show_wallet_unlock_dialog.set(true);
+		} else if ($wallet_initialized) {
+			goto('/assets');
+		} else {
+			goto('/wallet');
+		}
+	}
+
+	function unlockWallet() {
+		show_wallet_unlock_dialog.set(true);
 	}
 
 	function createWallet() {
@@ -105,10 +123,7 @@
 		tabindex="-1"
 	>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div
-			class="balance text-xs"
-			on:click={() => ($wallet_initialized ? goto('/assets') : goto('/wallet'))}
-		>
+		<div class="balance text-xs" on:click={clickOnBalance}>
 			<div class="flex items-center gap-2">
 				Estimated Balance
 				<svg
@@ -136,9 +151,11 @@
 			</div>
 		</div>
 		<div class="actions">
-			{#if $wallet_initialized}
+			{#if $wallet_initialized && !$crystalwallet_locked}
 				<button class="deposit" on:click={deposit}>Deposit</button>
 				<button class="withdraw" on:click={withdraw}>Withdraw</button>
+			{:else if $crystalwallet_locked}
+				<button class="deposit" on:click={unlockWallet}>Unlock Wallet</button>
 			{:else}
 				<button class="deposit" on:click={createWallet}>Create</button>
 				<button class="withdraw" on:click={restoreWallet}>Restore</button>
