@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolveCrystalwalletStateLoaded, show_wallet_unlock_dialog } from '../ui_state';
 	import { initMnemonicWorker, mnemonicRequiresDecryption, onDecrypt } from '../ui_wallet';
-	import { show_wallet_unlock_dialog } from '../ui_state';
 
 	const closeDialog = () => show_wallet_unlock_dialog.set(false);
 	let fillColor = 'var(--text-primary)';
@@ -28,7 +28,9 @@
 	onMount(async () => {
 		document.addEventListener('keydown', handleKeydown);
 		await initMnemonicWorker();
-		show_wallet_unlock_dialog.set(await mnemonicRequiresDecryption());
+		const walletLocked = await mnemonicRequiresDecryption();
+		show_wallet_unlock_dialog.set(walletLocked);
+		resolveCrystalwalletStateLoaded();
 	});
 </script>
 

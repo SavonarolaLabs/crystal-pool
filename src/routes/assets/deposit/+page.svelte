@@ -1,8 +1,9 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { ifWalletLockedGotoWallet } from '$lib/ui/ui_state';
 	import { onMount } from 'svelte';
-	import DepositWeb3 from './DepositWeb3.svelte';
 	import DepositHistory from './DepositHistory.svelte';
+	import DepositWeb3 from './DepositWeb3.svelte';
 	import MobileDeposit from './MobileDeposit.svelte';
 
 	let selectedWallet = 'web3wallet';
@@ -15,7 +16,10 @@
 		}
 	};
 
-	onMount(() => {
+	onMount(async () => {
+		const walletLocked = await ifWalletLockedGotoWallet();
+		if (walletLocked) return;
+
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
 			const wallet = params.get('selectedWallet');

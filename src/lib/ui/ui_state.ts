@@ -7,6 +7,7 @@ import type { Amount, Box, SignedTransaction, TokenAmount } from '@fleet-sdk/com
 import type { TxHistoryEntry } from '$lib/types/txHistory';
 import { serializeBigInt } from '../utils/serializeBigInt';
 import type { BoxRow } from '$lib/types/boxRow';
+import { goto } from '$app/navigation';
 
 export const web3wallet_connected = writable(false);
 export const web3wallet_wallet_name = writable('');
@@ -30,6 +31,26 @@ export const pending_deposits = writable([{
 	txId : 'f54150801685b1cd77120625c28a00bcdef7952711ab980d66f0f37d810f9666',
 },]);
 */
+let crystalwallet_state_loaded_resolve;
+export const crystalwallet_state_loaded = new Promise((resolve) => {
+	crystalwallet_state_loaded_resolve = resolve;
+});
+
+export function resolveCrystalwalletStateLoaded() {
+	if (crystalwallet_state_loaded_resolve) {
+		crystalwallet_state_loaded_resolve();
+	}
+}
+
+export async function ifWalletLockedGotoWallet() {
+	await crystalwallet_state_loaded;
+	if (get(crystalwallet_locked)) {
+		goto('/wallet');
+		return true; // Wallet is locked, return true
+	}
+	return false; // Wallet is not locked, return false
+}
+
 export const crystalwallet_locked: Writable<boolean> = writable(false);
 export const crystalwallet_value: Writable<bigint> = writable(0n);
 export const crystalwallet_tokens: Writable<TokenAmount<Amount>[]> = writable([]);

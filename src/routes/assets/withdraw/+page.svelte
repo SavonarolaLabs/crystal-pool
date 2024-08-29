@@ -1,13 +1,21 @@
 <script lang="ts">
-	import {goto} from "$app/navigation"
-	import WithdrawWidget from "./WithdrawWidget.svelte";
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import WithdrawWidget from './WithdrawWidget.svelte';
+	import { ifWalletLockedGotoWallet } from '$lib/ui/ui_state';
+
+	onMount(async () => {
+		const walletLocked = await ifWalletLockedGotoWallet();
+		if (walletLocked) return;
+	});
 </script>
+
 <div class="flex flex-col items-center">
 	<div class="page-header flex items-center">
 		<button class="back-arrow" on:click={() => goto('/assets')}>&#8592;</button>
 		<div class="title">Withdraw</div>
 	</div>
 	<div class="page_container flex items-center justify-center">
-			<WithdrawWidget></WithdrawWidget>
+		<WithdrawWidget></WithdrawWidget>
 	</div>
 </div>
