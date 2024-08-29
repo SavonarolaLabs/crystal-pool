@@ -1,8 +1,11 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { wallet_initialized } from '../ui_state';
+	import {
+		crystalwallet_locked,
+		show_wallet_unlock_dialog,
+		wallet_initialized
+	} from '../ui_state';
 	import { deleteWallet } from '../ui_wallet';
-
 </script>
 
 <div class="flex flex-col items-center">
@@ -10,18 +13,30 @@
 		<div class="title">Wallet</div>
 	</div>
 	<div class="deposit_container flex items-center gap-4">
-		{#if !$wallet_initialized}
+		{#if $crystalwallet_locked}
+			<div class="grow">
+				<div class="deposit_dot">Unlock Wallet</div>
+				<button class="btn" on:click={() => show_wallet_unlock_dialog.set(true)}
+					>unlock</button
+				>
+			</div>
+			<div class="grow">
+				<div class="deposit_dot">Delete Wallet</div>
+				<button class="btn" on:click={deleteWallet} style="background:red">DELETE</button>
+			</div>
+		{:else if !$wallet_initialized}
 			<div class="grow">
 				<div class="deposit_dot">New Crystal Wallet</div>
-				<button class="btn" on:click={()=>goto('/wallet/create')}>create</button>
+				<button class="btn" on:click={() => goto('/wallet/create')}>create</button>
 			</div>
 			<div class=" grow">
 				<div class="deposit_dot">Already have a Crystal Wallet?</div>
-				<button class="btn" on:click={()=>goto('/wallet/restore')}>restore</button>
+				<button class="btn" on:click={() => goto('/wallet/restore')}>restore</button>
 			</div>
 		{:else}
 			<div class="select-token_wrapper">
-				<button class="btn" on:click={deleteWallet}>DELETE WALLET</button>
+				<div class="deposit_dot">Delete Wallet</div>
+				<button class="btn" on:click={deleteWallet}>DELETE</button>
 			</div>
 		{/if}
 	</div>
