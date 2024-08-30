@@ -14,7 +14,7 @@
 		web3wallet_connected,
 		web3wallet_wallet_name
 	} from '../ui_state';
-	let menuOpen = true;
+	let menuOpen = false;
 	let hoverTimeout;
 
 	function handleMouseEnter() {
@@ -235,7 +235,7 @@
 
 	.divider {
 		height: 1px;
-		background-color: #64748b6b; /* Slate-500 color */
+		background-color: var(--divider-primary); /* Slate-500 color */
 		margin: 0.5rem -1rem; /* Negative margin to make it full width */
 	}
 </style>
