@@ -130,9 +130,12 @@
 						</div>
 						<div class="flex justify-between px-3 pb-2">
 							<div style="color: var(--primary-text);">
-								Available: {$web3wallet_confirmedTokens.find(
-									(ct) => ct.tokenId == t.tokenId
-								)?.amount ?? 0}
+								Available: {Number(
+									$web3wallet_confirmedTokens.find(
+										(ct) => ct.tokenId == t.tokenId
+									)?.amount ?? 0
+								) /
+									10 ** ergoTokens[t.tokenId].decimals}
 							</div>
 							<div class="flex gap-4">
 								<button

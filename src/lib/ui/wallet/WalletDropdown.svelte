@@ -125,7 +125,7 @@
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class="balance text-xs" on:click={clickOnBalance}>
 			<div class="flex items-center gap-2">
-				Estimated Balance
+				Crystal Wallet Balance
 				<svg
 					fill="currentColor"
 					height="1em"
@@ -162,6 +162,7 @@
 			{/if}
 		</div>
 		<div class="divider"></div>
+		<div class="secondary ml-3">Web3 Wallet</div>
 		{#if $web3wallet_connected}
 			<a
 				href="#"
@@ -199,6 +200,10 @@
 
 	.balance-total {
 		color: var(--text-primary);
+	}
+
+	.secondary {
+		color: var(--text-secondary);
 	}
 
 	.actions {

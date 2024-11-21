@@ -3,16 +3,17 @@ import { userBoxes } from './service/crystalPoolService';
 import { sumAssets, sumAssetsFromBoxes, sumNanoErg } from '$lib/utils/helper';
 import { showToast } from './header/toaster';
 import { TOKEN } from '$lib/constants/tokens';
-import type { Amount, Box, SignedTransaction, TokenAmount } from '@fleet-sdk/common';
+import type { Amount, Box, SignedTransaction, TokenAmount, TokenId } from '@fleet-sdk/common';
 import type { TxHistoryEntry } from '$lib/types/txHistory';
 import { serializeBigInt } from '../utils/serializeBigInt';
 import type { BoxRow } from '$lib/types/boxRow';
 import { goto } from '$app/navigation';
+import { ERGO_TOKEN_ID } from '$lib/constants/ergoTokens';
 
 export const web3wallet_connected = writable(false);
 export const web3wallet_wallet_name = writable('');
 export const web3wallet_available_wallets = writable([]);
-export const web3wallet_confirmedTokens = writable([]);
+export const web3wallet_confirmedTokens: Writable<TokenAmount<bigint>[]> = writable([]);
 /*
 export const crystalwallet_tokens = writable([{
 	tokenId: "0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b", //tokenId
@@ -156,7 +157,13 @@ export async function loadWeb3WalletTokens() {
 	try {
 		const utxo = await ergo.get_utxos();
 		const tokens = utxo.flatMap((box) => box.assets).reduce(sumAssets, []);
-		web3wallet_confirmedTokens.set(tokens);
+
+		const erg: bigint = sumNanoErg(utxo);
+		if (erg > 0) {
+			web3wallet_confirmedTokens.set([{ tokenId: ERGO_TOKEN_ID, amount: erg }, ...tokens]);
+		} else {
+			web3wallet_confirmedTokens.set(tokens);
+		}
 	} catch (e) {
 		showToast(`Failed to load ${get(web3wallet_wallet_name)} balance.`, 'warning');
 	}

@@ -1,69 +1,74 @@
 <script lang="ts">
-    import { onMount, createEventDispatcher } from 'svelte';
-    import { ergoTokens } from '$lib/constants/ergoTokens';
+	import { onMount, createEventDispatcher } from 'svelte';
+	import { ergoTokens } from '$lib/constants/ergoTokens';
 	import { crystalwallet_tokens, web3wallet_confirmedTokens } from '../ui_state';
-    const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher();
 
 	export let web3filter = false;
-    export let showDialog = false;
-    const closeDialog = () => (showDialog = false);
+	export let showDialog = false;
+	const closeDialog = () => (showDialog = false);
 
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === 'Enter' || event.key === 'Escape') {
-            closeDialog();
-        }
-    }
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter' || event.key === 'Escape') {
+			closeDialog();
+		}
+	}
 
-    function selectCrypto(coin: string) {
-        dispatch('message', { coin });
-        closeDialog();
-    }
+	function selectCrypto(coin: string) {
+		dispatch('message', { coin });
+		closeDialog();
+	}
 
-    onMount(() => {
-        document.addEventListener('keydown', handleKeydown);
-        return () => {
-            document.removeEventListener('keydown', handleKeydown);
-        };
-    });
+	onMount(() => {
+		document.addEventListener('keydown', handleKeydown);
+		return () => {
+			document.removeEventListener('keydown', handleKeydown);
+		};
+	});
 
-    let search = '';
-    function fuzzySearch(tokens: Record<string, any>, query: string): Record<string, any> {
-        if (query === "") {
-            return tokens;
-        }
-        const lowerQuery = query.toLowerCase();
-        return Object.entries(tokens).reduce((result, [key, value]) => {
-            // Only check attributes that exist and are strings
-            if ((value.name && value.name.toLowerCase().includes(lowerQuery)) ||
-                (value.ticker && value.ticker.toLowerCase().includes(lowerQuery)) ||
-                (value.description && value.description.toLowerCase().includes(lowerQuery)) ||
-                (value.project && value.project.toLowerCase().includes(lowerQuery))) {
-                result[key] = value;
-            }
-            return result;
-        }, {} as Record<string, any>);
-    }
+	let search = '';
+	function fuzzySearch(tokens: Record<string, any>, query: string): Record<string, any> {
+		if (query === '') {
+			return tokens;
+		}
+		const lowerQuery = query.toLowerCase();
+		return Object.entries(tokens).reduce(
+			(result, [key, value]) => {
+				// Only check attributes that exist and are strings
+				if (
+					(value.name && value.name.toLowerCase().includes(lowerQuery)) ||
+					(value.ticker && value.ticker.toLowerCase().includes(lowerQuery)) ||
+					(value.description && value.description.toLowerCase().includes(lowerQuery)) ||
+					(value.project && value.project.toLowerCase().includes(lowerQuery))
+				) {
+					result[key] = value;
+				}
+				return result;
+			},
+			{} as Record<string, any>
+		);
+	}
 
-    function scoreMatch(text: string, query: string): number {
-        const maxLen = Math.max(text.length, query.length);
-        let score = 0;
-        let textIndex = 0;
-        let queryIndex = 0;
+	function scoreMatch(text: string, query: string): number {
+		const maxLen = Math.max(text.length, query.length);
+		let score = 0;
+		let textIndex = 0;
+		let queryIndex = 0;
 
-        text = text.toLowerCase();
+		text = text.toLowerCase();
 
-        while (queryIndex < query.length && textIndex < text.length) {
-            if (text[textIndex] === query[queryIndex]) {
-                score++;
-                queryIndex++;
-            }
-            textIndex++;
-        }
+		while (queryIndex < query.length && textIndex < text.length) {
+			if (text[textIndex] === query[queryIndex]) {
+				score++;
+				queryIndex++;
+			}
+			textIndex++;
+		}
 
-        return score / maxLen; // Normalizing the score
-    }
+		return score / maxLen; // Normalizing the score
+	}
 
-    $: filteredTokens = fuzzySearch(ergoTokens, search);
+	$: filteredTokens = fuzzySearch(ergoTokens, search);
 </script>
 
 {#if showDialog}
@@ -114,20 +119,22 @@
 							></path></svg
 						></span
 					>
-		
+
 					<input placeholder="Search" class="ant-input" type="text" bind:value={search} />
 				</div>
 			</div>
 			<div class="scroll-container">
 				<div style="position:relative">
-					{#each  Object.keys(filteredTokens).filter(tokenId => web3filter?$web3wallet_confirmedTokens.some(t => t.tokenId == tokenId):$crystalwallet_tokens.some(t => t.tokenId == tokenId)) as k}
+					{#each Object.keys(filteredTokens).filter( (tokenId) => (web3filter ? $web3wallet_confirmedTokens.some((t) => t.tokenId == tokenId) : $crystalwallet_tokens.some((t) => t.tokenId == tokenId)) ) as k}
 						<div class="select-token" on:click={() => selectCrypto(k)}>
 							<div class="flex items-center gap-3">
 								<div style="width:32px;">
 									<img
 										style="width:32px;"
 										alt=""
-										src="{ergoTokens[k].logoURI?ergoTokens[k].logoURI:`/token/${k}.svg`}"
+										src={ergoTokens[k].logoURI
+											? ergoTokens[k].logoURI
+											: `/token/${k}.svg`}
 									/>
 								</div>
 								<div>
@@ -136,7 +143,20 @@
 								</div>
 							</div>
 							<div class="amount pr-2">
-								<div>{web3filter?($web3wallet_confirmedTokens.find(ct => ct.tokenId == k)?.amount?? 0):$crystalwallet_tokens.some(t => t.tokenId == k)?.amount ?? 0}</div>
+								<div>
+									{web3filter
+										? Number(
+												$web3wallet_confirmedTokens.find(
+													(ct) => ct.tokenId == k
+												)?.amount ?? 0
+											) /
+											10 ** ergoTokens[k].decimals
+										: Number(
+												$crystalwallet_tokens.find((t) => t.tokenId == k)
+													?.amount ?? 0
+											) /
+											10 ** ergoTokens[k].decimals}
+								</div>
 								<div class="label">≈ 0.00 USD</div>
 							</div>
 						</div>
