@@ -9,7 +9,7 @@ interface NodeInfo {
 	height: number;
 }
 
-class ErgoMempoolTracker {
+export class ErgoMempoolTracker {
 	private io: Server;
 	private db: BoxDB;
 	private nodeUrl: string;
@@ -52,7 +52,7 @@ class ErgoMempoolTracker {
 	}
 
 	private async fetchNodeInfo(): Promise<NodeInfo> {
-		const response = await fetch(`${this.nodeUrl}/info/`);
+		const response = await fetch(`${this.nodeUrl}/info`);
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
